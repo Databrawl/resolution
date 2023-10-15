@@ -1,0 +1,8 @@
+aiohttp
+asyncio
+requests
+python-dotenv
+fake-useragent
+openai
+langchain
+bs4
