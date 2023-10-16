@@ -1,5 +1,5 @@
 # Guardian
-* Chatbot that protects your customers and your team *
+*Chatbot that protects your customers and your team*
 
 ## Setup
 
