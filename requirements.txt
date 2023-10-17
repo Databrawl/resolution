@@ -1,8 +1,10 @@
 aiohttp
 asyncio
+chromadb
 requests
 python-dotenv
 fake-useragent
 openai
 langchain
+tiktoken
 bs4

@@ -1,7 +1,9 @@
 import logging
 
 
-from bot_utilities.ai_utils import generate_response
+from bots.ai_utils import generate_response
+from bots import retrieval
+
 from config import settings
 
 logging.basicConfig(level=settings.LOG_LEVEL)
@@ -19,6 +21,11 @@ def main():
         response = generate_response(instructions,
                                      {'id': 0, 'message': user_input, 'user_name': 'Tyrael', 'ai_name': 'Guardian'})
         print(response)
+
+    # while True:
+    #     user_input = input('>>> ')
+    #     response = retrieval.qa({'question': user_input})
+    #     print(response['answer'])
 
 
 if __name__ == "__main__":
