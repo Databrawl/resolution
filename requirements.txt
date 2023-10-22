@@ -2,9 +2,12 @@ aiohttp
 asyncio
 chromadb
 requests
+pyautogen
 python-dotenv
 fake-useragent
 openai
 langchain
 tiktoken
 bs4
+beautifulsoup4
+PyYAML
