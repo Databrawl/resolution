@@ -3,18 +3,24 @@
 
 ## Setup
 
-### Install dependencies
+1. Create environment file
 
-```bash
-pip install -r requirements.txt
-```
+    Create a `.env` file in the root of the repo with all the necessary variables (look at `config/settings.py`).
 
-### Create environment file
+2. Install dependencies
 
-Create a `.env` file in the root of the repo with all the necessary variables (look at `config/settings.py`).
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-### Run
+3. Initialize the Vector Database
 
-```bash
-python main.py
-```
+    ```bash
+    python src/vdb.py
+    ```
+
+4. Run the script you want from the `bots` folder. Example:
+
+    ```bash
+    python src/bots/chain_0.py
+    ```
