@@ -1,10 +1,14 @@
 import os
+import sys
+
 from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv())
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
+
+sys.path.append(SRC_ROOT)
 
 
 def load_instructions(name):

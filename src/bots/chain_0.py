@@ -8,10 +8,22 @@ Primitive sequence:
 https://python.langchain.com/docs/use_cases/question_answering/chat_vector_db
 """
 
+import os
+import sys
+
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms import OpenAI
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
+
+import os
+import sys
+SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(SRC_ROOT)
+
+# setting path
+sys.path.append(SRC_ROOT)
+sys.path.append(PROJECT_ROOT)
 
 from src import vdb
 

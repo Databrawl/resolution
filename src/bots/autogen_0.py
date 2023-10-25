@@ -4,7 +4,17 @@ AutoGen, Microsoft tool.
 https://microsoft.github.io/autogen/docs/Use-Cases/agent_chat/
 https://microsoft.github.io/autogen/docs/getting-started
 """
+import os
+import sys
+
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
+
+SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(SRC_ROOT)
+
+# setting path
+sys.path.append(SRC_ROOT)
+sys.path.append(PROJECT_ROOT)
 
 from src.config import settings
 
@@ -28,7 +38,7 @@ def ask(question: str, chat_messages: list = None):
     user_proxy = UserProxyAgent(
         name="user_proxy",
         # system_message="A human customer. Interact with customer_support to communicate your request. Ask clarifying questions if the answer does not satisfy you.",
-        system_message = """Reply TERMINATE if the task has been solved at full satisfaction. Otherwise, reply CONTINUE, or the reason why the task is not solved yet.""",
+        system_message="""Reply TERMINATE if the task has been solved at full satisfaction. Otherwise, reply CONTINUE, or the reason why the task is not solved yet.""",
         human_input_mode="NEVER",
         max_consecutive_auto_reply=0,
         is_termination_msg=lambda x: x.get("content", "") and x.get(

@@ -3,6 +3,8 @@ Single agent with one tool - knowledge base retrieval
 """
 import json
 import logging
+import os
+import sys
 
 import requests
 from langchain.agents import initialize_agent, AgentType, Tool
@@ -10,6 +12,13 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
+
+SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(SRC_ROOT)
+
+# setting path
+sys.path.append(SRC_ROOT)
+sys.path.append(PROJECT_ROOT)
 
 from src.config import settings
 
