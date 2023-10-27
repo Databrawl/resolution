@@ -104,12 +104,8 @@ def generate_response(instructions, user_input):
 
 
 if __name__ == "__main__":
-    with open('instructions/guardian-2.txt', 'r') as file:
-        # Read the content of the file into the variable
-        instructions = file.read()
-
     while True:
         user_input = input('>>> ')
-        response = generate_response(instructions,
+        response = generate_response(settings.SUPPORT_AGENT_INSTRUCTIONS,
                                      {'id': 0, 'message': user_input, 'user_name': 'Tyrael', 'ai_name': 'Guardian'})
         print(response)
