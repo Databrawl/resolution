@@ -1,6 +1,6 @@
 import logging
 
-from src.config import settings
+from config import settings
 
 logging.basicConfig(level=settings.LOG_LEVEL)
 logger = logging.getLogger(__name__)

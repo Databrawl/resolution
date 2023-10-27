@@ -3,22 +3,25 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 
-from src.config import settings
+from config import settings
 
 
-def populate(url):
+def populate(url=None):
     """Populates the vector database from the url provided"""
-    urls = [
-        "https://crypto.com/eea/cards",
-        "https://crypto.com/eea/earn",
-        "https://crypto.com/eea/about",
-        "https://crypto.com/eea/careers",
-        "https://crypto.com/eea",
-        "https://crypto.com/eea/fftb",
-        "https://crypto.com/eea/security",
-        "https://crypto.com/eea/partners",
-        "https://crypto.com/eea/defi-wallet"
-    ]
+    if not url:
+        urls = [
+            "https://crypto.com/eea/cards",
+            "https://crypto.com/eea/earn",
+            "https://crypto.com/eea/about",
+            "https://crypto.com/eea/careers",
+            "https://crypto.com/eea",
+            "https://crypto.com/eea/fftb",
+            "https://crypto.com/eea/security",
+            "https://crypto.com/eea/partners",
+            "https://crypto.com/eea/defi-wallet"
+        ]
+    else:
+        urls = [url]
 
     loader = WebBaseLoader(urls)
     documents = loader.load()

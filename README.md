@@ -13,10 +13,16 @@
     pip install -r requirements.txt
     ```
 
-3. Initialize the Vector Database
+3. Initialize the Vector Database with default data
 
     ```bash
     python src/vdb.py
+    ```
+   
+   If you want to add your own data, provide the website URL via KNOWLEDGE_URL, like this:
+   
+   ```bash
+    KNOWLEDGE_URL=https://gosamurai.ai/ python src/vdb.py
     ```
 
 4. Run the script you want from the `bots` folder. Example:
