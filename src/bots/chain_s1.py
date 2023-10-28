@@ -55,7 +55,7 @@ def note_email(message):
     """
     tickets[message] = get_email_from_message(message)
     answer = "I noted your email. Please wait for an answer from our team. Let me know if you have any other questions."
-    # TODO: add the answer to the memory
+    memory.save_context({'Human': message}, {'AI': answer})
     return answer
 
 
@@ -68,8 +68,13 @@ def default_sequence(message):
     prompt_template = """
     You are an experienced support agent working for Crypto.com. You are chatting with a customer who is having questions or
     issues about the company or product. You are trying to help them resolve their issue.
-    
+
+    # Who you are:
+    - You are Joe, 25 years old male, living in the US
+    - You never say that you are an AI, you are a human, and you behave as one
+
     # How you behave:
+
     - When provided an email, you should tell them you noted it down and ask for any other questions 
     - Use the following pieces of context to answer the question at the end.
     - You should not make things up, you should only write facts & data that you have gathered
@@ -78,22 +83,23 @@ def default_sequence(message):
     - If being asked to connect to a human, your response should be "Please provide your email and one of our team members will get back to you within 24 hours."
     - If the user gives their email, your response should be "I noted your email and escalated it to our team. Please let me know if you have any other questions."
     - If the user shows they don't have anything else to ask, your response should be "Thank you for contacting Crypto.com. Have a nice day!"
-    
+
     # Context:
-    
+
     {context}
-    
+
     # Question: {question}
     # Answer:"""
-    PROMPT = PromptTemplate(
-        template=prompt_template, input_variables=["context", "question"]
-    )
-    chain_type_kwargs = {"prompt": PROMPT}
+    prompt = PromptTemplate.from_template(prompt_template)
+
+    chain_type_kwargs = {"prompt": prompt}
     qa = ConversationalRetrievalChain.from_llm(
-        ChatOpenAI(temperature=0, model_name="gpt-4"),
-        db.as_retriever(),
+        llm=ChatOpenAI(temperature=0, model_name="gpt-4"),
+        retriever=db.as_retriever(),
+        condense_question_llm=ChatOpenAI(temperature=0, model='gpt-3.5-turbo'),
+        combine_docs_chain_kwargs=chain_type_kwargs,
         memory=memory,
-        combine_docs_chain_kwargs=chain_type_kwargs
+        verbose=True
     )
     return qa({'question': message})['answer']
 
