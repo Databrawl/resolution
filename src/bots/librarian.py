@@ -31,20 +31,6 @@ from langchain.schema import SystemMessage
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 
-from src.functions import search_knowledge_base
-
-SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_ROOT = os.path.dirname(SRC_ROOT)
-
-# setting path
-sys.path.append(SRC_ROOT)
-sys.path.append(PROJECT_ROOT)
-
-from src import vdb
-
-db = vdb.get()
-memory = ConversationBufferWindowMemory(memory_key="librarian_memory", return_messages=True, k=8)
-tickets = {}
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
@@ -54,6 +40,12 @@ sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
 from src.config import settings
+from src import vdb
+from src.functions import search_knowledge_base
+
+db = vdb.get()
+memory = ConversationBufferWindowMemory(memory_key="librarian_memory", return_messages=True, k=8)
+tickets = {}
 
 logger = logging.getLogger(__name__)
 
