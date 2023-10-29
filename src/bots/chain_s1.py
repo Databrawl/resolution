@@ -21,6 +21,8 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
 from langchain.schema.runnable import RunnableBranch
 
+from src.config import settings
+
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 
@@ -75,9 +77,8 @@ def default_sequence(message):
 
     # How you behave:
 
-    - When provided an email, you should tell them you noted it down and ask for any other questions 
-    - Use the following pieces of context to answer the question at the end.
-    - You should not make things up, you should only write facts & data that you have gathered
+    - Use the following pieces of Context to answer the question at the end.
+    - You should not make things up, you should only write facts & data from the Context
     - If you don't understand the question, ask to rephrase or ask for more details.
     - If you don't know the answer to the question, your response should be "Unfortunately, I can't assist with that. Please provide your email and one of our team members will get back to you within 24 hours."
     - If being asked to connect to a human, your response should be "Please provide your email and one of our team members will get back to you within 24 hours."
@@ -94,7 +95,7 @@ def default_sequence(message):
 
     chain_type_kwargs = {"prompt": prompt}
     qa = ConversationalRetrievalChain.from_llm(
-        llm=ChatOpenAI(temperature=0, model_name="gpt-4"),
+        llm=ChatOpenAI(temperature=0, model_name=settings.GPT_4),
         retriever=db.as_retriever(),
         condense_question_llm=ChatOpenAI(temperature=0, model='gpt-3.5-turbo'),
         combine_docs_chain_kwargs=chain_type_kwargs,
