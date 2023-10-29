@@ -1,9 +1,12 @@
+import sys
+
 from langchain.document_loaders import WebBaseLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 
 from config import settings
+from src.functions import search_knowledge_base
 
 
 def populate(url=None):
@@ -38,5 +41,13 @@ def get():
     return Chroma(persist_directory=settings.CHROMA_DIRECTORY, embedding_function=OpenAIEmbeddings())
 
 
+def retrieve(q, k=5):
+    return search_knowledge_base(q, k=k)
+
+
 if __name__ == '__main__':
-    populate(settings.KNOWLEDGE_URL)
+    # check first command line argument, if it's query, then query the database
+    if len(sys.argv) > 1 and sys.argv[1] == 'query':
+        print(retrieve(sys.argv[2]))
+    else:
+        populate(settings.KNOWLEDGE_URL)
