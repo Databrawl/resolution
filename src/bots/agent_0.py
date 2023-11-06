@@ -73,7 +73,7 @@ def research_agent(id, user_name, ai_name, instructions):
         tools,
         llm,
         agent=AgentType.OPENAI_FUNCTIONS,
-        verbose=False,
+        verbose=True,
         agent_kwargs=agent_kwargs,
         memory=memory
     )

@@ -11,3 +11,7 @@ tiktoken
 bs4
 beautifulsoup4
 PyYAML
+pytest
+pytest-mock
+unstructured
+pydantic

@@ -28,7 +28,7 @@ GPT_35_16 = 'gpt-3.5-turbo-16k'
 GPT_4 = 'gpt-4'
 INTERNET_ACCESS = True  # Set to true to enable internet access
 # To add custom prompts, create a .txt file like 'custom.txt' in `instructions` folder and set INSTRUCTIONS as 'custom'
-SUPPORT_AGENT_INSTRUCTIONS = load_instructions('support_agent-2')
+SUPPORT_AGENT_INSTRUCTIONS = load_instructions('support_agent-3')
 REVIEWER_INSTRUCTIONS = load_instructions('reviewer')
 MAX_SEARCH_RESULTS = 4  # Set the maximum search results for internet access DONT SET TOO HIGH
 MAX_TOKENS_GPT_35 = 4096

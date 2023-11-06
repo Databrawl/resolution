@@ -97,7 +97,8 @@ def default_sequence(message):
     qa = ConversationalRetrievalChain.from_llm(
         llm=ChatOpenAI(temperature=0, model_name=settings.GPT_4),
         retriever=db.as_retriever(),
-        condense_question_llm=ChatOpenAI(temperature=0, model='gpt-3.5-turbo'),
+        condense_question_llm=ChatOpenAI(temperature=0, model=settings.GPT_4),
+        # TODO: change prompt to expect statement
         combine_docs_chain_kwargs=chain_type_kwargs,
         memory=memory,
         verbose=True

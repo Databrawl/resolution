@@ -31,13 +31,13 @@ sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
 
-def is_question(message):
+def is_data_entry(message):
     llm = ChatOpenAI(
         temperature=0,
         model=settings.GPT_35,
     )
 
-    prompt = PromptTemplate.from_template("Check if the user asks a question or queries for information."
+    prompt = PromptTemplate.from_template("Check if the user wants to add some info to the knowledge base."
                                           "Answer YES or NO.\n"
                                           "User message:{message}")
     runnable = prompt | llm | BooleanOutputParser()
@@ -45,8 +45,8 @@ def is_question(message):
 
 
 counselor_chain = RunnableBranch(
-    (is_question, final_chain),
-    librarian_agent()
+    (is_data_entry, librarian_agent()),
+    final_chain
 )
 
 if __name__ == '__main__':
