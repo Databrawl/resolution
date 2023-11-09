@@ -3,10 +3,9 @@ from typing import List
 
 import chromadb
 from chromadb.utils import embedding_functions
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.pydantic_v1 import BaseModel, Field
-from langchain.vectorstores import Chroma
 
+from src import vdb
 from src.config import settings
 
 
@@ -17,26 +16,17 @@ class Node(BaseModel):
     uuid: str = Field(..., description="Text chunk identifier in UUID format")
     content: str = Field(..., description="The content itself")
 
-    # class Config:
-    #     arbitrary_types_allowed = True
-
 
 class NodeList(BaseModel):
     """List of nodes, or chunks, from the Vector Database"""
     # model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    nodes: List[Node] = Field(..., description="Set of text chunks, called Nodes",
-                              )
-
-    # class Config:
-    #     arbitrary_types_allowed = True
+    nodes: List[Node] = Field(..., description="Set of text chunks, called Nodes")
 
 
 def search_knowledge_base(query, k=5, include_ids=False):
     """Searches the knowledge base for relevant information"""
-    embeddings = OpenAIEmbeddings()
-    vdb = Chroma(persist_directory=settings.CHROMA_DIRECTORY, embedding_function=embeddings)
-    docs = vdb.similarity_search(query, k=k)
+    docs = vdb.retrieve(query, k=k)
 
     return '\n'.join([d.page_content for d in docs])
 

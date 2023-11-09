@@ -73,14 +73,14 @@ def populate(url=None):
     logging.info('Vector database population completed')
 
 
-def retrieve(q):
+def retrieve(q, k=5):
     vector_store = SupabaseVectorStore(
         embedding=OpenAIEmbeddings(),
         client=_get_client(),
         table_name="documents",
         query_name="match_documents",
     )
-    return vector_store.similarity_search(q)
+    return vector_store.similarity_search(q, k=k)
 
 
 if __name__ == '__main__':

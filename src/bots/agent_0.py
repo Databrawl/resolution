@@ -1,12 +1,10 @@
 """
 Single agent with one tool - knowledge base retrieval
 """
-import json
 import logging
 import os
 import sys
 
-import requests
 from langchain.agents import initialize_agent, AgentType, Tool
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
@@ -21,30 +19,9 @@ sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
 from src.config import settings
+from src.functions import search_knowledge_base
 
 logger = logging.getLogger(__name__)
-
-
-def knowledge_retrieval(query):
-    # Define the data to be sent in the request
-    data = {
-        "params": {
-            "query": query
-        },
-        "project": settings.RELEVANCE_PROJECT_ID
-    }
-
-    # Convert Python object to JSON string
-    data_json = json.dumps(data)
-
-    # Send the POST request
-    response = requests.post(settings.VDB_URL, data=data_json)
-
-    # Check the response status code
-    if response.status_code == 200:
-        return response.json()['output']['transformed']
-    else:
-        print(f'HTTP request failed with status code {response.status_code}')
 
 
 def research_agent(id, user_name, ai_name, instructions):
@@ -64,7 +41,7 @@ def research_agent(id, user_name, ai_name, instructions):
     tools = [
         Tool(
             name="Knowledge_retrieval",
-            func=knowledge_retrieval,
+            func=search_knowledge_base,
             description="This is your knowledge base. Always use this tool first after receiving the query."
         ),
     ]
