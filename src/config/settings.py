@@ -59,3 +59,6 @@ AUTOGEN_CONFIG_LIST = [
         'api_key': OPENAI_API_KEY,
     },  # OpenAI API endpoint for gpt-3.5-turbo-16k
 ]
+
+SUPABASE_URL: str = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY: str = os.environ.get("SUPABASE_KEY")
