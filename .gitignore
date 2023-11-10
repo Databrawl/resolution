@@ -1,3 +1,5 @@
 .env
 .cache
 chroma_db
+__pycache__
+init.py
