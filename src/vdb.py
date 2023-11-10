@@ -22,22 +22,22 @@ def populate(url=None):
     """Populates the vector database from the url provided"""
     if not url:
         urls = [
-             "https://sitegpt.ai/"
-             "https://sitegpt.ai/features"
-             "https://sitegpt.ai/integrations"
-             "https://sitegpt.ai/pricing"
-             "https://sitegpt.ai/demo"
-             "https://sitegpt.ai/docs/api-reference"
-             "https://sitegpt.ai/contact-us"
-             #"https://crypto.com/eea/cards",
-             #"https://crypto.com/eea/earn",
-             #"https://crypto.com/eea/about",
-             #"https://crypto.com/eea/careers",
-             #"https://crypto.com/eea",
-             #"https://crypto.com/eea/fftb",
-             #"https://crypto.com/eea/security",
-             #"https://crypto.com/eea/partners",
-             #"https://crypto.com/eea/defi-wallet"
+            ",https://sitegpt.ai/",
+            ",https://sitegpt.ai/features",
+            ",https://sitegpt.ai/integrations",
+            ",https://sitegpt.ai/pricing",
+            ",https://sitegpt.ai/demo",
+            ",https://sitegpt.ai/docs/api-reference",
+            ",https://sitegpt.ai/contact-us",
+            # "https://crypto.com/eea/cards",
+            # "https://crypto.com/eea/earn",
+            # "https://crypto.com/eea/about",
+            # "https://crypto.com/eea/careers",
+            # "https://crypto.com/eea",
+            # "https://crypto.com/eea/fftb",
+            # "https://crypto.com/eea/security",
+            # "https://crypto.com/eea/partners",
+            # "https://crypto.com/eea/defi-wallet"
         ]
     else:
         urls = [url]
