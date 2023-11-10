@@ -1,6 +1,7 @@
 import logging
 import sys
 from pprint import pprint
+from typing import Union
 
 from langchain.document_loaders import WebBaseLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -22,13 +23,13 @@ def populate(url=None):
     """Populates the vector database from the url provided"""
     if not url:
         urls = [
-            ",https://sitegpt.ai/",
-            ",https://sitegpt.ai/features",
-            ",https://sitegpt.ai/integrations",
-            ",https://sitegpt.ai/pricing",
-            ",https://sitegpt.ai/demo",
-            ",https://sitegpt.ai/docs/api-reference",
-            ",https://sitegpt.ai/contact-us",
+            "https://sitegpt.ai/",
+            "https://sitegpt.ai/features",
+            "https://sitegpt.ai/integrations",
+            "https://sitegpt.ai/pricing",
+            "https://sitegpt.ai/demo",
+            "https://sitegpt.ai/docs/api-reference",
+            "https://sitegpt.ai/contact-us",
             # "https://crypto.com/eea/cards",
             # "https://crypto.com/eea/earn",
             # "https://crypto.com/eea/about",
@@ -62,6 +63,7 @@ def populate(url=None):
         for cleaner in cleaners:
             document.page_content = cleaner(document.page_content)
 
+    # TODO: try different text splitters
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
         chunk_overlap=50,
@@ -78,6 +80,14 @@ def populate(url=None):
         query_name="match_documents",
     )
     logging.info('Vector database population completed')
+
+
+def archive_text(text):
+    pass
+
+
+def archive_urls(urls: Union[str, list[str]]):
+    pass
 
 
 def retrieve(q, k=5):
