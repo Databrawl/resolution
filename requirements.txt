@@ -2,11 +2,11 @@ aiohttp
 asyncio
 chromadb
 requests
-pyautogen
 python-dotenv
 fake-useragent
 openai
 langchain
+llama_index
 tiktoken
 bs4
 beautifulsoup4
@@ -16,3 +16,6 @@ pytest-mock
 unstructured
 pydantic
 supabase
+vecs
+jinja2
+wandb
