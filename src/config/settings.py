@@ -18,14 +18,10 @@ def load_instructions(name):
 
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'WARNING')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-VDB_URL = os.getenv('VDB_URL')
-CHROMA_DIRECTORY = os.path.join(PROJECT_ROOT, 'chroma_db')
-KNOWLEDGE_URL = os.getenv('KNOWLEDGE_URL')
-RELEVANCE_PROJECT_ID = os.getenv('RELEVANCE_PROJECT_ID')
+KNOWLEDGE_URLS = os.getenv('KNOWLEDGE_URLS')
 RESULT_SEPARATOR = ' -:- '
-GPT_35 = 'gpt-3.5-turbo-16k-0613'
-GPT_35_16 = 'gpt-3.5-turbo-16k'
-GPT_4 = 'gpt-4'
+GPT_35 = 'gpt-3.5-turbo-1106'
+GPT_4 = 'gpt-4-1106-preview'
 INTERNET_ACCESS = True  # Set to true to enable internet access
 # To add custom prompts, create a .txt file like 'custom.txt' in `instructions` folder and set INSTRUCTIONS as 'custom'
 SUPPORT_AGENT_INSTRUCTIONS = load_instructions('support_agent-3')
@@ -34,25 +30,6 @@ MAX_SEARCH_RESULTS = 4  # Set the maximum search results for internet access DON
 MAX_TOKENS_GPT_35 = 4096
 MAX_TOKENS_GPT_35_16 = 16_385
 MAX_TOKENS_GPT_4 = 8192
-# FUNCTIONS_CONFIG = {
-#     "functions": [
-#         ,
-#         {
-#             "name": "scrape",
-#             "description": "Scraping website content based on url",
-#             "parameters": {
-#                 "type": "object",
-#                 "properties": {
-#                     "url": {
-#                         "type": "string",
-#                         "description": "Website url to scrape",
-#                     }
-#                 },
-#                 "required": ["url"],
-#             },
-#         },
-#     ]
-# }
 AUTOGEN_CONFIG_LIST = [
     {
         'model': GPT_4,
@@ -60,5 +37,18 @@ AUTOGEN_CONFIG_LIST = [
     },  # OpenAI API endpoint for gpt-3.5-turbo-16k
 ]
 
+# Supabase configs
 SUPABASE_URL: str = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY: str = os.environ.get("SUPABASE_KEY")
+SUPABASE_DB_USER: str = os.environ.get("SUPABASE_DB_USER")
+SUPABASE_DB_PASSWORD: str = os.environ.get("SUPABASE_DB_PASSWORD")
+SUPABASE_DB_HOST: str = os.environ.get("SUPABASE_DB_HOST")
+SUPABASE_DB_PORT: int = int(os.environ.get("SUPABASE_DB_PORT"))
+SUPABASE_DB_NAME: str = os.environ.get("SUPABASE_DB_NAME")
+SUPABASE_DB = f"postgresql://{SUPABASE_DB_USER}:{SUPABASE_DB_PASSWORD}@{SUPABASE_DB_HOST}:{SUPABASE_DB_PORT}/" \
+              f"{SUPABASE_DB_NAME}"
+SUPABASE_DOCUMENTS_TABLE = "documents"
+
+# Llamaindex configs
+CHUNK_SIZE = 512
+CHUNK_OVERLAP = 50
