@@ -26,7 +26,7 @@ class NodeList(BaseModel):
 
 def search_knowledge_base(query, k=5, include_ids=False):
     """Searches the knowledge base for relevant information"""
-    docs = vdb.retrieve(query, k=k)
+    docs = vdb.retrieve(query, retriever_top_k=k)
 
     return '\n'.join([d.page_content for d in docs])
 

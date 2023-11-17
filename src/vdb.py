@@ -1,12 +1,25 @@
 import logging
+import logging
 import sys
+from functools import reduce
 from pprint import pprint
+from typing import Sequence
 from typing import Union
 
-from langchain.document_loaders import WebBaseLoader
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import SupabaseVectorStore
+from llama_index import StorageContext, Response, QueryBundle
+from llama_index import (
+    VectorStoreIndex,
+    ServiceContext,
+)
+from llama_index import download_loader, Document
+from llama_index import (
+    get_response_synthesizer,
+)
+from llama_index.query_engine import RetrieverQueryEngine
+from llama_index.retrievers import VectorIndexRetriever
+from llama_index.schema import NodeWithScore
+from llama_index.vector_stores import SupabaseVectorStore
 from supabase.client import Client, create_client
 from unstructured.cleaners.core import clean_bullets, clean_dashes, clean_extra_whitespace, \
     clean_non_ascii_chars, clean_ordered_bullets, clean_trailing_punctuation, group_broken_paragraphs, \
@@ -14,39 +27,17 @@ from unstructured.cleaners.core import clean_bullets, clean_dashes, clean_extra_
 
 from config import settings
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+
+BeautifulSoupWebReader = download_loader("BeautifulSoupWebReader")
+
 
 def _get_client() -> Client:
     return create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
 
-def populate(url=None):
-    """Populates the vector database from the url provided"""
-    if not url:
-        urls = [
-            "https://sitegpt.ai/",
-            "https://sitegpt.ai/features",
-            "https://sitegpt.ai/integrations",
-            "https://sitegpt.ai/pricing",
-            "https://sitegpt.ai/demo",
-            "https://sitegpt.ai/docs/api-reference",
-            "https://sitegpt.ai/contact-us",
-            # "https://crypto.com/eea/cards",
-            # "https://crypto.com/eea/earn",
-            # "https://crypto.com/eea/about",
-            # "https://crypto.com/eea/careers",
-            # "https://crypto.com/eea",
-            # "https://crypto.com/eea/fftb",
-            # "https://crypto.com/eea/security",
-            # "https://crypto.com/eea/partners",
-            # "https://crypto.com/eea/defi-wallet"
-        ]
-    else:
-        urls = [url]
-
-    logging.info('Loading documents from URLs')
-    loader = WebBaseLoader(urls)
-    documents = loader.load()
-
+def _clean(text: str) -> str:
     cleaners = [
         clean_bullets,
         clean_dashes,
@@ -58,51 +49,81 @@ def populate(url=None):
         replace_unicode_quotes
     ]
 
-    # clean documents
-    for document in documents:
-        for cleaner in cleaners:
-            document.page_content = cleaner(document.page_content)
-
-    # TODO: try different text splitters
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50,
-        length_function=len
-    )
-    texts = text_splitter.split_documents(documents)
-
-    logging.info(f'Populating vector database with {urls} data')
-    SupabaseVectorStore.from_documents(
-        texts,
-        OpenAIEmbeddings(),
-        client=_get_client(),
-        table_name="documents",
-        query_name="match_documents",
-    )
-    logging.info('Vector database population completed')
+    # Apply each cleaner function to the text in sequence
+    return reduce(lambda x, cleaner: cleaner(x), cleaners, text)
 
 
-def archive_text(text):
-    pass
-
-
-def archive_urls(urls: Union[str, list[str]]):
-    pass
-
-
-def retrieve(q, k=5):
+def _create_documents(documents: Sequence[Document]) -> None:
     vector_store = SupabaseVectorStore(
-        embedding=OpenAIEmbeddings(),
-        client=_get_client(),
-        table_name="documents",
-        query_name="match_documents",
+        postgres_connection_string=settings.SUPABASE_DB,
+        collection_name=settings.SUPABASE_DOCUMENTS_TABLE
     )
-    return vector_store.similarity_search(q, k=k)
+    storage_context = StorageContext.from_defaults(vector_store=vector_store)
+    service_context = ServiceContext.from_defaults(
+        chunk_size=settings.CHUNK_SIZE, chunk_overlap=settings.CHUNK_OVERLAP
+    )
+    VectorStoreIndex.from_documents(documents, storage_context=storage_context, service_context=service_context)
+
+
+def archive_urls(urls: Union[str, list[str]]) -> None:
+    if isinstance(urls, str):
+        urls = [urls]
+
+    loader = BeautifulSoupWebReader()
+    documents = loader.load_data(urls=urls)
+    for document in documents:
+        document.text = _clean(document.text)
+
+    _create_documents(documents)
+
+
+def archive_text(text: str) -> None:
+    document = Document(text=_clean(text))
+
+    _create_documents([document])
+
+
+def get_index() -> VectorStoreIndex:
+    vector_store = SupabaseVectorStore(
+        postgres_connection_string=settings.SUPABASE_DB,
+        collection_name=settings.SUPABASE_DOCUMENTS_TABLE
+    )
+    return VectorStoreIndex.from_vector_store(vector_store=vector_store)
+
+
+def retrieve(query: str, retriever_top_k: int = 5) -> list[NodeWithScore]:
+    index = get_index()
+    query_bundle = QueryBundle(query)
+
+    retriever = VectorIndexRetriever(
+        index=index,
+        similarity_top_k=retriever_top_k,
+    )
+    nodes = retriever.retrieve(query_bundle)
+
+    return nodes
+
+
+def query_llama(query: str, k: int = 5) -> Response:
+    index = get_index()
+
+    retriever = VectorIndexRetriever(
+        index=index,
+        similarity_top_k=k,
+    )
+
+    query_engine = RetrieverQueryEngine(
+        retriever=retriever,
+        response_synthesizer=get_response_synthesizer(),
+    )
+
+    return query_engine.query(query)
 
 
 if __name__ == '__main__':
     # check first command line argument, if it's query, then query the database
     if len(sys.argv) > 1 and sys.argv[1] == 'query':
-        pprint(retrieve(sys.argv[2]))
+        results = retrieve(sys.argv[2])
+        pprint(results)
     else:
-        populate(settings.KNOWLEDGE_URL)
+        archive_urls(settings.KNOWLEDGE_URLS)
