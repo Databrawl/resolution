@@ -6,7 +6,6 @@ from the same domain.
 
 * Also keeps the conversation memory, last 8 messages
 
-# TODO: Remove redundant \n, \t, and spaces from the document.page_content
 # TODO: Add source (URL or text data) to the VDB entries. Make it work as an ID. This way we can update the information.
 # TODO: Add a tool to delete the information from the database
 # TODO: Check if the information is already in the database and add update functionality
@@ -15,22 +14,15 @@ References:
     * https://python.langchain.com/docs/modules/agents/how_to/custom-functions-with-openai-functions-agent
         defining functions for the agent. It shows how to specify types, so that you don't need to convert list manually
 """
-import json
 import logging
 import os
 import sys
 
-import requests
 from langchain.agents import initialize_agent, AgentType, Tool
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import WebBaseLoader
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
-
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
@@ -40,39 +32,13 @@ sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
 from src.config import settings
-from src import vdb
 from src.functions import search_knowledge_base
+from src.vdb import archive_urls, archive_text
 
-db = vdb.get()
 memory = ConversationBufferWindowMemory(memory_key="librarian_memory", return_messages=True, k=8)
 tickets = {}
 
 logger = logging.getLogger(__name__)
-
-
-def archive(data):
-    print('Archiving text data:')
-    print(data)
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=400,
-        chunk_overlap=50,
-        length_function=len
-    )
-    texts = text_splitter.split_text(data)
-    Chroma.from_texts(texts, OpenAIEmbeddings(), persist_directory=settings.CHROMA_DIRECTORY)
-
-
-def scrape_urls(urls):
-    urls_decoded = urls.split(';')
-    loader = WebBaseLoader(urls_decoded)
-    documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=400,
-        chunk_overlap=50,
-        length_function=len
-    )
-    split_documents = text_splitter.split_documents(documents)
-    Chroma.from_documents(split_documents, OpenAIEmbeddings(), persist_directory=settings.CHROMA_DIRECTORY)
 
 
 def librarian_agent():
@@ -104,12 +70,12 @@ def librarian_agent():
     tools = [
         Tool(
             name="Archive_text_data",
-            func=archive,
+            func=archive_text,
             description="Store text data in the knowledge base."
         ),
         Tool(
             name="Archive_URLs",
-            func=scrape_urls,
+            func=archive_urls,
             description="Scan provided URLs for text data and save it in the knowledge base."
         ),
         Tool(
