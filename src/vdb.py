@@ -126,4 +126,4 @@ if __name__ == '__main__':
         results = retrieve(sys.argv[2])
         pprint(results)
     else:
-        archive_urls(settings.KNOWLEDGE_URLS)
+        archive_urls(settings.KNOWLEDGE_URLS.split(','))
