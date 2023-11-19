@@ -77,7 +77,7 @@ def get_pre_process_chain() -> Runnable[Any, BaseMessage]:
     """
     prompt_template = """ 
     Given the following chat history and a follow up message, rephrase the follow up message if needed,
-    so that the intent is clear without a prior context.
+    so that the intent is clear without a prior context. Reply in the same language as the original message.
 
     Chat History:
     {chat_history}
