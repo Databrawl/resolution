@@ -6,7 +6,6 @@ from pprint import pprint
 from typing import Sequence
 from typing import Union
 
-from langchain.vectorstores import SupabaseVectorStore
 from llama_index import StorageContext, Response, QueryBundle
 from llama_index import (
     VectorStoreIndex,
