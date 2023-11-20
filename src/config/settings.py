@@ -1,9 +1,15 @@
+import logging
 import os
 import sys
 
 from dotenv import find_dotenv, load_dotenv
 
-load_dotenv(find_dotenv())
+ENV = os.getenv('ENV', 'local')
+if ENV == 'prod':
+    logging.info('⚠️ Running in a production mode ⚠️')
+
+DOTENV_FILE = f'{ENV}.env'
+load_dotenv(find_dotenv(DOTENV_FILE))
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
