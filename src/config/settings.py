@@ -4,7 +4,7 @@ import sys
 
 from dotenv import find_dotenv, load_dotenv
 
-ENV = os.getenv('ENV', 'local')
+ENV = os.getenv('ENV', 'prod')
 if ENV == 'prod':
     logging.info('⚠️ Running in a production mode ⚠️')
 

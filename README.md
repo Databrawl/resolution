@@ -3,9 +3,11 @@
 
 ## Setup
 
-1. Create environment file
-
-    Create a `.env` file in the root of the repo with all the necessary variables (look at `config/settings.py`).
+1. Create environment file(s)
+   Each environment has its own configuration file. `local.env` for local, `prod.env` for
+   Production.
+   Create each file in the root of the repo with all the necessary variables (look
+   at `config/settings.py`).
 
 2. Install dependencies
 
@@ -14,19 +16,15 @@
     ```
 
 3. Initialize the Vector Database with default data
-
-    ```bash
-    python src/vdb.py
-    ```
    
    If you want to add your own data, provide the website URL via KNOWLEDGE_URL, like this:
    
    ```bash
-    KNOWLEDGE_URL=https://gosamurai.ai/ python src/vdb.py
+    ENV=prod KNOWLEDGE_URLS=https://gosamurai.ai/,https://gosamurai.ai/payments python src/vdb.py
     ```
 
 4. Run the script you want from the `bots` folder. Example:
 
     ```bash
-    python src/bots/chain_0.py
+    ENV=prod python src/bots/chain_s2.py
     ```
