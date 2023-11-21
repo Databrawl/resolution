@@ -23,15 +23,15 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.schema import BaseMessage, HumanMessage, StrOutputParser, AIMessage
 from langchain.schema.runnable import RunnableBranch, Runnable, RunnableLambda, RunnablePassthrough
 
-from src.config import settings
-from src.memory.retrievers import LlamaVectorIndexRetriever, format_docs
-
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 
 # setting path
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
+
+from src.config import settings
+from src.memory.retrievers import LlamaVectorIndexRetriever, format_docs
 
 from langchain.globals import set_verbose
 
