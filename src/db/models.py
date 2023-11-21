@@ -1,8 +1,10 @@
 import re
 
+from llama_index.constants import DEFAULT_EMBEDDING_DIM
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.ext.declarative import DeferredReflection
-from sqlalchemy.orm import DeclarativeBase, declared_attr
+from sqlalchemy.orm import DeclarativeBase, declared_attr, relationship
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
@@ -37,14 +39,17 @@ class User(Base, Reflected):
 class Org(BaseId):
     name: Mapped[str] = mapped_column(String(30))
 
+    # relationships
+    chunks = relationship("Chunk", backref="org")
+
 
 class OrgUser(BaseId):
     # Many-to-many between users and orgs, we need since we cannot modify Users table that is set by Supabase
     user_id = mapped_column(ForeignKey('auth.users.id'))
     org_id: Mapped[int] = mapped_column(ForeignKey(Org.id))
 
-# class Chunk(Base):
-#     # id: Mapped[int] = mapped_column(primary_key=True)
-#     org_id: Mapped[int] = mapped_column(ForeignKey(Org.id))
-#
-#     embedding = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))
+
+class Chunk(BaseId):
+    org_id: Mapped[int] = mapped_column(ForeignKey(Org.id))
+
+    embedding = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))
