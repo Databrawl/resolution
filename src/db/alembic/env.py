@@ -21,12 +21,6 @@ target_metadata = Base.metadata
 print(target_metadata.tables)
 
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
-
-
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -52,7 +46,6 @@ def run_migrations_offline() -> None:
 
 
 def include_object(obj, name, type_, reflected, compare_to):
-    print('Include object', obj, name, type_, reflected, compare_to)
     if type_ == "table" and obj.schema == "auth":
         # We don't track auth schema changes, as those tables are controlled by Supabase
         return False
