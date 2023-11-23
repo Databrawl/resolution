@@ -35,6 +35,26 @@ def dbsession(engine):
     connection.close()
 
 
+class TestOrg:
+    def test_similarity_search_trivial(self, dbsession):
+        org = Org(name='test company')
+        expected = []
+        for i in range(5):
+            embedding = [0] * DEFAULT_EMBEDDING_DIM
+            embedding[i] = 100
+            chunk = Chunk(embedding=embedding)
+            org.chunks.append(chunk)
+            expected.append(chunk)
+        dbsession.add(org)
+        dbsession.commit()
+
+        search_embedding = [0] * DEFAULT_EMBEDDING_DIM
+        search_embedding[0] = 100
+        chunks = org.similarity_search(dbsession, search_embedding)
+
+        assert chunks == expected
+
+
 class TestChunk:
     def test_create_chunk_instance_with_valid_values(self, dbsession):
         embedding = [1.0] * DEFAULT_EMBEDDING_DIM

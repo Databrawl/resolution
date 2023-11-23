@@ -4,6 +4,7 @@ from uuid import uuid4
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import String, ForeignKey
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import DeferredReflection
 from sqlalchemy.orm import DeclarativeBase, declared_attr, relationship
@@ -37,6 +38,17 @@ class Org(Base):
     name: Mapped[str] = mapped_column(String(30))
     # relationships
     chunks = relationship("Chunk", backref="org")
+
+    # TODO: use centralized session
+    def similarity_search(self, session, embedding: list[float], k: int = 10):
+        """Search for similar chunks in this org"""
+        q = select(Chunk). \
+            where(Chunk.org_id == self.id). \
+            order_by(Chunk.embedding.cosine_distance(embedding)). \
+            limit(k)
+        print(q)
+        res = session.execute(q)
+        return list(map(lambda r: r.Chunk, res))
 
 
 class OrgUser(Base):
