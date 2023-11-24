@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import DeferredReflection
@@ -58,6 +58,10 @@ class OrgUser(Base):
 
 
 class Chunk(Base):
+    __table_args__ = (
+        UniqueConstraint("org_id", "embedding", name="org_embedding_unique_together"),
+    )
+
     org_id: Mapped[int] = mapped_column(ForeignKey(Org.id))
 
     embedding = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))

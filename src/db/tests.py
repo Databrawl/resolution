@@ -2,7 +2,7 @@ from uuid import uuid4
 
 import pytest
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
-from sqlalchemy import create_engine, exc
+from sqlalchemy import create_engine, exc, select
 from sqlalchemy.orm import Session
 
 from config import settings
@@ -77,6 +77,45 @@ class TestChunk:
         dbsession.add(org)
         with pytest.raises(exc.StatementError):
             dbsession.commit()
+
+    def test_create_same_chunks_same_org(self, dbsession):
+        embedding = [1.0] * DEFAULT_EMBEDDING_DIM
+        org = Org(name='test company')
+        chunk_1 = Chunk(embedding=embedding)
+        chunk_2 = Chunk(embedding=embedding)
+        org.chunks = [chunk_1, chunk_2]
+        dbsession.add(org)
+
+        with pytest.raises(exc.IntegrityError):
+            dbsession.commit()
+
+    def test_create_different_chunks_same_org(self, dbsession):
+        embedding_1 = [1.0] * DEFAULT_EMBEDDING_DIM
+        embedding_2 = [2.0] * DEFAULT_EMBEDDING_DIM
+        org = Org(name='test company')
+        chunk_1 = Chunk(embedding=embedding_1)
+        chunk_2 = Chunk(embedding=embedding_2)
+        org.chunks = [chunk_1, chunk_2]
+        dbsession.add(org)
+        dbsession.commit()
+
+        chunks = dbsession.execute(select(Chunk)).all()
+        assert len(chunks) == 2
+
+    def test_create_same_chunk_different_orgs(self, dbsession):
+        embedding = [1.0] * DEFAULT_EMBEDDING_DIM
+        org_1 = Org(name='test company 1')
+        org_2 = Org(name='test company 2')
+        chunk_1 = Chunk(embedding=embedding)
+        chunk_2 = Chunk(embedding=embedding)
+        org_1.chunks = [chunk_1]
+        org_2.chunks = [chunk_2]
+        dbsession.add_all([org_1, org_2])
+        dbsession.commit()
+
+        rows = dbsession.execute(select(Chunk)).all()
+        assert len(rows) == 2
+        assert rows[0].Chunk.org_id != rows[1].Chunk.org_id
 
 
 class TestGeneric:
