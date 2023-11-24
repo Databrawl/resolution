@@ -1,5 +1,4 @@
 import logging
-import logging
 import sys
 from functools import reduce
 from pprint import pprint
