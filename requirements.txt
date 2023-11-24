@@ -16,7 +16,6 @@ pytest-mock
 unstructured==0.10.30
 pydantic==2.5.1
 supabase==2.0.3
-vecs==0.4.1
 jinja2
 wandb
 SQLAlchemy==2.0.23
