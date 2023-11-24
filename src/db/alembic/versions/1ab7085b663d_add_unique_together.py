@@ -1,4 +1,6 @@
-"""Add Chunk
+"""Add Unuque together constraint (org_id + embedding) for Chunk
+
+It's needed to avoid inserting the same chunk twice.
 
 Revision ID: 1ab7085b663d
 Revises: 1bc47b191673
