@@ -64,4 +64,5 @@ class Chunk(Base):
 
     org_id: Mapped[int] = mapped_column(ForeignKey(Org.id))
 
-    embedding = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))
+    text: Mapped[str] = mapped_column(String)
+    embedding: Mapped[Vector] = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))
