@@ -35,6 +35,30 @@ def dbsession(engine):
     connection.close()
 
 
+class TestBase:
+    def test_get_existing(self, dbsession):
+        org = Org(name='test company')
+        dbsession.add(org)
+        dbsession.commit()
+
+        retrieved_org = Org.get(dbsession, org.id)
+
+        assert retrieved_org.name == 'test company'
+
+    def test_with_reflected_model(self, dbsession):
+        user = User(email="test@user.com")
+        dbsession.add(user)
+        dbsession.commit()
+
+        retrieved_user = User.get(dbsession, user.id)
+
+        assert retrieved_user.email == "test@user.com"
+
+    def test_get_non_existing(self, dbsession):
+        with pytest.raises(exc.NoResultFound):
+            Org.get(dbsession, str(uuid4()))
+
+
 class TestOrg:
     def test_similarity_search_trivial(self, dbsession):
         org = Org(name='test company')

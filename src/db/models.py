@@ -8,7 +8,7 @@ from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.ext.declarative import DeferredReflection
-from sqlalchemy.orm import DeclarativeBase, declared_attr, relationship
+from sqlalchemy.orm import DeclarativeBase, declared_attr, relationship, Session
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
@@ -22,6 +22,12 @@ class Base(DeclarativeBase):
     def __tablename__(cls):
         """Convert class name to snake_case table name"""
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', cls.__name__).lower()
+
+    @classmethod
+    def get(cls, session: Session, pk: str) -> Any:
+        """Get an instance by primary key"""
+        stmt = select(cls).where(cls.id == pk).limit(1)
+        return session.execute(stmt).scalar_one()
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
@@ -47,7 +53,7 @@ class Org(Base):
     chunks = relationship("Chunk", backref="org")
 
     # TODO: use centralized session
-    def similarity_search(self, session, embedding: list[float], k: int = 10):
+    def similarity_search(self, session: Session, embedding: list[float], k: int = 10):
         """Search for similar chunks in this org"""
         q = select(Chunk). \
             where(Chunk.org_id == self.id). \
