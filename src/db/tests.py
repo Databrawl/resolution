@@ -66,7 +66,7 @@ class TestOrg:
         for i in range(5):
             embedding = [0] * DEFAULT_EMBEDDING_DIM
             embedding[i] = 100
-            chunk = Chunk(embedding=embedding)
+            chunk = Chunk(embedding=embedding, data='test chunk')
             org.chunks.append(chunk)
             expected.append(chunk)
         dbsession.add(org)
