@@ -1,11 +1,12 @@
 import re
+from typing import Any
 from uuid import uuid4
 
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy import select
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.ext.declarative import DeferredReflection
 from sqlalchemy.orm import DeclarativeBase, declared_attr, relationship
 from sqlalchemy.orm import Mapped
@@ -27,6 +28,12 @@ class Base(DeclarativeBase):
 
 class Reflected(DeferredReflection):
     __abstract__ = True
+
+
+class ForeignKeyCascade(ForeignKey):
+    def __init__(self, *args, **kwargs):
+        kwargs['ondelete'] = "CASCADE"
+        super().__init__(*args, **kwargs)
 
 
 class User(Base, Reflected):
@@ -53,8 +60,8 @@ class Org(Base):
 
 class OrgUser(Base):
     # Many-to-many between users and orgs, we need since we cannot modify Users table that is set by Supabase
-    user_id = mapped_column(ForeignKey('auth.users.id'))
-    org_id: Mapped[int] = mapped_column(ForeignKey(Org.id))
+    user_id = mapped_column(ForeignKeyCascade('auth.users.id'))
+    org_id: Mapped[int] = mapped_column(ForeignKeyCascade(Org.id))
 
 
 class Chunk(Base):
@@ -62,7 +69,8 @@ class Chunk(Base):
         UniqueConstraint("org_id", "embedding", name="org_embedding_unique_together"),
     )
 
-    org_id: Mapped[int] = mapped_column(ForeignKey(Org.id))
+    org_id: Mapped[int] = mapped_column(ForeignKeyCascade(Org.id))
 
     text: Mapped[str] = mapped_column(String)
     embedding: Mapped[Vector] = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))
+    meta_data: Mapped[dict[str, Any]] = mapped_column(JSON)
