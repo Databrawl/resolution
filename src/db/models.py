@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import re
-from typing import Any, Sequence
+from typing import Any
 from uuid import uuid4
 
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
@@ -53,13 +55,15 @@ class Org(Base):
     chunks = relationship("Chunk", backref="org")
 
     # TODO: use centralized session
-    def similarity_search(self, session: Session, embedding: list[float], k: int = 10) -> Sequence[Base]:
+    def similarity_search(self, session: Session, embedding: list[float], k: int = 10) -> list[tuple[Chunk, float]]:
         """Search for similar chunks in this org"""
-        q = select(Chunk). \
+        q = select(Chunk, 1 - Chunk.embedding.cosine_distance(embedding)). \
             where(Chunk.org_id == self.id). \
             order_by(Chunk.embedding.cosine_distance(embedding)). \
             limit(k)
-        return session.execute(q).scalars().all()
+        # res = session.execute(q)
+        # return session.execute(q).scalars().all()
+        return list(map(tuple, session.execute(q).all()))
 
 
 class OrgUser(Base):

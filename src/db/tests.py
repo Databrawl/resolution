@@ -62,21 +62,26 @@ class TestBase:
 class TestOrg:
     def test_similarity_search_trivial(self, dbsession):
         org = Org(name='test company')
-        expected = []
+        expected_chunks = []
         for i in range(5):
             embedding = [0] * DEFAULT_EMBEDDING_DIM
             embedding[i] = 100
             chunk = Chunk(embedding=embedding, data='test chunk')
             org.chunks.append(chunk)
-            expected.append(chunk)
+            expected_chunks.append(chunk)
         dbsession.add(org)
         dbsession.commit()
 
         search_embedding = [0] * DEFAULT_EMBEDDING_DIM
         search_embedding[0] = 100
-        chunks = org.similarity_search(dbsession, search_embedding)
+        chunks_with_similarities = org.similarity_search(dbsession, search_embedding)
 
-        assert chunks == expected
+        assert len(chunks_with_similarities) == 5
+        assert chunks_with_similarities[0] == (expected_chunks[0], 1.0)
+        assert chunks_with_similarities[1] == (expected_chunks[1], 0.0)
+        assert chunks_with_similarities[2] == (expected_chunks[2], 0.0)
+        assert chunks_with_similarities[3] == (expected_chunks[3], 0.0)
+        assert chunks_with_similarities[4] == (expected_chunks[4], 0.0)
 
 
 class TestChunk:
