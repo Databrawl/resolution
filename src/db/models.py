@@ -74,10 +74,11 @@ class OrgUser(Base):
 
 class Chunk(Base):
     __table_args__ = (
-        UniqueConstraint("org_id", "embedding", name="org_embedding_unique_together"),
+        UniqueConstraint("org_id", "hash_value", name="org_hash_unique_together"),
     )
 
     org_id: Mapped[int] = mapped_column(ForeignKeyCascade(Org.id))
 
+    hash_value: Mapped[str] = mapped_column(String(64))
     embedding: Mapped[Vector] = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))
     data: Mapped[dict[str, Any]] = mapped_column(JSON)
