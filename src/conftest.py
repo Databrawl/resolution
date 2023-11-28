@@ -2,8 +2,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from config import settings
 from db.models import Reflected
+from .config import settings
 
 
 @pytest.fixture(scope="session")
