@@ -61,8 +61,6 @@ class Org(Base):
             where(Chunk.org_id == self.id). \
             order_by(Chunk.embedding.cosine_distance(embedding)). \
             limit(k)
-        # res = session.execute(q)
-        # return session.execute(q).scalars().all()
         return list(map(tuple, session.execute(q).all()))
 
 
