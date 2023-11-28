@@ -1,9 +1,12 @@
+import random
+import string
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from db.models import Reflected
-from .config import settings
+from db.models import Reflected, User
+from src.config import settings
 
 
 @pytest.fixture(scope="session")
@@ -30,3 +33,17 @@ def dbsession(engine):
     transaction.rollback()
     # put back the connection to the connection pool
     connection.close()
+
+
+@pytest.fixture
+def user_factory(dbsession):
+    def create_user(length=5):
+        characters = string.ascii_letters + string.digits + '_'
+        local_part = ''.join(random.choice(characters) for _ in range(length))
+        email = f"{local_part}@test.com"
+        user = User(email=email)
+        dbsession.add(user)
+        dbsession.commit()
+        return user
+
+    return create_user

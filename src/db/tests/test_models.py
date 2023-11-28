@@ -17,14 +17,12 @@ class TestBase:
 
         assert retrieved_org.name == 'test company'
 
-    def test_with_reflected_model(self, dbsession):
-        user = User(email="test@user.com")
-        dbsession.add(user)
-        dbsession.commit()
+    def test_get_reflected_model(self, dbsession, user_factory):
+        user = user_factory()
 
         retrieved_user = User.get(dbsession, user.id)
 
-        assert retrieved_user.email == "test@user.com"
+        assert retrieved_user.email == user.email
 
     def test_get_non_existing(self, dbsession):
         with pytest.raises(exc.NoResultFound):
@@ -120,9 +118,9 @@ class TestChunk:
 
 
 class TestGeneric:
-    def test_all_models_together(self, dbsession):
+    def test_all_models_together(self, dbsession, user_factory):
         """ Test that all models can be created together """
-        user = User(id=uuid4(), email="user@mail.com")
+        user = user_factory()
         org = Org(name='test company')
         embedding = [1.0] * DEFAULT_EMBEDDING_DIM
         chunk = Chunk(embedding=embedding)
