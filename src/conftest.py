@@ -1,11 +1,13 @@
 import random
 import string
+from hashlib import sha256
 
 import pytest
+from langchain.embeddings import OpenAIEmbeddings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from db.models import Reflected, User
+from db.models import Reflected, User, Chunk, Org
 from src.config import settings
 
 
@@ -47,3 +49,19 @@ def user_factory(dbsession):
         return user
 
     return create_user
+
+
+@pytest.fixture
+def chunk_factory(dbsession):
+    def create_chunk(org: Org, data: str = None, embedding: list[float] = None):
+        if not embedding:
+            embedding = OpenAIEmbeddings().embed_query(data)
+        if not data:
+            data = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+        hash_value = sha256(data.encode()).hexdigest()
+        chunk = Chunk(org_id=org.id, hash_value=hash_value, embedding=embedding, data=data)
+        dbsession.add(chunk)
+        dbsession.commit()
+        return chunk
+
+    return create_chunk

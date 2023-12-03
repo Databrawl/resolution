@@ -30,17 +30,18 @@ class TestBase:
 
 
 class TestOrg:
-    def test_similarity_search_trivial(self, dbsession):
+    def test_similarity_search_trivial(self, dbsession, chunk_factory):
         org = Org(name='test company')
+        dbsession.add(org)
+        dbsession.commit()
+
         expected_chunks = []
         for i in range(5):
             embedding = [0] * DEFAULT_EMBEDDING_DIM
             embedding[i] = 100
-            chunk = Chunk(embedding=embedding, data='test chunk')
+            chunk = chunk_factory(org=org, data=f"Chunk {i}", embedding=embedding)
             org.chunks.append(chunk)
             expected_chunks.append(chunk)
-        dbsession.add(org)
-        dbsession.commit()
 
         search_embedding = [0] * DEFAULT_EMBEDDING_DIM
         search_embedding[0] = 100
@@ -54,63 +55,59 @@ class TestOrg:
         assert chunks_with_similarities[4] == (expected_chunks[4], 0.0)
 
 
+# TODO: fix these tests to use chunk_factory
 class TestChunk:
-    def test_create_chunk_instance_with_valid_values(self, dbsession):
-        embedding = [1.0] * DEFAULT_EMBEDDING_DIM
+    def test_create_chunk_instance_with_valid_values(self, dbsession, chunk_factory):
         org = Org(name='test company')
-        chunk = Chunk(embedding=embedding)
-        org.chunks.append(chunk)
+        # Add that to the OrgFactory
         dbsession.add(org)
         dbsession.commit()
+        chunk = chunk_factory(org=org, data=f"Chunk")
 
         assert chunk.id is not None
         assert chunk.org_id == org.id
-        assert all(chunk.embedding == embedding)
 
-    def test_create_chunk_instance_with_invalid_embedding_length(self, dbsession):
+    def test_create_chunk_instance_with_invalid_embedding_length(self, dbsession, chunk_factory):
         wrong_embedding_len = 10
         embedding = [1.0] * wrong_embedding_len
         org = Org(name='test company')
-        chunk = Chunk(embedding=embedding)
-        org.chunks.append(chunk)
         dbsession.add(org)
+        dbsession.commit()
         with pytest.raises(exc.StatementError):
-            dbsession.commit()
+            chunk_factory(org=org, embedding=embedding)
 
-    def test_create_same_chunks_same_org(self, dbsession):
-        embedding = [1.0] * DEFAULT_EMBEDDING_DIM
+    def test_create_same_chunks_same_org(self, dbsession, chunk_factory):
         org = Org(name='test company')
-        chunk_1 = Chunk(embedding=embedding)
-        chunk_2 = Chunk(embedding=embedding)
-        org.chunks = [chunk_1, chunk_2]
         dbsession.add(org)
-
+        dbsession.commit()
+        chunk_factory(org=org, data='test data')
         with pytest.raises(exc.IntegrityError):
-            dbsession.commit()
+            chunk_factory(org=org, data='test data')
 
-    def test_create_different_chunks_same_org(self, dbsession):
+    def test_create_different_chunks_same_org(self, dbsession, chunk_factory):
         embedding_1 = [1.0] * DEFAULT_EMBEDDING_DIM
         embedding_2 = [2.0] * DEFAULT_EMBEDDING_DIM
         org = Org(name='test company')
-        chunk_1 = Chunk(embedding=embedding_1)
-        chunk_2 = Chunk(embedding=embedding_2)
-        org.chunks = [chunk_1, chunk_2]
         dbsession.add(org)
         dbsession.commit()
+
+        chunk_factory(org=org, embedding=embedding_1)
+        chunk_factory(org=org, embedding=embedding_2)
 
         chunks = dbsession.execute(select(Chunk)).all()
         assert len(chunks) == 2
 
-    def test_create_same_chunk_different_orgs(self, dbsession):
+    def test_create_same_chunk_different_orgs(self, dbsession, chunk_factory):
         embedding = [1.0] * DEFAULT_EMBEDDING_DIM
         org_1 = Org(name='test company 1')
         org_2 = Org(name='test company 2')
-        chunk_1 = Chunk(embedding=embedding)
-        chunk_2 = Chunk(embedding=embedding)
-        org_1.chunks = [chunk_1]
-        org_2.chunks = [chunk_2]
         dbsession.add_all([org_1, org_2])
         dbsession.commit()
+        chunk_factory(org=org_1, embedding=embedding)
+        chunk_factory(org=org_2, embedding=embedding)
+        # chunk_factory = Chunk(embedding=embedding)
+        # org_1.chunks = [chunk_1]
+        # org_2.chunks = [chunk_2]
 
         rows = dbsession.execute(select(Chunk)).all()
         assert len(rows) == 2
@@ -118,15 +115,15 @@ class TestChunk:
 
 
 class TestGeneric:
-    def test_all_models_together(self, dbsession, user_factory):
+    def test_all_models_together(self, dbsession, user_factory, chunk_factory):
         """ Test that all models can be created together """
         user = user_factory()
         org = Org(name='test company')
-        embedding = [1.0] * DEFAULT_EMBEDDING_DIM
-        chunk = Chunk(embedding=embedding)
-        org.chunks.append(chunk)
-        dbsession.add_all([user, org])
+        dbsession.add(org)
         dbsession.commit()
+        embedding = [1.0] * DEFAULT_EMBEDDING_DIM
+        chunk = chunk_factory(org=org, data="Chunk 1", embedding=embedding)
+        org.chunks.append(chunk)
 
         org_user = OrgUser(user_id=user.id, org_id=org.id)
         dbsession.add(org_user)
