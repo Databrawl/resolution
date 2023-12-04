@@ -12,6 +12,7 @@ bs4==0.0.1
 beautifulsoup4==4.12.2
 PyYAML
 pytest
+factory-boy==3.3.0
 pytest-mock
 unstructured==0.10.30
 pydantic==2.5.1
