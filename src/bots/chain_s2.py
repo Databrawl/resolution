@@ -14,7 +14,6 @@ https://python.langchain.com/docs/use_cases/question_answering/chat_vector_db
 import os
 import re
 import sys
-from operator import itemgetter
 from typing import Any
 
 from langchain.chat_models import ChatOpenAI
@@ -37,7 +36,7 @@ from langchain.globals import set_verbose
 
 set_verbose(True)
 
-memory = ConversationBufferWindowMemory(memory_key="chat_history", return_messages=True, k=8)
+memory = ConversationBufferWindowMemory(memory_key="chat_history", return_messages=True, k=5)
 tickets = {}
 
 
@@ -89,7 +88,7 @@ def get_pre_process_chain() -> Runnable[Any, BaseMessage]:
     llm = ChatOpenAI(temperature=0, model=settings.GPT_35)
     chain = (
             {
-                "chat_history": RunnableLambda(memory.load_memory_variables) | itemgetter("chat_history"),
+                "chat_history": lambda x: memory.buffer_as_str,
                 "message": lambda x: x,
             }
             | prompt
@@ -213,15 +212,24 @@ def retrieval_chain() -> Runnable[Any, BaseMessage]:
 
     {context}
 
+    # Chat History:
+
+    {chat_history}
+
     # Question: {question}
     # Answer:"""
+
     prompt = PromptTemplate.from_template(prompt_template)
     retriever = LlamaVectorIndexRetriever()
 
     llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
     chain = (
             RunnableLambda(lambda m: save_message(HumanMessage(content=m)))
-            | {"context": retriever | format_docs, "question": RunnablePassthrough()}
+            | {
+                "context": retriever | format_docs,
+                "question": RunnablePassthrough(),
+                "chat_history": lambda _: memory.buffer_as_str
+            }
             | prompt
             | llm
             | StrOutputParser()
