@@ -5,7 +5,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 from langchain.pydantic_v1 import BaseModel, Field
 
-from src import vdb
+from memory.utils import retrieve
 from src.config import settings
 
 
@@ -26,7 +26,7 @@ class NodeList(BaseModel):
 
 def search_knowledge_base(query, k=5, include_ids=False):
     """Searches the knowledge base for relevant information"""
-    docs = vdb.retrieve(query, retriever_top_k=k)
+    docs = retrieve(query, retriever_top_k=k)
 
     return '\n'.join([d.text for d in docs])
 

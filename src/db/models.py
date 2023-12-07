@@ -9,12 +9,11 @@ from pgvector.sqlalchemy import Vector
 from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSON, UUID
-from sqlalchemy.ext.declarative import DeferredReflection
 from sqlalchemy.orm import DeclarativeBase, declared_attr, relationship
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-from db import db_session
+from db.core import db_session, Reflected
 
 
 class Base(DeclarativeBase):
@@ -35,10 +34,6 @@ class Base(DeclarativeBase):
         return session.execute(stmt).scalar_one()
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-
-
-class Reflected(DeferredReflection):
-    __abstract__ = True
 
 
 class ForeignKeyCascade(ForeignKey):

@@ -5,7 +5,7 @@ import factory
 from factory import lazy_attribute
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 
-from db import db_session
+from db.core import db_session
 from db.models import User, Org, Chunk, OrgUser
 
 

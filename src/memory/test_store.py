@@ -7,10 +7,10 @@ from llama_index.schema import TextNode
 from llama_index.vector_stores import VectorStoreQuery
 from sqlalchemy import select
 
-from db import db_session
+from db.core import db_session, current_org
 from db.models import Chunk
 from db.tests.factories import OrgFactory
-from memory.retrievers import ChunkVectorStore
+from memory.store import ChunkVectorStore
 
 
 class TestChunkVectorStore:
@@ -21,6 +21,7 @@ class TestChunkVectorStore:
     def test_add_nodes(self):
         # Arrange
         org = OrgFactory.create()
+        current_org.set(org)
         nodes = [
             TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(), text="random text 1",
                      metadata={"key": "value 1"}),
@@ -29,7 +30,7 @@ class TestChunkVectorStore:
             TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(), text="random text 3",
                      metadata={"key": "value 3"}),
         ]
-        chunk_vector_store = ChunkVectorStore(org.id)
+        chunk_vector_store = ChunkVectorStore()
 
         # Act
         ids = chunk_vector_store.add(nodes)
@@ -50,6 +51,7 @@ class TestChunkVectorStore:
     def test_query(self):
         # Arrange
         org = OrgFactory.create()
+        current_org.set(org)
         embeddings_model = OpenAIEmbeddings()
         texts = [
             "Hi there!",
@@ -63,7 +65,7 @@ class TestChunkVectorStore:
                      metadata={"key": "value 1"})
             for text in texts
         ]
-        chunk_vector_store = ChunkVectorStore(org.id)
+        chunk_vector_store = ChunkVectorStore()
         ids = chunk_vector_store.add(nodes)
         # Now set up the query
         query_str = "Hello World!"
@@ -96,16 +98,18 @@ class TestChunkVectorStore:
             metadata={"key": "value 1"}
         )
 
-        fake_vector_store = ChunkVectorStore(fake_org.id)
-        real_vector_store = ChunkVectorStore(real_org.id)
+        current_org.set(fake_org)
+        fake_vector_store = ChunkVectorStore()
         fake_vector_store.add([node])
         # Now set up the query
         query_embedding = embeddings_model.embed_query(text)
         query = VectorStoreQuery(query_embedding=query_embedding, query_str=text, similarity_top_k=3)
+        # And set the vector store to a different org
+        current_org.set(real_org)
+        real_vector_store = ChunkVectorStore()
 
         # Act
         query_results = real_vector_store.query(query)  # chunk was added to a different vector store!
 
         # Assert
-        # target_chunk = dbsession.execute(select(Chunk).where(Chunk.data == query_str)).scalar_one()
         assert query_results.nodes == []

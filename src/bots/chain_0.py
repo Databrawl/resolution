@@ -23,9 +23,7 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from src import vdb
 
-db = vdb.get()
 memory = ConversationBufferWindowMemory(memory_key="chat_history", return_messages=True, k=8)
 prompt_template = """
 You are an experienced support agent working for Crypto.com. You are chatting with a customer who is having questions or

@@ -2,8 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from db import db_session
-from db.models import Reflected
+from db.core import db_session, Reflected
 from src.config import settings
 
 

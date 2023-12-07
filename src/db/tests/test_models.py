@@ -4,7 +4,7 @@ import pytest
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from sqlalchemy import exc, select
 
-from db import db_session
+from db.core import db_session
 from db.models import Chunk, Org, User
 from db.tests.factories import OrgFactory, UserFactory, ChunkFactory, OrgUserFactory
 
@@ -46,10 +46,7 @@ class TestOrg:
 
         assert len(chunks_with_similarities) == 5
         assert chunks_with_similarities[0] == (expected_chunks[0], 1.0)
-        assert chunks_with_similarities[1] == (expected_chunks[1], 0.0)
-        assert chunks_with_similarities[2] == (expected_chunks[2], 0.0)
-        assert chunks_with_similarities[3] == (expected_chunks[3], 0.0)
-        assert chunks_with_similarities[4] == (expected_chunks[4], 0.0)
+        assert all(chunks_with_similarities[i][1] == 0.0 for i in range(1, 5))
 
 
 class TestChunk:

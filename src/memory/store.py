@@ -1,23 +1,22 @@
-from typing import Dict, List, Any
+from typing import Any, List
 
-from langchain.callbacks.manager import CallbackManagerForRetrieverRun
-from langchain.pydantic_v1 import Field
-from langchain.schema import BaseRetriever, Document
 from llama_index.schema import BaseNode
-from llama_index.vector_stores.types import VectorStore, VectorStoreQuery, VectorStoreQueryResult
+from llama_index.vector_stores import VectorStoreQuery, VectorStoreQueryResult
+from llama_index.vector_stores.types import VectorStore
 from llama_index.vector_stores.utils import node_to_metadata_dict, metadata_dict_to_node
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
-from db import db_session
-from db.models import Chunk, Org
-from src.vdb import retrieve
+from db.core import db_session, current_org
+from db.models import Org, Chunk
 
 
 class ChunkVectorStore(VectorStore):
-    def __init__(self, org_id: str) -> None:
+    stores_text: bool = True
+
+    def __init__(self) -> None:
         self.dbsession: Session = db_session.get()
-        self.org: Org = Org.get(org_id)
+        self.org: Org = current_org.get()
 
     def client(self) -> Any:
         return
@@ -70,26 +69,3 @@ class ChunkVectorStore(VectorStore):
             ids.append(node.node_id)
 
         return VectorStoreQueryResult(nodes=nodes, similarities=similarities, ids=ids)
-
-
-class LlamaVectorIndexRetriever(BaseRetriever):
-    """`LlamaIndex` retriever.
-
-    It is used for the question-answering with sources over
-    an LlamaIndex data structure."""
-
-    query_kwargs: Dict = Field(default_factory=dict)
-    """Keyword arguments to pass to the query method."""
-
-    def _get_relevant_documents(
-            self, query: str, *, run_manager: CallbackManagerForRetrieverRun
-    ) -> List[Document]:
-        """Get documents relevant for a query."""
-        nodes = retrieve(query, **self.query_kwargs)
-
-        return [Document(page_content=node.text, metadata=node.metadata)
-                for node in nodes]
-
-
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)

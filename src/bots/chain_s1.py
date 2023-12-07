@@ -30,9 +30,6 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from src import vdb
-
-db = vdb.get()
 memory = ConversationBufferWindowMemory(memory_key="chat_history", return_messages=True, k=8)
 tickets = {}
 

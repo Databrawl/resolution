@@ -19,7 +19,7 @@ sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
 from src.config import settings
-from src.functions import search_knowledge_base
+from memory.functions import search_knowledge_base
 
 logger = logging.getLogger(__name__)
 

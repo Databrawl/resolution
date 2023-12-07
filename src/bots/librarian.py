@@ -24,6 +24,8 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 
+from memory.utils import archive_text, archive_urls
+
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 
@@ -32,8 +34,7 @@ sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
 from src.config import settings
-from src.functions import search_knowledge_base
-from src.vdb import archive_urls, archive_text
+from memory.functions import search_knowledge_base
 
 memory = ConversationBufferWindowMemory(memory_key="librarian_memory", return_messages=True, k=8)
 tickets = {}
