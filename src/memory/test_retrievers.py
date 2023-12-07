@@ -7,7 +7,9 @@ from llama_index.schema import TextNode
 from llama_index.vector_stores import VectorStoreQuery
 from sqlalchemy import select
 
-from db.models import Org, Chunk
+from db import db_session
+from db.models import Chunk
+from db.tests.factories import OrgFactory
 from memory.retrievers import ChunkVectorStore
 
 
@@ -16,9 +18,9 @@ class TestChunkVectorStore:
     def _get_random_embedding():
         return [random.random() for _ in range(DEFAULT_EMBEDDING_DIM)]
 
-    def test_add_nodes(self, dbsession):
+    def test_add_nodes(self):
         # Arrange
-        org = Org(name="test company")
+        org = OrgFactory.create()
         nodes = [
             TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(), text="random text 1",
                      metadata={"key": "value 1"}),
@@ -27,16 +29,14 @@ class TestChunkVectorStore:
             TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(), text="random text 3",
                      metadata={"key": "value 3"}),
         ]
-        dbsession.add(org)
-        dbsession.commit()
-        chunk_vector_store = ChunkVectorStore(org.id, dbsession)
+        chunk_vector_store = ChunkVectorStore(org.id)
 
         # Act
         ids = chunk_vector_store.add(nodes)
 
         # Assert
 
-        chunks = dbsession.execute(select(Chunk)).scalars().all()
+        chunks = db_session.get().execute(select(Chunk)).scalars().all()
         assert len(chunks) == 3
         node_texts = ["random text 1", "random text 2", "random text 3"]
         node_metadata_values = ["value 1", "value 2", "value 3"]
@@ -47,9 +47,9 @@ class TestChunkVectorStore:
         assert len(ids) == len(nodes)
         assert all(id in ids for id in [node.node_id for node in nodes])
 
-    def test_query(self, dbsession):
+    def test_query(self):
         # Arrange
-        org = Org(name="test company")
+        org = OrgFactory.create()
         embeddings_model = OpenAIEmbeddings()
         texts = [
             "Hi there!",
@@ -63,9 +63,7 @@ class TestChunkVectorStore:
                      metadata={"key": "value 1"})
             for text in texts
         ]
-        dbsession.add(org)
-        dbsession.commit()
-        chunk_vector_store = ChunkVectorStore(org.id, dbsession)
+        chunk_vector_store = ChunkVectorStore(org.id)
         ids = chunk_vector_store.add(nodes)
         # Now set up the query
         query_str = "Hello World!"
@@ -77,7 +75,7 @@ class TestChunkVectorStore:
 
         # Assert
         # target_chunk = dbsession.execute(select(Chunk).where(Chunk.data == query_str)).scalar_one()
-        target_chunk = Chunk.get(dbsession, ids[4])
+        target_chunk = Chunk.get(ids[4])
         assert len(query_results.nodes) == 3
         assert query_results.nodes[0].text == query_str
         assert query_results.nodes[0].node_id == str(target_chunk.id)
@@ -86,8 +84,8 @@ class TestChunkVectorStore:
 
     def test_query_isolates_data(self, dbsession):
         # Arrange
-        real_org = Org(name="real company")
-        fake_org = Org(name="fake company")
+        real_org = OrgFactory.create(name="real company")
+        fake_org = OrgFactory.create(name="fake company")
         embeddings_model = OpenAIEmbeddings()
         text = "Hello World!"
 
@@ -98,10 +96,8 @@ class TestChunkVectorStore:
             metadata={"key": "value 1"}
         )
 
-        dbsession.add_all([real_org, fake_org])
-        dbsession.commit()
-        fake_vector_store = ChunkVectorStore(fake_org.id, dbsession)
-        real_vector_store = ChunkVectorStore(real_org.id, dbsession)
+        fake_vector_store = ChunkVectorStore(fake_org.id)
+        real_vector_store = ChunkVectorStore(real_org.id)
         fake_vector_store.add([node])
         # Now set up the query
         query_embedding = embeddings_model.embed_query(text)

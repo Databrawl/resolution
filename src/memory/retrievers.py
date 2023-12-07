@@ -9,14 +9,15 @@ from llama_index.vector_stores.utils import node_to_metadata_dict, metadata_dict
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
+from db import db_session
 from db.models import Chunk, Org
 from src.vdb import retrieve
 
 
 class ChunkVectorStore(VectorStore):
-    def __init__(self, org_id: str, session: Session) -> None:
-        self.dbsession: Session = session
-        self.org: Org = Org.get(self.dbsession, org_id)
+    def __init__(self, org_id: str) -> None:
+        self.dbsession: Session = db_session.get()
+        self.org: Org = Org.get(org_id)
 
     def client(self) -> Any:
         return
@@ -54,7 +55,6 @@ class ChunkVectorStore(VectorStore):
         """Query vector store."""
         # Filters are not supported yet
         chunks_with_similarities = self.org.similarity_search(
-            session=self.dbsession,
             embedding=query.query_embedding,
             k=query.similarity_top_k
         )
