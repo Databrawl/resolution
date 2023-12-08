@@ -1,4 +1,5 @@
 # Guardian
+
 *Chatbot that protects your customers and your team*
 
 ## Setup
@@ -16,15 +17,16 @@
     ```
 
 3. Initialize the Vector Database with default data
-   
-   If you want to add your own data, provide the website URL via KNOWLEDGE_URL, like this:
-   
-   ```bash
-    ENV=prod KNOWLEDGE_URLS=https://gosamurai.ai/,https://gosamurai.ai/payments python src/vdb.py
-    ```
 
-4. Run the script you want from the `bots` folder. Example:
+   If you want to add your own data, provide the website URL via KNOWLEDGE_URL, like this:
 
     ```bash
-    ENV=prod python src/bots/chain_s2.py
+    KNOWLEDGE_URLS=https://gosamurai.ai/,https://gosamurai.ai/payments python src/main.py vdb samurai
     ```
+
+   The first parameter is the type of the operation, the second is the name of the organization.
+   Available operations:
+
+   1. `vdb` - Vector Database initialization
+   2. `librarian` - chat with the Librarian bot
+   3. `chat` - chat with the support bot, customer mode
