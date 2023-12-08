@@ -10,7 +10,6 @@ Otherwise:
 
 https://python.langchain.com/docs/use_cases/question_answering/chat_vector_db
 """
-
 import os
 import re
 import sys
@@ -22,6 +21,7 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.schema import BaseMessage, HumanMessage, StrOutputParser, AIMessage
 from langchain.schema.runnable import RunnableBranch, Runnable, RunnableLambda, RunnablePassthrough
 
+from db.core import db_session, current_org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -102,9 +102,6 @@ def get_pre_process_chain() -> Runnable[Any, BaseMessage]:
 def retrieval_chain() -> Runnable[Any, BaseMessage]:
     """
     Retrieve relevant documents and produce the response based on that context.
-
-    :param message: str, the input message
-    :return: Retrieval chain
     """
     prompt_template = """
     You are an expert customer support agent with a 20 years of dedicated experience. You interact with clients in an efficient, empathetic, and highly effective manner. Equipped with exceptional communication skills and high emotional intelligence, you navigate the challenges of customer interactions with ease and finesse. You handle client inquiries, resolve issues, and provide information, ensuring high levels of customer satisfaction. You blend technological proficiency with a deep understanding of human communication nuances, aiming to offer a seamless and positive customer experience.
@@ -221,7 +218,8 @@ def retrieval_chain() -> Runnable[Any, BaseMessage]:
     # Answer:"""
 
     prompt = PromptTemplate.from_template(prompt_template)
-    retriever = LlamaVectorIndexRetriever()
+    retriever = LlamaVectorIndexRetriever(metadata={"db_session": db_session.get(),
+                                                    "current_org": current_org.get()})
 
     llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
     chain = (
@@ -248,8 +246,8 @@ def get_chain():
 
 
 if __name__ == '__main__':
-    chain = get_chain()
+    retriever_chain = get_chain()
     while True:
         user_input = input('>>> ')
-        response = chain.invoke(user_input)
+        response = retriever_chain.invoke(user_input)
         print(response)

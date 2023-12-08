@@ -4,6 +4,7 @@ from langchain.callbacks.manager import CallbackManagerForRetrieverRun
 from langchain.pydantic_v1 import Field
 from langchain.schema import BaseRetriever, Document
 
+from db.core import enable_context
 from memory.utils import retrieve
 
 
@@ -20,6 +21,10 @@ class LlamaVectorIndexRetriever(BaseRetriever):
             self, query: str, *, run_manager: CallbackManagerForRetrieverRun
     ) -> List[Document]:
         """Get documents relevant for a query."""
+        # First, enable the context from the metadata since it was lost in the thread initialization
+        enable_context(self.metadata)
+
+        # Then, retrieve the documents
         nodes = retrieve(query, **self.query_kwargs)
 
         return [Document(page_content=node.text, metadata=node.metadata)
