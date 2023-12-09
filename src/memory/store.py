@@ -1,3 +1,4 @@
+import logging
 from typing import Any, List
 
 from llama_index.schema import BaseNode
@@ -5,10 +6,13 @@ from llama_index.vector_stores import VectorStoreQuery, VectorStoreQueryResult
 from llama_index.vector_stores.types import VectorStore
 from llama_index.vector_stores.utils import node_to_metadata_dict, metadata_dict_to_node
 from sqlalchemy import delete
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from db.core import db_session, current_org
 from db.models import Org, Chunk
+
+logger = logging.getLogger(__name__)
 
 
 class ChunkVectorStore(VectorStore):
@@ -39,8 +43,13 @@ class ChunkVectorStore(VectorStore):
                 embedding=node.embedding,
                 data=node_data
             )
-            self.dbsession.add(chunk)
-            ids.append(node.node_id)
+            # start a savepoint for each chunk
+            try:
+                with self.dbsession.begin_nested():
+                    self.dbsession.add(chunk)
+                    ids.append(node.node_id)
+            except IntegrityError:
+                logger.info(f"Chunk with hash {node.hash} already exists in org {self.org.id}.")
         self.dbsession.commit()
         return ids
 

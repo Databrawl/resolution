@@ -23,11 +23,14 @@ class TestChunkVectorStore:
         org = OrgFactory.create()
         current_org.set(org)
         nodes = [
-            TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(), text="random text 1",
+            TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(),
+                     text="random text 1",
                      metadata={"key": "value 1"}),
-            TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(), text="random text 2",
+            TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(),
+                     text="random text 2",
                      metadata={"key": "value 2"}),
-            TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(), text="random text 3",
+            TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(),
+                     text="random text 3",
                      metadata={"key": "value 3"}),
         ]
         chunk_vector_store = ChunkVectorStore()
@@ -36,7 +39,6 @@ class TestChunkVectorStore:
         ids = chunk_vector_store.add(nodes)
 
         # Assert
-
         chunks = db_session.get().execute(select(Chunk)).scalars().all()
         assert len(chunks) == 3
         node_texts = ["random text 1", "random text 2", "random text 3"]
@@ -46,7 +48,7 @@ class TestChunkVectorStore:
             assert chunk.data['key'] in node_metadata_values
             assert str(chunk.id) in ids
         assert len(ids) == len(nodes)
-        assert all(id in ids for id in [node.node_id for node in nodes])
+        assert all(_id in ids for _id in [node.node_id for node in nodes])
 
     def test_query(self):
         # Arrange
@@ -70,7 +72,8 @@ class TestChunkVectorStore:
         # Now set up the query
         query_str = "Hello World!"
         query_embedding = embeddings_model.embed_query(query_str)
-        query = VectorStoreQuery(query_embedding=query_embedding, query_str=query_str, similarity_top_k=3)
+        query = VectorStoreQuery(query_embedding=query_embedding, query_str=query_str,
+                                 similarity_top_k=3)
 
         # Act
         query_results = chunk_vector_store.query(query)
@@ -103,13 +106,44 @@ class TestChunkVectorStore:
         fake_vector_store.add([node])
         # Now set up the query
         query_embedding = embeddings_model.embed_query(text)
-        query = VectorStoreQuery(query_embedding=query_embedding, query_str=text, similarity_top_k=3)
+        query = VectorStoreQuery(query_embedding=query_embedding, query_str=text,
+                                 similarity_top_k=3)
         # And set the vector store to a different org
         current_org.set(real_org)
         real_vector_store = ChunkVectorStore()
 
         # Act
-        query_results = real_vector_store.query(query)  # chunk was added to a different vector store!
+        query_results = real_vector_store.query(
+            query)  # chunk was added to a different vector store!
 
         # Assert
         assert query_results.nodes == []
+
+    def test_add_duplicates(self):
+        # Arrange
+        org = OrgFactory.create()
+        current_org.set(org)
+        node_1 = TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(),
+                          text="random text 1",
+                          metadata={"key": "value 1"})
+        nodes = [
+            node_1,
+            node_1,
+            TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(),
+                     text="random text 2",
+                     metadata={"key": "value 3"}),
+        ]
+        chunk_vector_store = ChunkVectorStore()
+
+        # Act
+        ids = chunk_vector_store.add(nodes)
+
+        # Assert
+        chunks = db_session.get().execute(select(Chunk)).scalars().all()
+        assert len(chunks) == 2
+        node_texts = ["random text 1", "random text 2"]
+        for chunk in chunks:
+            assert any(node_texts[i] in chunk.data["_node_content"] for i in range(len(node_texts)))
+            assert str(chunk.id) in ids
+        assert len(ids) == len(nodes)
+        assert all(_id in ids for _id in [node.node_id for node in nodes])
