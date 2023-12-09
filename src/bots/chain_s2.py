@@ -86,7 +86,7 @@ def get_pre_process_chain() -> Runnable[Any, BaseMessage]:
     """
     prompt = ChatPromptTemplate.from_template(prompt_template)
 
-    llm = ChatOpenAI(temperature=0, model=settings.GPT_35)
+    llm = ChatOpenAI(temperature=0, model=settings.GPT_4)
     chain = (
             {
                 "chat_history": lambda x: memory.buffer_as_str,
