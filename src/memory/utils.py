@@ -1,15 +1,14 @@
 import logging
-import sys
 from functools import reduce
 from typing import Sequence
 from typing import Union
 
+from llama_index import Document
 from llama_index import StorageContext, QueryBundle
 from llama_index import (
     VectorStoreIndex,
     ServiceContext,
 )
-from llama_index import download_loader, Document
 from llama_index.retrievers import VectorIndexRetriever
 from llama_index.schema import NodeWithScore
 from supabase.client import Client, create_client
@@ -18,12 +17,10 @@ from unstructured.cleaners.core import clean_bullets, clean_dashes, clean_extra_
     replace_unicode_quotes
 
 from config import settings
+from memory.crawler import WebCrawler
 from memory.store import ChunkVectorStore
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
-
-BeautifulSoupWebReader = download_loader("BeautifulSoupWebReader")
+logger = logging.getLogger(__name__)
 
 
 def _get_client() -> Client:
@@ -61,12 +58,21 @@ def _get_index() -> VectorStoreIndex:
     return VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
 
-def archive_urls(urls: Union[str, list[str]]) -> None:
+def archive_urls(urls: Union[str, list[str]], depth: int = 0) -> None:
+    """
+    Scrape provided URLs and archive the text content. If depth provided, act as a crawler and scrape all links to a
+    given depth.
+
+    :param urls: single URL or a list of URLs divided by commas
+    :param depth: integer representing the depth of the crawler, None if no crawling is required
+    :return:
+    """
     if isinstance(urls, str):
         urls = [urls]
 
-    loader = BeautifulSoupWebReader()
+    loader = WebCrawler(depth=depth)
     documents = loader.load_data(urls=urls)
+    logger.info(f"Loaded {len(documents)} documents from {len(urls)} URLs.")
     for document in documents:
         document.text = _clean(document.text)
 

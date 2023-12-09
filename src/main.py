@@ -1,6 +1,5 @@
 import argparse
 import logging
-import sys
 from pprint import pprint
 
 from sqlalchemy import select
@@ -34,6 +33,8 @@ def main():
     parser.add_argument('mode', type=str, help='Application operation mode. One of: "vdb", "librarian", "chat"')
     parser.add_argument('org', type=str, help='The Organization name')
     parser.add_argument('--query', type=str, help='String to query Vector Database for', default=None)
+    parser.add_argument('--crawl_depth', type=int, help='Depth of crawl of the URLs, default is 0 - no crawl',
+                        default=0)
     args = parser.parse_args()
 
     # set the context vars
@@ -48,9 +49,9 @@ def main():
     if args.mode == 'vdb':
         if not args.query:
             # no query provided, let's store the documents
-            archive_urls(settings.KNOWLEDGE_URLS.split(','))
+            archive_urls(settings.KNOWLEDGE_URLS.split(','), args.crawl_depth)
         else:
-            results = retrieve(sys.argv[2])
+            results = retrieve(args.query)
             pprint(results)
     elif args.mode == "librarian":
         while True:
