@@ -11,29 +11,26 @@ from config import settings
 from db.core import get_db, current_org, db_session
 from db.models import Org
 from db.tests.factories import OrgFactory
-from memory.functions import search_native_formatted
 from memory.utils import archive_urls, retrieve
 
 logging.basicConfig(level=settings.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
 
-def old_main():
-    search_res = search_native_formatted('USDC')
-    print(search_res)
-    # node_list = NodeList(nodes=[Node(uuid='12342134', content='Abs asfsdf'),
-    #                             Node(uuid='21341234', content='Gsfsdf ffbs')])
-    # print(node_list)
-
-
+# TODO:
+# 1. Fix URL parsing list error
+# 2. Fix Wandb session serializing
 def main():
     # Create the parser
     parser = argparse.ArgumentParser(description='Call foo function with org_id')
     # Add the arguments
-    parser.add_argument('mode', type=str, help='Application operation mode. One of: "vdb", "librarian", "chat"')
+    parser.add_argument('mode', type=str,
+                        help='Application operation mode. One of: "vdb", "librarian", "chat"')
     parser.add_argument('org', type=str, help='The Organization name')
-    parser.add_argument('--query', type=str, help='String to query Vector Database for', default=None)
-    parser.add_argument('--crawl_depth', type=int, help='Depth of crawl of the URLs, default is 0 - no crawl',
+    parser.add_argument('--query', type=str, help='String to query Vector Database for',
+                        default=None)
+    parser.add_argument('--crawl_depth', type=int,
+                        help='Depth of crawl of the URLs, default is 0 - no crawl',
                         default=0)
     args = parser.parse_args()
 
