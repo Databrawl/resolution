@@ -149,9 +149,9 @@ def retrieval_chain() -> Runnable[Any, BaseMessage]:
     Description: Inquiries that require deep knowledge or technical specifications.
     How to act: Retrieve relevant information from the Context and provide detailed answer.
 
-    Case 7. Comparisson
+    Case 7. Comparison
     Description: Asking you to compare different products or services.
-    How to act: Show the advantages and use-cases for our products. If there is a comparisson between only our products, try to find advantages for all of them and provide the relevant use cases for each.
+    How to act: Show the advantages and use-cases for our products. If there is a comparison between only our products, try to find advantages for all of them and provide the relevant use cases for each.
 
     Case 8. Common issues
     Description: Questions about frequent challenges or issues customers might face.
