@@ -5,7 +5,7 @@ from pprint import pprint
 from sqlalchemy import select
 from sqlalchemy.orm import exc
 
-from bots.chain_s2 import get_chain
+from bots.chain_s3 import get_chain
 from bots.librarian import librarian_agent
 from config import settings
 from db.core import get_db, current_org, db_session
