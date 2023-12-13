@@ -1,8 +1,6 @@
 import os
 from typing import List
 
-import chromadb
-from chromadb.utils import embedding_functions
 from langchain.pydantic_v1 import BaseModel, Field
 
 from memory.utils import retrieve
