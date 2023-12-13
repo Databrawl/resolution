@@ -5,7 +5,7 @@ from pprint import pprint
 from sqlalchemy import select
 from sqlalchemy.orm import exc
 
-from bots.chain_s3 import get_chain
+from bots.agent_1 import get_agent
 from bots.librarian import librarian_agent
 from config import settings
 from db.core import get_db, current_org, db_session
@@ -56,10 +56,17 @@ def main():
             response = librarian_agent().run(user_input)
             print(response)
     elif args.mode == "chat":
-        chain = get_chain()
+        # chain = get_chain()
+        agent = get_agent()
+        from langchain.globals import set_debug
+
+        # set_verbose(True)
+        set_debug(True)
         while True:
             user_input = input('>>> ')
-            response = chain.invoke(user_input)
+            # response = chain.invoke(user_input)
+            response = agent.run(user_input)
+
             print(response)
 
 
