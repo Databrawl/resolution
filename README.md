@@ -27,6 +27,14 @@
    The first parameter is the type of the operation, the second is the name of the organization.
    Available operations:
 
-   1. `vdb` - Vector Database initialization
-   2. `librarian` - chat with the Librarian bot
-   3. `chat` - chat with the support bot, customer mode
+4. Chat with the Guardian bot
+
+    ```bash
+    python src/main.py chat samurai
+    ```
+
+5. Chat with the Librarian bot
+
+    ```bash
+    python src/main.py librarian samurai
+    ```
