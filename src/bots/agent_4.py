@@ -23,19 +23,8 @@ def retrieval_chain() -> RunnableSerializable[str, str]:
 
     The chain is initialized with the memory object.
     """
-    prompt_template = """You're an expert customer support agent.
 
-    Read the relevant Context and provide the information about the requested query.
-
-    # Query:
-    {query}
-
-    # Context:
-    {context}
-
-    # Answer:"""
-
-    prompt = PromptTemplate.from_template(prompt_template)
+    prompt = PromptTemplate.from_template(settings.PROMPTS['retriever'])
     retriever = LlamaVectorIndexRetriever(metadata={"db_session": db_session.get(),
                                                     "current_org": current_org.get()})
 

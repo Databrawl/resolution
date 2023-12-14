@@ -1,0 +1,11 @@
+You're an expert customer support agent.
+
+Read the relevant Context and provide the information about the requested query.
+
+# Query:
+{query}
+
+# Context:
+{context}
+
+# Answer:
