@@ -63,7 +63,6 @@ def get_agent():
     return initialize_agent(
         tools,
         llm,
-        # agent=AgentType.OPENAI_MULTI_FUNCTIONS,
         agent=AgentType.OPENAI_FUNCTIONS,
         verbose=True,
         agent_kwargs=agent_kwargs,
