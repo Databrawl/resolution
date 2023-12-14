@@ -1,19 +1,25 @@
 """
-Simple agent with a single Retriever tool, which doesn't do query pre-processing
+The agent that properly fills the chat history: adds human message before sending it to the tools.
 """
 from __future__ import annotations
 
 import logging
 
-from langchain.agents import AgentType, Tool, initialize_agent
+from langchain.agents import Tool, AgentExecutor
+from langchain.agents.format_scratchpad import format_to_openai_function_messages
+from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import MessagesPlaceholder
-from langchain.prompts import PromptTemplate
-from langchain.schema import StrOutputParser, BaseMemory, \
-    SystemMessage
-from langchain.schema.runnable import RunnableSerializable, RunnablePassthrough
+from langchain.prompts import PromptTemplate, ChatPromptTemplate
+from langchain.schema import BaseMemory, \
+    AIMessage
+from langchain.schema import HumanMessage, StrOutputParser
+from langchain.schema.runnable import RunnableLambda, RunnablePassthrough
+from langchain.schema.runnable import RunnableSerializable
+from langchain.tools.render import format_tool_to_openai_function
 
+from bots.chain_s2 import save_message
 from config import settings
 from db.core import db_session, current_org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
@@ -60,8 +66,13 @@ def retrieval_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
 
 def get_agent():
     memory = ConversationBufferMemory(memory_key="memory", return_messages=True)
+
+    def save_message_passthrough(payload):
+        memory.chat_memory.add_message(payload["input"])
+        # passing through the whole input
+        return payload
+
     llm = ChatOpenAI(temperature=0, model=settings.GPT_35)
-    system_message = SystemMessage(content=settings.PROMPTS['manager'])
 
     tools = [
         Tool.from_function(
@@ -70,19 +81,27 @@ def get_agent():
             description="Useful when you need to get the information about the product",
         )
     ]
-
-    agent_kwargs = {
-        "system_message": system_message,
-        "extra_prompt_messages": [
-            MessagesPlaceholder(variable_name="memory")
-        ],
-    }
-
-    return initialize_agent(
-        tools,
-        llm,
-        agent=AgentType.OPENAI_MULTI_FUNCTIONS,
-        verbose=True,
-        agent_kwargs=agent_kwargs,
-        memory=memory,
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", settings.PROMPTS['manager']),
+            ("user", "{input}"),
+            MessagesPlaceholder(variable_name="agent_scratchpad"),
+        ]
     )
+    llm_with_tools = llm.bind(functions=[format_tool_to_openai_function(t) for t in tools])
+
+    agent = (  # TODO: change to save human message + save agent message
+            RunnableLambda(lambda m: save_message_passthrough(HumanMessage(content=m["input"])))
+            | {
+                "input": lambda x: x["input"],
+                "agent_scratchpad": lambda x: format_to_openai_function_messages(
+                    x["intermediate_steps"]
+                ),
+            }
+            | prompt
+            | llm_with_tools
+            | OpenAIFunctionsAgentOutputParser()
+            | RunnableLambda(lambda m: save_message(AIMessage(content=m)))
+    )
+
+    return AgentExecutor(agent=agent, tools=tools, verbose=True)

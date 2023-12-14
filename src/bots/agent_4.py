@@ -1,6 +1,3 @@
-"""
-Simple agent with a single Retriever tool, which doesn't do query pre-processing
-"""
 from __future__ import annotations
 
 import logging
@@ -10,8 +7,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.prompts import PromptTemplate
-from langchain.schema import StrOutputParser, BaseMemory, \
-    SystemMessage
+from langchain.schema import StrOutputParser, SystemMessage
 from langchain.schema.runnable import RunnableSerializable, RunnablePassthrough
 
 from config import settings
@@ -21,7 +17,7 @@ from memory.retriever import LlamaVectorIndexRetriever, format_docs
 logger = logging.getLogger(__name__)
 
 
-def retrieval_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
+def retrieval_chain() -> RunnableSerializable[str, str]:
     """
     Retrieve relevant documents and produce the response based on that context.
 
@@ -29,16 +25,13 @@ def retrieval_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
     """
     prompt_template = """You're an expert customer support agent.
 
-    Read the chat history and the relevant Context and provide the answer to the question.
-    Answer "I don't know" if the context does not have the answer. 
+    Read the relevant Context and provide the information about the requested query.
+
+    # Query:
+    {query}
 
     # Context:
-
     {context}
-
-    # Chat History:
-
-    {chat_history}
 
     # Answer:"""
 
@@ -49,8 +42,8 @@ def retrieval_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
     llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
     return (
             {
+                "query": RunnablePassthrough(),
                 "context": RunnablePassthrough() | retriever | format_docs,
-                "chat_history": lambda _: memory.buffer_as_str
             }
             | prompt
             | llm
@@ -65,7 +58,7 @@ def get_agent():
 
     tools = [
         Tool.from_function(
-            func=retrieval_chain(memory).invoke,
+            func=retrieval_chain().invoke,
             name="Retriever",
             description="Useful when you need to get the information about the product",
         )
@@ -81,7 +74,8 @@ def get_agent():
     return initialize_agent(
         tools,
         llm,
-        agent=AgentType.OPENAI_MULTI_FUNCTIONS,
+        # agent=AgentType.OPENAI_MULTI_FUNCTIONS,
+        agent=AgentType.OPENAI_FUNCTIONS,
         verbose=True,
         agent_kwargs=agent_kwargs,
         memory=memory,
