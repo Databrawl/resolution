@@ -17,7 +17,7 @@ from typing import Any
 
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
-from langchain.prompts import PromptTemplate
+from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.schema import BaseMessage, HumanMessage, StrOutputParser, AIMessage
 from langchain.schema.runnable import RunnableBranch, Runnable, RunnableLambda, RunnablePassthrough
 
@@ -31,7 +31,7 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from src.config import settings
+from server.config import settings
 
 from langchain.globals import set_verbose
 
@@ -68,6 +68,35 @@ def note_email(message):
     answer = "I noted your email. Please wait for an answer from our team. Let me know if you have any other questions."
     memory.save_context({'Human': message}, {'AI': answer})
     return answer
+
+
+def get_pre_process_chain() -> Runnable[Any, BaseMessage]:
+    """
+    Pre-process the message before sending it to the retriever
+    :return: str, the pre-processed message
+    """
+    prompt_template = """
+    Rephrase the Follow Up Input message, so that the intent is clear without a prior context from a provided Chat History. Save the voice tone of the follow up message. If there are multiple questions or requests in the Follow Up Input message, rephrase each of them.
+
+    Chat History:
+    {chat_history}
+
+    Follow Up Input: {message}
+    Rephrased Follow Up:
+    """
+    prompt = ChatPromptTemplate.from_template(prompt_template)
+
+    llm = ChatOpenAI(temperature=0, model=settings.GPT_4)
+    chain = (
+            {
+                "chat_history": lambda x: memory.buffer_as_str,
+                "message": lambda x: x,
+            }
+            | prompt
+            | llm
+            | RunnableLambda(lambda x: x.content)
+    )
+    return chain
 
 
 def retrieval_chain() -> Runnable[Any, BaseMessage]:
@@ -212,7 +241,7 @@ def retrieval_chain() -> Runnable[Any, BaseMessage]:
 def get_chain():
     return RunnableBranch(
         (get_email_from_message, note_email),
-        retrieval_chain()
+        get_pre_process_chain() | retrieval_chain()
     )
 
 

@@ -13,7 +13,8 @@ from llama_index.retrievers import VectorIndexRetriever
 from llama_index.schema import NodeWithScore
 from supabase.client import Client, create_client
 from unstructured.cleaners.core import clean_bullets, clean_dashes, clean_extra_whitespace, \
-    clean_non_ascii_chars, clean_ordered_bullets, clean_trailing_punctuation, group_broken_paragraphs, \
+    clean_non_ascii_chars, clean_ordered_bullets, clean_trailing_punctuation, \
+    group_broken_paragraphs, \
     replace_unicode_quotes
 
 from config import settings

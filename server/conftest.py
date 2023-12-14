@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from db.core import db_session, Reflected
-from src.config import settings
+from server.config import settings
 
 
 @pytest.fixture(scope="session")

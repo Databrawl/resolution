@@ -4,7 +4,7 @@ from typing import List
 from langchain.pydantic_v1 import BaseModel, Field
 
 from memory.utils import retrieve
-from src.config import settings
+from server.config import settings
 
 
 class Node(BaseModel):

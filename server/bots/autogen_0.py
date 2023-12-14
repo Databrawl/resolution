@@ -16,7 +16,7 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from src.config import settings
+from server.config import settings
 
 
 def ask(question: str, chat_messages: list = None):

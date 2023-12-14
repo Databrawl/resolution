@@ -18,7 +18,7 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from src.config import settings
+from server.config import settings
 from memory.functions import search_knowledge_base
 
 logger = logging.getLogger(__name__)
