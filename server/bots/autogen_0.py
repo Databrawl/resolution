@@ -16,22 +16,21 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from server.config import settings
 
 
 def ask(question: str, chat_messages: list = None):
     # Create assistant agent
     support_agent = AssistantAgent(
         name="customer_support",
-        system_message=settings.SUPPORT_AGENT_INSTRUCTIONS,
+        system_message=app_settings.SUPPORT_AGENT_INSTRUCTIONS,
         # system_message="You are a support agent. You are helpful assistant, you answer customer's questions, you always search for the answer in the knowledge base and you wait for the approval from the reviewer; Add TERMINATE to the end of your final response.",
-        llm_config={"config_list": settings.AUTOGEN_CONFIG_LIST})
+        llm_config={"config_list": app_settings.AUTOGEN_CONFIG_LIST})
 
     reviewer = AssistantAgent(
         name="reviewer",
-        system_message=settings.REVIEWER_INSTRUCTIONS,
+        system_message=app_settings.REVIEWER_INSTRUCTIONS,
         # system_message="You are a Senior customer support manager. You review the answers from the customer_support agent and approve them if they conform to the company's knowledge base and are not repetitive; Add TERMINATE to the end when you are satisfied with the agent's answer.",
-        llm_config={"config_list": settings.AUTOGEN_CONFIG_LIST}
+        llm_config={"config_list": app_settings.AUTOGEN_CONFIG_LIST}
     )
 
     # Create user proxy agent
@@ -50,7 +49,7 @@ def ask(question: str, chat_messages: list = None):
         messages=chat_messages or [],
         max_round=20)
     manager = GroupChatManager(groupchat=groupchat,
-                               llm_config={"config_list": settings.AUTOGEN_CONFIG_LIST}
+                               llm_config={"config_list": app_settings.AUTOGEN_CONFIG_LIST}
                                )
 
     # manager should just pass the message over to the rest of the team

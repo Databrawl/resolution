@@ -4,7 +4,6 @@ from typing import List
 from langchain.pydantic_v1 import BaseModel, Field
 
 from memory.utils import retrieve
-from server.config import settings
 
 
 class Node(BaseModel):
@@ -35,7 +34,7 @@ def search_native(query: str) -> NodeList:
     Args:
         query: str, the query to search for
     """
-    client = chromadb.PersistentClient(path=settings.CHROMA_DIRECTORY)
+    client = chromadb.PersistentClient(path=app_settings.CHROMA_DIRECTORY)
     openai_ef = embedding_functions.OpenAIEmbeddingFunction(
         api_key=os.environ["OPENAI_API_KEY"],
         model_name="text-embedding-ada-002"
@@ -66,7 +65,7 @@ def update_documents(nodes: NodeList) -> None:
         nodes = NodeList(nodes=[nodes])
     if not isinstance(nodes, NodeList):
         raise TypeError(f'Expected NodeList, got {type(nodes)}')
-    client = chromadb.PersistentClient(path=settings.CHROMA_DIRECTORY)
+    client = chromadb.PersistentClient(path=app_settings.CHROMA_DIRECTORY)
     openai_ef = embedding_functions.OpenAIEmbeddingFunction(
         api_key=os.environ["OPENAI_API_KEY"],
         model_name="text-embedding-ada-002"

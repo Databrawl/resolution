@@ -5,7 +5,7 @@ import factory
 from factory import lazy_attribute
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 
-from db.core import db_session
+from db import db
 from db.models import User, Org, Chunk, OrgUser
 
 
@@ -27,8 +27,9 @@ class ModelFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     class Meta:
         abstract = True
-        sqlalchemy_session_factory = db_session.get
-        sqlalchemy_session = None
+        # TODO: resolve this
+        # sqlalchemy_session_factory = db.session
+        sqlalchemy_session = db.session
         sqlalchemy_session_persistence = 'commit'
 
 

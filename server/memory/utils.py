@@ -11,21 +11,16 @@ from llama_index import (
 )
 from llama_index.retrievers import VectorIndexRetriever
 from llama_index.schema import NodeWithScore
-from supabase.client import Client, create_client
 from unstructured.cleaners.core import clean_bullets, clean_dashes, clean_extra_whitespace, \
     clean_non_ascii_chars, clean_ordered_bullets, clean_trailing_punctuation, \
     group_broken_paragraphs, \
     replace_unicode_quotes
 
-from config import settings
 from memory.crawler import WebCrawler
 from memory.store import ChunkVectorStore
+from settings import app_settings
 
 logger = logging.getLogger(__name__)
-
-
-def _get_client() -> Client:
-    return create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
 
 def _clean(text: str) -> str:
@@ -49,20 +44,24 @@ def _create_documents(documents: Sequence[Document]) -> None:
 
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
     service_context = ServiceContext.from_defaults(
-        chunk_size=settings.CHUNK_SIZE, chunk_overlap=settings.CHUNK_OVERLAP
+        chunk_size=app_settings.CHUNK_SIZE, chunk_overlap=app_settings.CHUNK_OVERLAP
     )
-    VectorStoreIndex.from_documents(documents, storage_context=storage_context, service_context=service_context)
+    VectorStoreIndex.from_documents(documents, storage_context=storage_context,
+                                    service_context=service_context)
 
 
 def _get_index() -> VectorStoreIndex:
     vector_store = ChunkVectorStore()
-    return VectorStoreIndex.from_vector_store(vector_store=vector_store)
+    return VectorStoreIndex.from_vector_store(
+        vector_store=vector_store,
+        service_context=ServiceContext.from_defaults(llm=None)
+    )
 
 
 def archive_urls(urls: Union[str, list[str]], depth: int = 0) -> None:
     """
-    Scrape provided URLs and archive the text content. If depth provided, act as a crawler and scrape all links to a
-    given depth.
+    Scrape provided URLs and archive the text content. If depth provided, act as a crawler and
+    scrape all links to a given depth.
 
     :param urls: single URL or a list of URLs divided by commas
     :param depth: integer representing the depth of the crawler, None if no crawling is required

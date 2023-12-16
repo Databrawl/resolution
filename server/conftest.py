@@ -2,14 +2,13 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from db.core import db_session, Reflected
-from server.config import settings
+from settings import app_settings
 
 
 @pytest.fixture(scope="session")
 def engine():
     # TODO: seed test db with auth schema data, then switch to test db
-    return create_engine(settings.SUPABASE_DB)
+    return create_engine(app_settings.DATABASE_URI)
 
 
 @pytest.fixture(autouse=True, scope="function")

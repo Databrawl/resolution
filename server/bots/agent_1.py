@@ -11,8 +11,6 @@ from langchain.schema import StrOutputParser, BaseMemory, \
     SystemMessage
 from langchain.schema.runnable import RunnableSerializable
 
-from config import settings
-from db.core import current_org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
 
 logger = logging.getLogger(__name__)
@@ -32,7 +30,7 @@ def query_builder_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
     # Search Query:
     """
     prompt = PromptTemplate.from_template(prompt_template)
-    llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
+    llm = ChatOpenAI(temperature=0, model_name=app_settings.GPT_4)
 
     return (
             {
@@ -69,7 +67,7 @@ def retrieval_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
     prompt = PromptTemplate.from_template(prompt_template)
     retriever = LlamaVectorIndexRetriever(metadata={"current_org": current_org.get()})
 
-    llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
+    llm = ChatOpenAI(temperature=0, model_name=app_settings.GPT_4)
     return (
             {
                 "context": query_builder_chain(memory) | retriever | format_docs,
@@ -85,8 +83,8 @@ def retrieval_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
 def get_agent():
     memory = ConversationBufferMemory(memory_key="memory", return_messages=True)
     # read_only_memory = ReadOnlySharedMemory(memory=memory)
-    llm = ChatOpenAI(temperature=0, model=settings.GPT_35)
-    system_message = SystemMessage(content=settings.PROMPTS['manager'])
+    llm = ChatOpenAI(temperature=0, model=app_settings.GPT_35)
+    system_message = SystemMessage(content=app_settings.PROMPTS['manager'])
     tools = [
         Tool(
             name="Retriever",

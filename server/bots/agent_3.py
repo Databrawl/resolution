@@ -20,8 +20,6 @@ from langchain.schema.runnable import RunnableSerializable
 from langchain.tools.render import format_tool_to_openai_function
 
 from bots.chain_s2 import save_message
-from config import settings
-from db.core import db_session, current_org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
 
 logger = logging.getLogger(__name__)
@@ -52,7 +50,7 @@ def retrieval_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
     retriever = LlamaVectorIndexRetriever(metadata={"db_session": db_session.get(),
                                                     "current_org": current_org.get()})
 
-    llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
+    llm = ChatOpenAI(temperature=0, model_name=app_settings.GPT_4)
     return (
             {
                 "context": RunnablePassthrough() | retriever | format_docs,
@@ -72,7 +70,7 @@ def get_agent():
         # passing through the whole input
         return payload
 
-    llm = ChatOpenAI(temperature=0, model=settings.GPT_35)
+    llm = ChatOpenAI(temperature=0, model=app_settings.GPT_35)
 
     tools = [
         Tool.from_function(
@@ -83,7 +81,7 @@ def get_agent():
     ]
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", settings.PROMPTS['manager']),
+            ("system", app_settings.PROMPTS['manager']),
             ("user", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
         ]

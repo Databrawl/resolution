@@ -33,7 +33,6 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from server.config import settings
 from memory.functions import search_knowledge_base
 
 memory = ConversationBufferWindowMemory(memory_key="librarian_memory", return_messages=True, k=8)
@@ -67,7 +66,7 @@ def librarian_agent():
         "system_message": system_message,
     }
 
-    llm = ChatOpenAI(temperature=0, model=settings.GPT_35)
+    llm = ChatOpenAI(temperature=0, model=app_settings.GPT_35)
     tools = [
         Tool(
             name="Archive_text_data",

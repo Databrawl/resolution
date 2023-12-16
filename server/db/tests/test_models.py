@@ -4,7 +4,6 @@ import pytest
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from sqlalchemy import exc, select
 
-from db.core import db_session
 from db.models import Chunk, Org, User
 from db.tests.factories import OrgFactory, UserFactory, ChunkFactory, OrgUserFactory
 

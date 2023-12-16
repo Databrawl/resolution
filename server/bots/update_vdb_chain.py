@@ -14,7 +14,6 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
 
 from memory.functions import update_documents, search_native_formatted, Node
-from server.config import settings
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
@@ -70,7 +69,7 @@ update_prompt_template = """
     # Answer (make sure to answer in the correct format):
 """
 update_prompt = PromptTemplate.from_template(update_prompt_template)
-llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
+llm = ChatOpenAI(temperature=0, model_name=app_settings.GPT_4)
 # update_documents_runnable = create_openai_fn_runnable([update_documents], llm, update_prompt)
 # node_list_runnable = create_structured_output_runnable(NodeList, llm, update_prompt)
 node_list_runnable = create_structured_output_runnable(Node, llm, update_prompt)

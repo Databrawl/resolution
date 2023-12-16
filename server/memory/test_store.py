@@ -7,7 +7,6 @@ from llama_index.schema import TextNode
 from llama_index.vector_stores import VectorStoreQuery
 from sqlalchemy import select
 
-from db.core import db_session, current_org
 from db.models import Chunk
 from db.tests.factories import OrgFactory
 from memory.store import ChunkVectorStore

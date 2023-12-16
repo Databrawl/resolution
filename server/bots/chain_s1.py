@@ -21,8 +21,6 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
 from langchain.schema.runnable import RunnableBranch
 
-from server.config import settings
-
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 
@@ -92,9 +90,9 @@ def default_sequence(message):
 
     chain_type_kwargs = {"prompt": prompt}
     qa = ConversationalRetrievalChain.from_llm(
-        llm=ChatOpenAI(temperature=0, model_name=settings.GPT_4),
+        llm=ChatOpenAI(temperature=0, model_name=app_settings.GPT_4),
         retriever=db.as_retriever(),
-        condense_question_llm=ChatOpenAI(temperature=0, model=settings.GPT_4),
+        condense_question_llm=ChatOpenAI(temperature=0, model=app_settings.GPT_4),
         # TODO: change prompt to expect statement
         combine_docs_chain_kwargs=chain_type_kwargs,
         memory=memory,

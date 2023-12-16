@@ -21,7 +21,6 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.schema import BaseMessage, HumanMessage, StrOutputParser, AIMessage
 from langchain.schema.runnable import RunnableBranch, Runnable, RunnableLambda, RunnablePassthrough
 
-from db.core import db_session, current_org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,7 +30,6 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from server.config import settings
 
 from langchain.globals import set_verbose
 
@@ -86,7 +84,7 @@ def get_pre_process_chain() -> Runnable[Any, BaseMessage]:
     """
     prompt = ChatPromptTemplate.from_template(prompt_template)
 
-    llm = ChatOpenAI(temperature=0, model=settings.GPT_4)
+    llm = ChatOpenAI(temperature=0, model=app_settings.GPT_4)
     chain = (
             {
                 "chat_history": lambda x: memory.buffer_as_str,
@@ -221,7 +219,7 @@ def retrieval_chain() -> Runnable[Any, BaseMessage]:
     retriever = LlamaVectorIndexRetriever(metadata={"db_session": db_session.get(),
                                                     "current_org": current_org.get()})
 
-    llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
+    llm = ChatOpenAI(temperature=0, model_name=app_settings.GPT_4)
     chain = (
             RunnableLambda(lambda m: save_message(HumanMessage(content=m)))
             | {

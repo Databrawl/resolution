@@ -18,7 +18,7 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
 
-from server.config import settings
+
 from memory.functions import search_knowledge_base
 
 logger = logging.getLogger(__name__)
@@ -83,6 +83,7 @@ def generate_response(instructions, user_input):
 if __name__ == "__main__":
     while True:
         user_input = input('>>> ')
-        response = generate_response(settings.SUPPORT_AGENT_INSTRUCTIONS,
-                                     {'id': 0, 'message': user_input, 'user_name': 'Tyrael', 'ai_name': 'Guardian'})
+        response = generate_response(app_settings.SUPPORT_AGENT_INSTRUCTIONS,
+                                     {'id': 0, 'message': user_input, 'user_name': 'Tyrael',
+                                      'ai_name': 'Guardian'})
         print(response)

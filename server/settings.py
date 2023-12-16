@@ -34,7 +34,8 @@ class AppSettings(BaseSettings):
     messages when an ENV var isn't correctly formatted; for example when you provide an incorrect
     formatted DATABASE_URI.
 
-    ".env" loading is also supported. FastAPI will autoload and ".env" file if one can be found
+    ".env" loading is also supported. FastAPI will autoload "<env>.env" file, where <env> is the
+    value of ENV environment variable (use local, dev, prod for example) if one can be found.
     """
 
     PROJECT_NAME: str = "Guardian Support Defender"

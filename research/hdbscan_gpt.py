@@ -15,8 +15,6 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
 )
 
-from config import settings
-
 
 def get_prompt():
     system_template = "You're an expert customer support manager. You're helping to categorize a " \
@@ -37,7 +35,7 @@ def _summarize_clusters(df):
     results = []
     for c in df.cluster.unique():
         chain = LLMChain(
-            llm=ChatOpenAI(temperature=0, model_name=settings.GPT_4), prompt=get_prompt(),
+            llm=ChatOpenAI(temperature=0, model_name=app_settings.GPT_4), prompt=get_prompt(),
             verbose=False
         )
         tickets_str = "\n\n\n\n".join(

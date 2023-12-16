@@ -21,7 +21,6 @@ from langchain.schema.runnable import RunnableBranch
 
 from server.bots.chain_s1 import final_chain
 from server.bots.librarian import librarian_agent
-from server.config import settings
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
@@ -34,7 +33,7 @@ sys.path.append(PROJECT_ROOT)
 def is_data_entry(message):
     llm = ChatOpenAI(
         temperature=0,
-        model=settings.GPT_35,
+        model=app_settings.GPT_35,
     )
 
     prompt = PromptTemplate.from_template("Check if the user wants to add some info to the knowledge base."
