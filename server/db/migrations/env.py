@@ -1,8 +1,11 @@
+from typing import Any
+
 import structlog
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+from sqlalchemy.sql.schema import SchemaItem
 
-from server.db.database import BaseModel, Reflected
+from db.models import BaseModel, Reflected
 from server.settings import app_settings
 
 # this is the Alembic Config object, which provides
@@ -40,7 +43,11 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def include_object(obj, name, type_, reflected, compare_to):
+def include_object(obj: SchemaItem,
+                   name: Any,
+                   type_: str,
+                   reflected: Any,
+                   compare_to: Any) -> bool:
     if type_ == "table" and obj.schema == "auth":
         # We don't track auth schema changes, as those tables are controlled by Supabase
         return False
@@ -80,6 +87,7 @@ def run_migrations_online() -> None:
         target_metadata=target_metadata,
         process_revision_directives=process_revision_directives,
         compare_type=True,
+        include_object=include_object
     )
     try:
         with context.begin_transaction():
