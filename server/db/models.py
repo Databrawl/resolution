@@ -153,7 +153,7 @@ class Org(BaseModel):
     users = relationship("OrgUser", backref="org")
 
     # Not a column
-    current: ContextVar[Mapped["Org"]] = ContextVar('current')
+    current: ContextVar[Org] = ContextVar('current')
 
     def similarity_search(self, embedding: list[float], k: int = 10) -> list[tuple[Chunk, float]]:
         """Search for similar chunks in this org"""

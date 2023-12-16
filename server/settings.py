@@ -15,11 +15,11 @@ SRC_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 def read_prompts_to_dict():
     files_content = {}
-    directory = os.path.join(SRC_ROOT, 'bots', 'prompts')
+    directory = os.path.join(SRC_ROOT, "bots", "prompts")
     for file in os.listdir(directory):
         file_path = os.path.join(directory, file)
         if os.path.isfile(file_path):
-            with open(file_path, 'r') as f:
+            with open(file_path, "r") as f:
                 base_name = os.path.splitext(file)[0]
                 files_content[base_name] = f.read()
     return files_content
@@ -37,7 +37,7 @@ class AppSettings(BaseSettings):
     ".env" loading is also supported. FastAPI will autoload and ".env" file if one can be found
     """
 
-    PROJECT_NAME: str = "Boilerplate webservice"
+    PROJECT_NAME: str = "Guardian Support Defender"
     TESTING: bool = True
 
     SESSION_SECRET: str = "".join(
@@ -135,19 +135,27 @@ class AppSettings(BaseSettings):
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
 
+    # Supabase
     SUPABASE_URL: str
     SUPABASE_KEY: str
-    OPENAI_API_KEY: str
+
     LANGCHAIN_WANDB_TRACING: bool = False
     WANDB_PROJECT: str = "guardian"
-    KNOWLEDGE_URLS: str
 
-    # Llamaindex configs
+    # OpenAI
+    OPENAI_API_KEY: str
+    GPT_35: str = "gpt-3.5-turbo-1106"
+    GPT_4: str = "gpt-4-1106-preview"
+
+    # LlamaIndex
     CHUNK_SIZE: int = 512
     CHUNK_OVERLAP: int = 50
 
+    # Project settings
     PROMPTS: dict[str, str] = read_prompts_to_dict()
+    KNOWLEDGE_URLS: str
 
 
 ENV = os.getenv('ENV', 'prod')
 app_settings = AppSettings(_env_file=f'{ENV}.env')
+os.environ['OPENAI_API_KEY'] = app_settings.OPENAI_API_KEY

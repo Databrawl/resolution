@@ -9,7 +9,7 @@ from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from db.core import db_session, current_org
+from db import db
 from db.models import Org, Chunk
 
 logger = logging.getLogger(__name__)
@@ -19,8 +19,8 @@ class ChunkVectorStore(VectorStore):
     stores_text: bool = True
 
     def __init__(self) -> None:
-        self.dbsession: Session = db_session.get()
-        self.org: Org = current_org.get()
+        self.dbsession: Session = db.session
+        self.org: Org = Org.current.get()
 
     def client(self) -> Any:
         return

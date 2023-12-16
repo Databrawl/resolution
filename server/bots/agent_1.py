@@ -12,7 +12,7 @@ from langchain.schema import StrOutputParser, BaseMemory, \
 from langchain.schema.runnable import RunnableSerializable
 
 from config import settings
-from db.core import db_session, current_org
+from db.core import current_org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
 
 logger = logging.getLogger(__name__)
@@ -67,8 +67,7 @@ def retrieval_chain(memory: BaseMemory) -> RunnableSerializable[str, str]:
     # Question: {question}
 
     prompt = PromptTemplate.from_template(prompt_template)
-    retriever = LlamaVectorIndexRetriever(metadata={"db_session": db_session.get(),
-                                                    "current_org": current_org.get()})
+    retriever = LlamaVectorIndexRetriever(metadata={"current_org": current_org.get()})
 
     llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
     return (

@@ -2,18 +2,19 @@ import argparse
 import logging
 from pprint import pprint
 
+from langchain.globals import set_verbose
 from sqlalchemy import select
 from sqlalchemy.orm import exc
 
 from bots.agent_4 import get_agent
 from bots.librarian import librarian_agent
-from config import settings
-from db.core import get_db, current_org, db_session
+from db import db
 from db.models import Org
 from db.tests.factories import OrgFactory
 from memory.utils import archive_urls, retrieve
+from settings import app_settings
 
-logging.basicConfig(level=settings.LOG_LEVEL)
+logging.basicConfig(level=app_settings.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
 
@@ -34,37 +35,35 @@ def main():
                         default=0)
     args = parser.parse_args()
 
-    # set the context vars
-    session = next(get_db())
-    db_session.set(session)
-    try:
-        org = session.execute(select(Org).where(Org.name == args.org)).scalar_one()
-    except exc.NoResultFound:
-        org = OrgFactory.create(name=args.org)
-    current_org.set(org)
+    with db.database_scope():
+        try:
+            org = db.session.execute(select(Org).where(Org.name == args.org)).scalar_one()
+        except exc.NoResultFound:
+            org = OrgFactory.create(name=args.org)
+        Org.current.set(org)
 
-    if args.mode == 'vdb':
-        if not args.query:
-            # no query provided, let's store the documents
-            archive_urls(settings.KNOWLEDGE_URLS.split(','), args.crawl_depth)
-        else:
-            results = retrieve(args.query)
-            pprint(results)
-    elif args.mode == "librarian":
-        while True:
-            user_input = input('>>> ')
-            response = librarian_agent().run(user_input)
-            print(response)
-    elif args.mode == "chat":
-        agent = get_agent()
+        if args.mode == 'vdb':
+            if not args.query:
+                # no query provided, let's store the documents
+                archive_urls(app_settings.KNOWLEDGE_URLS.split(','), args.crawl_depth)
+            else:
+                results = retrieve(args.query)
+                pprint(results)
+        elif args.mode == "librarian":
+            while True:
+                user_input = input('>>> ')
+                response = librarian_agent().run(user_input)
+                print(response)
+        elif args.mode == "chat":
+            agent = get_agent()
 
-        # set_verbose(True)
-        # set_debug(True)
-        while True:
-            user_input = input('>>> ')
-            response = agent.run(user_input)
+            set_verbose(True)
+            # set_debug(True)
+            while True:
+                user_input = input('>>> ')
+                response = agent.run(user_input)
 
-            print(response)
+                print(response)
 
 
 if __name__ == "__main__":

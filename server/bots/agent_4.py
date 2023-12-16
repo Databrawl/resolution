@@ -10,9 +10,9 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser, SystemMessage
 from langchain.schema.runnable import RunnableSerializable, RunnablePassthrough
 
-from config import settings
-from db.core import db_session, current_org
+from db.models import Org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
+from settings import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -24,11 +24,12 @@ def retrieval_chain() -> RunnableSerializable[str, str]:
     The chain is initialized with the memory object.
     """
 
-    prompt = PromptTemplate.from_template(settings.PROMPTS['retriever'])
-    retriever = LlamaVectorIndexRetriever(metadata={"db_session": db_session.get(),
-                                                    "current_org": current_org.get()})
+    prompt = PromptTemplate.from_template(app_settings.PROMPTS['retriever'])
+    retriever = LlamaVectorIndexRetriever(metadata={"current_org": Org.current.get()})
 
-    llm = ChatOpenAI(temperature=0, model_name=settings.GPT_4)
+    llm = ChatOpenAI(temperature=0,
+                     openai_api_key=app_settings.OPENAI_API_KEY,
+                     model_name=app_settings.GPT_4)
     return (
             {
                 "query": RunnablePassthrough(),
@@ -42,8 +43,10 @@ def retrieval_chain() -> RunnableSerializable[str, str]:
 
 def get_agent():
     memory = ConversationBufferMemory(memory_key="memory", return_messages=True)
-    llm = ChatOpenAI(temperature=0, model=settings.GPT_35)
-    system_message = SystemMessage(content=settings.PROMPTS['manager'])
+    llm = ChatOpenAI(temperature=0,
+                     model=app_settings.GPT_35,
+                     openai_api_key=app_settings.OPENAI_API_KEY)
+    system_message = SystemMessage(content=app_settings.PROMPTS['manager'])
 
     tools = [
         Tool.from_function(
