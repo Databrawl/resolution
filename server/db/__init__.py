@@ -1,7 +1,4 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from server.db.database import Database
+from server.settings import app_settings
 
-from config import settings
-
-engine = create_engine(settings.SUPABASE_DB)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+db = Database(app_settings.DATABASE_URI)
