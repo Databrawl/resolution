@@ -29,7 +29,9 @@ class _Base:
     _json_include: List = []
     _json_exclude: List = []
 
-    def __json__(self, excluded_keys: Set = set()) -> Dict:  # noqa: B006
+    def __json__(self, excluded_keys: Set = None) -> Dict:  # noqa: B006
+        if excluded_keys is None:
+            excluded_keys = set()
         ins = sa_inspect(self)
 
         columns = set(ins.mapper.column_attrs.keys())
@@ -94,13 +96,11 @@ class _Base:
         """Convert class name to snake_case table name"""
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', cls.__name__).lower()
 
-    # TODO: move get somewhere, maybe make a standalone query function
-    # @classmethod
-    # def get(cls, pk: str) -> Any:
-    #     """Get an instance by primary key"""
-    #     stmt = select(cls).where(cls.id == pk).limit(1)
-    #     session = db_session.get()
-    #     return session.execute(stmt).scalar_one()
+    @classmethod
+    def get(cls, pk: str) -> Any:
+        """Get an instance by primary key"""
+        stmt = select(cls).where(cls.id == pk).limit(1)
+        return db.session.execute(stmt).scalar_one()
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
