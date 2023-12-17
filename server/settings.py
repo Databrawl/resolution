@@ -78,7 +78,7 @@ class AppSettings(BaseSettings):
     ENVIRONMENT: str = "local"
     SWAGGER_HOST: str = "localhost"
     GUI_URI: str = "http://localhost:3000"
-    DATABASE_URI: str = "postgresql://boilerplate:boilerplate@localhost/boilerplate"
+    DATABASE_URI: str = "postgresql://postgres:postgres@localhost/postgres"
 
     @field_validator("DATABASE_URI", mode="before")
     @classmethod
@@ -97,13 +97,13 @@ class AppSettings(BaseSettings):
     CACHE_HOST: str = "127.0.0.1"
     CACHE_PORT: int = 6379
     POST_MORTEM_DEBUGGER: str = ""
-    SERVICE_NAME: str = "Boilerplate"
+    SERVICE_NAME: str = "Guardian Server"
     LOGGING_HOST: str = "localhost"
     LOG_LEVEL: str = "DEBUG"
 
-    FIRST_SUPERUSER: EmailStr = "admin@banaan.org"
+    FIRST_SUPERUSER: EmailStr = "justice@heaven.org"
     FIRST_SUPERUSER_PASSWORD: str = "CHANGEME"
-    FIRST_USER: EmailStr = "user@banaan.org"
+    FIRST_USER: EmailStr = "honor@heaven.org"
     FIRST_USER_PASSWORD: str = "CHANGEME"
 
     # Mail settings
