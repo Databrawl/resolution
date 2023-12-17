@@ -4,6 +4,7 @@ import pytest
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from sqlalchemy import exc, select
 
+from db import db
 from db.models import Chunk, Org, User
 from db.tests.factories import OrgFactory, UserFactory, ChunkFactory, OrgUserFactory
 
@@ -75,7 +76,7 @@ class TestChunk:
         ChunkFactory.create(org=org, data={"text": "Chunk 1"})
         ChunkFactory.create(org=org, data={"text": "Chunk 2"})
 
-        chunks = db_session.get().execute(select(Chunk)).all()
+        chunks = db.session.execute(select(Chunk)).all()
         assert len(chunks) == 2
 
     def test_create_same_chunk_different_orgs(self):
@@ -84,7 +85,7 @@ class TestChunk:
         ChunkFactory.create(org=org_1, data={"text": "Chunk"})
         ChunkFactory.create(org=org_2, data={"text": "Chunk"})
 
-        rows = db_session.get().execute(select(Chunk)).all()
+        rows = db.session.execute(select(Chunk)).all()
         assert len(rows) == 2
         assert rows[0].Chunk.org_id != rows[1].Chunk.org_id
 
