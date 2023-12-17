@@ -40,3 +40,7 @@
     ```bash
     python server/main.py librarian samurai
     ```
+
+## Development
+
+[Docs](docs/README.md)
