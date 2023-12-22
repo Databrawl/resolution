@@ -11,10 +11,6 @@ SET row_security = off;
 
 CREATE EXTENSION IF NOT EXISTS "pgsodium" WITH SCHEMA "pgsodium";
 
-CREATE SCHEMA IF NOT EXISTS "vecs";
-
-ALTER SCHEMA "vecs" OWNER TO "postgres";
-
 CREATE EXTENSION IF NOT EXISTS "pg_graphql" WITH SCHEMA "graphql";
 
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements" WITH SCHEMA "extensions";
@@ -28,25 +24,6 @@ CREATE EXTENSION IF NOT EXISTS "supabase_vault" WITH SCHEMA "vault";
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
 
 CREATE EXTENSION IF NOT EXISTS "vector" WITH SCHEMA "public";
-
-SET default_tablespace = '';
-
-SET default_table_access_method = "heap";
-
-CREATE TABLE IF NOT EXISTS "vecs"."documents"
-(
-    "id"       character varying             NOT NULL,
-    "vec"      "public"."vector"(1536)       NOT NULL,
-    "metadata" "jsonb" DEFAULT '{}'::"jsonb" NOT NULL
-);
-
-ALTER TABLE "vecs"."documents"
-    OWNER TO "postgres";
-
-ALTER TABLE ONLY "vecs"."documents"
-    ADD CONSTRAINT "documents_pkey" PRIMARY KEY ("id");
-
-CREATE INDEX "ix_vector_cosine_ops_hnsw_96b8d0f" ON "vecs"."documents" USING "hnsw" ("vec" "public"."vector_cosine_ops");
 
 GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
