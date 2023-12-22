@@ -24,7 +24,7 @@ class TestBase:
 
         assert retrieved_user.email == user.email
 
-    def test_get_non_existing(self, dbsession):
+    def test_get_non_existing(self):
         with pytest.raises(exc.NoResultFound):
             Org.get(str(uuid4()))
 

@@ -7,7 +7,8 @@ from llama_index.schema import TextNode
 from llama_index.vector_stores import VectorStoreQuery
 from sqlalchemy import select
 
-from db.models import Chunk
+from db import db
+from db.models import Chunk, Org
 from db.tests.factories import OrgFactory
 from memory.store import ChunkVectorStore
 
@@ -20,7 +21,7 @@ class TestChunkVectorStore:
     def test_add_nodes(self):
         # Arrange
         org = OrgFactory.create()
-        current_org.set(org)
+        Org.current.set(org)
         nodes = [
             TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(),
                      text="random text 1",
@@ -38,7 +39,7 @@ class TestChunkVectorStore:
         ids = chunk_vector_store.add(nodes)
 
         # Assert
-        chunks = db_session.get().execute(select(Chunk)).scalars().all()
+        chunks = db.session.execute(select(Chunk)).scalars().all()
         assert len(chunks) == 3
         node_texts = ["random text 1", "random text 2", "random text 3"]
         node_metadata_values = ["value 1", "value 2", "value 3"]
@@ -52,7 +53,7 @@ class TestChunkVectorStore:
     def test_query(self):
         # Arrange
         org = OrgFactory.create()
-        current_org.set(org)
+        Org.current.set(org)
         embeddings_model = OpenAIEmbeddings()
         texts = [
             "Hi there!",
@@ -78,7 +79,6 @@ class TestChunkVectorStore:
         query_results = chunk_vector_store.query(query)
 
         # Assert
-        # target_chunk = dbsession.execute(select(Chunk).where(Chunk.data == query_str)).scalar_one()
         target_chunk = Chunk.get(ids[4])
         assert len(query_results.nodes) == 3
         assert query_results.nodes[0].text == query_str
@@ -86,7 +86,7 @@ class TestChunkVectorStore:
         assert query_results.nodes[1].text == "Hi there!"
         assert query_results.nodes[2].text == "Oh, hello!"
 
-    def test_query_isolates_data(self, dbsession):
+    def test_query_isolates_data(self):
         # Arrange
         real_org = OrgFactory.create(name="real company")
         fake_org = OrgFactory.create(name="fake company")
@@ -100,7 +100,7 @@ class TestChunkVectorStore:
             metadata={"key": "value 1"}
         )
 
-        current_org.set(fake_org)
+        Org.current.set(fake_org)
         fake_vector_store = ChunkVectorStore()
         fake_vector_store.add([node])
         # Now set up the query
@@ -108,7 +108,7 @@ class TestChunkVectorStore:
         query = VectorStoreQuery(query_embedding=query_embedding, query_str=text,
                                  similarity_top_k=3)
         # And set the vector store to a different org
-        current_org.set(real_org)
+        Org.current.set(real_org)
         real_vector_store = ChunkVectorStore()
 
         # Act
@@ -121,7 +121,7 @@ class TestChunkVectorStore:
     def test_add_duplicates(self):
         # Arrange
         org = OrgFactory.create()
-        current_org.set(org)
+        Org.current.set(org)
         node_1 = TextNode(id_=str(uuid.uuid4()), embedding=self._get_random_embedding(),
                           text="random text 1",
                           metadata={"key": "value 1"})
@@ -138,7 +138,7 @@ class TestChunkVectorStore:
         ids = chunk_vector_store.add(nodes)
 
         # Assert
-        chunks = db_session.get().execute(select(Chunk)).scalars().all()
+        chunks = db.session.execute(select(Chunk)).scalars().all()
         assert len(chunks) == 2
         node_texts = ["random text 1", "random text 2"]
         for chunk in chunks:

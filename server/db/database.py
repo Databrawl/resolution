@@ -2,13 +2,11 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import Any
-from typing import Generator, Iterator, Optional
-from uuid import uuid4
+from typing import Iterator
 
 import structlog
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Query, Session, scoped_session, sessionmaker
+from sqlalchemy.orm import Query, Session, sessionmaker
 from sqlalchemy_searchable import SearchQueryMixin
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
@@ -60,50 +58,28 @@ SESSION_ARGUMENTS = {
 
 
 class Database:
-    """Setup and contain our database connection.
+    """Setup and contain database connection.
 
     This is used to be able to set up the database in a uniform way while allowing easy testing and
     session management.
 
-    Session management is done using ``scoped_session`` with a special scopefunc, because we cannot
-    use threading.local(). Contextvar does the right thing with respect to asyncio and behaves
-    similar to threading.local().
-    We only store a random string in the contextvar and let scoped session do the heavy lifting.
-    This allows us to easily start a new session or get the existing one using the scoped_session
-    mechanics.
+    Session management is done using the  Contextvars. It does the right thing with respect to
+    asyncio. Each context will have its own session. The session is automatically closed when used
+    in a context manager:
+
+        with db.session:
+            # do stuff
     """
 
     def __init__(self, db_url: str) -> None:
-        self.request_context: ContextVar[str] = ContextVar("request_context", default="")
         self.engine = create_engine(db_url, **ENGINE_ARGUMENTS)
         self.session_factory = sessionmaker(bind=self.engine, **SESSION_ARGUMENTS)
-
-        self.scoped_session = scoped_session(self.session_factory, self._scopefunc)
-
-    def _scopefunc(self) -> Optional[str]:
-        scope_str = self.request_context.get()
-        return scope_str
+        self.session_context_var: ContextVar[Session] = ContextVar("session_context_var",
+                                                                   default=self.session_factory())
 
     @property
-    def session(self) -> WrappedSession:
-        return self.scoped_session()
-
-    @contextmanager
-    def database_scope(self, **kwargs: Any) -> Generator["Database", None, None]:
-        """Create a new database session (scope).
-
-        This creates a new database session to handle all the database connection from a single scope (request or workflow).
-        This method should typically only been called in request middleware or at the start of workflows.
-
-        Args:
-            ``**kwargs``: Optional session kw args for this session
-        """
-        token = self.request_context.set(str(uuid4()))
-        self.scoped_session(**kwargs)
-
-        yield self
-        self.scoped_session.remove()
-        self.request_context.reset(token)
+    def session(self) -> Session:
+        return self.session_context_var.get()
 
 
 class DBSessionMiddleware(BaseHTTPMiddleware):
@@ -113,7 +89,7 @@ class DBSessionMiddleware(BaseHTTPMiddleware):
         self.database = database
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        with self.database.database_scope():
+        with self.database.session:
             response = await call_next(request)
         return response
 
@@ -141,7 +117,7 @@ def disable_commit(db: Database, log: BoundLogger) -> Iterator:
 def transactional(db: Database, log: BoundLogger) -> Iterator:
     """Run a step function in an implicit transaction with automatic rollback or commit.
 
-    It will rollback in case of error, commit otherwise. It will also disable the `commit()` method
+    It will roll back in case of error, commit otherwise. It will also disable the `commit()` method
     on `BaseModel.session` for the time `transactional` is in effect.
     """
     try:

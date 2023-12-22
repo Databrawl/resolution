@@ -17,9 +17,15 @@ class Options(factory.alchemy.SQLAlchemyOptions):
     def _check_has_sqlalchemy_session_set(meta, value):
         try:
             if value and meta.sqlalchemy_session:
-                raise RuntimeError("Provide either a sqlalchemy_session or a sqlalchemy_session_factory, not both")
+                raise RuntimeError("Provide either a sqlalchemy_session or a sqlalchemy_session_"
+                                   "factory, not both")
         except AttributeError:
             pass
+
+
+def _session_factory():
+    """It's simply making the property call delayed, until the session object is set"""
+    return db.session
 
 
 class ModelFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -27,9 +33,8 @@ class ModelFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     class Meta:
         abstract = True
-        # TODO: resolve this
-        # sqlalchemy_session_factory = db.session
-        sqlalchemy_session = db.session
+        sqlalchemy_session_factory = _session_factory
+        sqlalchemy_session = None
         sqlalchemy_session_persistence = 'commit'
 
 

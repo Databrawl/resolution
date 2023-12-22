@@ -3,12 +3,12 @@ from __future__ import annotations
 
 import re
 from contextvars import ContextVar
-from typing import Any, List, Set, Dict, ClassVar, Callable, cast
+from typing import Any, List, Set, Dict, Callable
 from uuid import uuid4
 
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import String, UniqueConstraint, inspect as sa_inspect, UUID, MetaData, ForeignKey
+from sqlalchemy import String, UniqueConstraint, inspect as sa_inspect, UUID, ForeignKey
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.declarative import as_declarative, DeferredReflection
@@ -17,7 +17,6 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from db import db
-from db.database import SearchQuery
 
 
 @as_declarative()
@@ -112,10 +111,8 @@ class BaseModel(_Base):
     This should be used instead of Base.
     """
 
-    metadata: ClassVar[MetaData]
-    query: ClassVar[SearchQuery] = cast(SearchQuery, db.scoped_session.query_property())
-
     __abstract__ = True
+    __table_args__ = {"schema": "public"}
 
     __init__: Callable[..., _Base]  # type: ignore
 

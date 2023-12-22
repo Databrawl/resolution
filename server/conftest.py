@@ -1,20 +1,18 @@
 import os
 from contextlib import closing
-from typing import cast
+from typing import Union
 
 import pytest
 import structlog
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import create_engine, text
-from sqlalchemy.engine.url import make_url
-from sqlalchemy.orm.scoping import scoped_session
+from sqlalchemy.engine.url import make_url, URL
 from sqlalchemy.orm.session import sessionmaker
 
-from db.models import BaseModel
-from server.db import db
-from server.db.database import ENGINE_ARGUMENTS, SESSION_ARGUMENTS, SearchQuery
-from server.settings import app_settings
+from db import db
+from db.database import ENGINE_ARGUMENTS, SESSION_ARGUMENTS
+from settings import app_settings
 
 logger = structlog.getLogger(__name__)
 
@@ -91,7 +89,9 @@ def database(db_uri):
         conn.execute(text("COMMIT;"))
         conn.execute(text(f'CREATE DATABASE "{db_to_create}";'))
 
+    init_schema(url)
     run_migrations(db_uri)
+
     db.engine = create_engine(db_uri, **ENGINE_ARGUMENTS)
 
     try:
@@ -103,26 +103,42 @@ def database(db_uri):
             conn.execute(text(f'DROP DATABASE IF EXISTS "{db_to_create}";'))
 
 
+def init_schema(url: Union[str, URL]) -> None:
+    """
+    Set up initial Database from the SQL dump
+    :param url: Test database connection string
+    """
+    test_engine = create_engine(url)
+    with closing(test_engine.connect()) as test_conn:
+        path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        with open(os.path.join(path, "server", "db", "migrations", "init.sql")) as init_schema_file:
+            test_conn.execute(text(init_schema_file.read()))
+        with open(os.path.join(path, "supabase", "migrations",
+                               "20231219212620_remote_schema.sql")) as sp_migration:
+            test_conn.execute(text(sp_migration.read()))
+        test_conn.commit()
+
+
 @pytest.fixture(autouse=True)
 def db_session(database):
     """
     Ensure tests are run in a transaction with automatic rollback.
 
-    This implementation creates a connection and transaction before yielding to the test function. Any transactions
-    started and committed from within the test will be tied to this outer transaction. From the test function's
-    perspective it looks like everything will indeed be committed; allowing for queries on the database to be
-    performed to see if functions under test have persisted their changes to the database correctly. However once
-    the test function returns this fixture will clean everything up by rolling back the outer transaction; leaving the
-    database in a known state (=empty except what migrations have added as the initial state).
+    This implementation creates a connection and transaction before yielding to the test function.
+    Any transactions started and committed from within the test will be tied to this outer
+    transaction. From the test function's perspective it looks like everything will indeed be
+    committed. It allowes for queries on the database to be performed to see if functions under test
+    have persisted their changes to the database correctly.
+    However, once the test function returns, this fixture will clean everything up by rolling back
+    the outer transaction, leaving the database in an empty state (besides the migrations).
 
     Args:
         database: fixture for providing an initialized database.
 
     """
-    with closing(db.engine.connect()) as test_connection:
-        db.session_factory = sessionmaker(**SESSION_ARGUMENTS, bind=test_connection)
-        db.scoped_session = scoped_session(db.session_factory, db._scopefunc)
-        BaseModel.set_query(cast(SearchQuery, db.scoped_session.query_property()))
+    with db.engine.connect() as test_connection:
+        db.session_factory = sessionmaker(bind=test_connection, **SESSION_ARGUMENTS)
+        db.session_context_var.set(db.session_factory())
 
         transaction = test_connection.begin()
         try:
