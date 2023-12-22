@@ -35,7 +35,7 @@ def main():
                         default=0)
     args = parser.parse_args()
 
-    with db.database_scope():
+    with db.session:
         try:
             org = db.session.execute(select(Org).where(Org.name == args.org)).scalar_one()
         except exc.NoResultFound:
