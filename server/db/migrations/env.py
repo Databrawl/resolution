@@ -6,7 +6,7 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.sql.schema import SchemaItem
 
 from db.models import BaseModel, Reflected
-from server.settings import app_settings
+from settings import app_settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
