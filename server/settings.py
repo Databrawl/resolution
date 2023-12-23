@@ -99,7 +99,7 @@ class AppSettings(BaseSettings):
     POST_MORTEM_DEBUGGER: str = ""
     SERVICE_NAME: str = "Guardian Server"
     LOGGING_HOST: str = "localhost"
-    LOG_LEVEL: str = "DEBUG"
+    LOG_LEVEL: str = "INFO"
 
     FIRST_SUPERUSER: EmailStr = "justice@heaven.org"
     FIRST_SUPERUSER_PASSWORD: str = "CHANGEME"

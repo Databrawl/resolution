@@ -14,7 +14,7 @@ from starlette.responses import Response
 from starlette.types import ASGIApp
 from structlog.stdlib import BoundLogger
 
-from server.utils.json import json_dumps, json_loads
+from utils.json import json_dumps, json_loads
 
 logger = structlog.get_logger(__name__)
 

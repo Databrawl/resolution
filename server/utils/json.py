@@ -72,7 +72,7 @@ import rapidjson as json
 import structlog
 from pydantic import BaseModel
 
-from server.utils.date_utils import isoformat
+from utils.date_utils import isoformat
 
 PY_JSON_TYPES = Union[Dict[str, Any], List, str, int, float, bool, None, object]
 

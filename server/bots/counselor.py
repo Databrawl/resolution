@@ -19,8 +19,8 @@ from langchain.output_parsers import BooleanOutputParser
 from langchain.prompts import PromptTemplate
 from langchain.schema.runnable import RunnableBranch
 
-from server.bots.chain_s1 import final_chain
-from server.bots.librarian import librarian_agent
+from bots.chain_s1 import final_chain
+from bots.librarian import librarian_agent
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
