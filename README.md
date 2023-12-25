@@ -44,3 +44,20 @@
 ## Development
 
 [Docs](docs/README.md)
+
+## Roadmap
+
+### 0.8 alpha release
+
+Planning.
+
+We want to provide test environments to prospect clients. Simple chat window with the chat already configured for their
+company needs.
+
+### Basic components:
+
+1. ✅ Org support
+2. Chat is attached to current org
+   It's easier to make accounts bound to the Org. Otherwise, we'll probably need to bind orgs and the databases to the
+   URLs, which is complex and complicated. We should have boilerplate code for authentication available.
+3. Save chat history in DB
