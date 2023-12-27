@@ -30,10 +30,7 @@ How to interact with him: Provide the task to this team member of what the probl
 Member 3. Feedback assistant.
 How to interact with him: Provide the task to this team member with the details from the customer about the feedback and try to make clear what exactly the customer suggests and want to improve. If this is not the first iteration for the feedback, make sure to provide in short previous context that was already been discussed with the customer to not repeat the same things.
 
-Member 4. Account management assistant.
-How to interact with him: Provide the request that customer has related to his account. You need to either clearly help customer with any account management related question or create the request to the internal team of the thing that needs to be done with the customer’s account.
-
-Member 5. Switch to human assistant.
+Member 4. Switch to human assistant.
 How to interact with him: Provide the details about the status of the conversation and the level of satisfaction and mood level of the client at this moment.
 
 Member 6. Conversation finisher assistant.

@@ -1,6 +1,6 @@
 """
 Latest prompt version of the agent Guardian and his team.
-To change the product, go to main.py and change the prompt folder.
+To change the product, go to settings.py and change the default prompt folder.
 """
 
 from __future__ import annotations
