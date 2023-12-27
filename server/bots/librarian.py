@@ -25,6 +25,7 @@ from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 
 from memory.utils import archive_text, archive_urls
+from settings import app_settings
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)
@@ -66,7 +67,9 @@ def librarian_agent():
         "system_message": system_message,
     }
 
-    llm = ChatOpenAI(temperature=0, model=app_settings.GPT_35)
+    llm = ChatOpenAI(temperature=0,
+                     model=app_settings.GPT_4,
+                     openai_api_key=app_settings.OPENAI_API_KEY)
     tools = [
         Tool(
             name="Archive_text_data",
