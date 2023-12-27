@@ -33,7 +33,7 @@ How to interact with him: Provide the task to this team member with the details 
 Member 4. Switch to human assistant.
 How to interact with him: Provide the details about the status of the conversation and the level of satisfaction and mood level of the client at this moment.
 
-Member 6. Conversation finisher assistant.
+Member 5. Conversation finisher assistant.
 How to interact with him: Tell that the customer is ready to finish the conversation and provide his satisfaction level, mood level and the current conversation status.
 
 #BASIC GUIDELINES:
