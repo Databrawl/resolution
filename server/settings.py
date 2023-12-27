@@ -15,7 +15,7 @@ SRC_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 def read_prompts_to_dict():
     files_content = {}
-    directory = os.path.join(SRC_ROOT, "bots", "prompts")
+    directory = os.path.join(SRC_ROOT, "bots", "prompts", "samurai")
     for file in os.listdir(directory):
         file_path = os.path.join(directory, file)
         if os.path.isfile(file_path):
