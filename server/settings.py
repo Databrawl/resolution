@@ -8,9 +8,10 @@ from typing import Any, Dict, List, Optional
 from pydantic import field_validator
 from pydantic.networks import EmailStr, PostgresDsn
 from pydantic_core.core_schema import ValidationInfo
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 SRC_ROOT = os.path.dirname(os.path.abspath(__file__))
+ENV = os.getenv('ENV', 'prod')
 
 
 def read_prompts_to_dict():
@@ -37,6 +38,7 @@ class AppSettings(BaseSettings):
     ".env" loading is also supported. FastAPI will autoload "<env>.env" file, where <env> is the
     value of ENV environment variable (use local, dev, prod for example) if one can be found.
     """
+    model_config = SettingsConfigDict(env_file=f'.env.{ENV}', extra='allow')
 
     PROJECT_NAME: str = "Guardian Support Defender"
     TESTING: bool = True
@@ -46,6 +48,8 @@ class AppSettings(BaseSettings):
     # OAUTH settings
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     JWT_ALGORITHM: str = "HS256"
+    JWT_SECRET_KEY: str
+
     # CORS settings
     CORS_ORIGINS: str = "*"
     CORS_ALLOW_METHODS: List[str] = [
@@ -135,6 +139,7 @@ class AppSettings(BaseSettings):
             info.data["SMTP_HOST"] and info.data["SMTP_PORT"] and info.data["EMAILS_FROM_EMAIL"])
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
+    RESEND_API_KEY: str = None
 
     # Supabase
     SUPABASE_URL: str
@@ -157,6 +162,5 @@ class AppSettings(BaseSettings):
     KNOWLEDGE_URLS: str
 
 
-ENV = os.getenv('ENV', 'prod')
-app_settings = AppSettings(_env_file=f'{ENV}.env')
+app_settings = AppSettings()
 os.environ['OPENAI_API_KEY'] = app_settings.OPENAI_API_KEY

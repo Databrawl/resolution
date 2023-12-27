@@ -1,70 +1,110 @@
-import argparse
 import logging
-from pprint import pprint
+import os
 
-from langchain.globals import set_verbose
-from sqlalchemy import select
-from sqlalchemy.orm import exc
+import structlog
+from fastapi import HTTPException
+from fastapi.applications import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from mangum import Mangum
+from starlette.middleware.sessions import SessionMiddleware
 
-from bots.agent_5 import get_agent
-from bots.librarian import librarian_agent
-from db import db
-from db.models import Org
-from db.tests.factories import OrgFactory
-from memory.utils import archive_urls, retrieve
-from settings import app_settings
+from modules.api_key.controller import api_key_router
+from modules.chat.controller import chat_router
+from modules.contact_support.controller import contact_router
+from modules.misc.controller import misc_router
+from modules.notification.controller import notification_router
+from modules.onboarding.controller import onboarding_router
+from modules.prompt.controller import prompt_router
+from modules.upload.controller import upload_router
+from modules.user.controller import user_router
+from packages.utils import handle_request_validation_error
+from server.db import db
+from server.db.database import DBSessionMiddleware
+from server.settings import app_settings
 
-logging.basicConfig(level=app_settings.LOG_LEVEL)
-logger = logging.getLogger(__name__)
+structlog.configure(
+    processors=[
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.processors.format_exc_info,
+        structlog.processors.TimeStamper(),
+        structlog.dev.ConsoleRenderer(),
+    ],
+    wrapper_class=structlog.make_filtering_bound_logger(logging.NOTSET),
+    context_class=dict,
+    logger_factory=structlog.PrintLoggerFactory(),
+    cache_logger_on_first_use=False,
+)
+
+logger = structlog.get_logger(__name__)
+
+app = FastAPI(
+    title="Guardian Chatbot",
+    description="The final chatbot.",
+    openapi_url="/api/openapi.json",
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    default_response_class=JSONResponse,
+    # root_path="/prod",
+    servers=[  # TODO: wtf is this?
+        {
+            "url": "https://postgres-boilerplate.renedohmen.nl",
+            "description": "Test environment",
+        }
+        if os.getenv("ENVIRONMENT") == "production"
+        else {"url": "/", "description": "Local environment"},
+    ],
+)
+
+app.include_router(chat_router)
+app.include_router(onboarding_router)
+app.include_router(misc_router)
+
+app.include_router(upload_router)
+app.include_router(user_router)
+app.include_router(api_key_router)
+app.include_router(prompt_router)
+app.include_router(notification_router)
+app.include_router(contact_router)
 
 
-# TODO:
-# 1. Fix URL parsing list error
-# 2. Fix Wandb session serializing
-def main():
-    # Create the parser
-    parser = argparse.ArgumentParser(description='Call foo function with org_id')
-    # Add the arguments
-    parser.add_argument('mode', type=str,
-                        help='Application operation mode. One of: "vdb", "librarian", "chat"')
-    parser.add_argument('org', type=str, help='The Organization name')
-    parser.add_argument('--query', type=str, help='String to query Vector Database for',
-                        default=None)
-    parser.add_argument('--crawl_depth', type=int,
-                        help='Depth of crawl of the URLs, default is 0 - no crawl',
-                        default=0)
-    args = parser.parse_args()
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_, exc):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
 
-    with db.session:
-        try:
-            org = db.session.execute(select(Org).where(Org.name == args.org)).scalar_one()
-        except exc.NoResultFound:
-            org = OrgFactory.create(name=args.org)
-        Org.current.set(org)
 
-        if args.mode == 'vdb':
-            if not args.query:
-                # no query provided, let's store the documents
-                archive_urls(app_settings.KNOWLEDGE_URLS.split(','), args.crawl_depth)
-            else:
-                results = retrieve(args.query)
-                pprint(results)
-        elif args.mode == "librarian":
-            while True:
-                user_input = input('>>> ')
-                response = librarian_agent().run(user_input)
-                print(response)
-        elif args.mode == "chat":
-            agent = get_agent()
+handle_request_validation_error(app)
 
-            set_verbose(True)
-            # set_debug(True)
-            while True:
-                user_input = input('>>> ')
-                response = agent.run(user_input)
+app.add_middleware(SessionMiddleware, secret_key=app_settings.SESSION_SECRET)
+app.add_middleware(DBSessionMiddleware, database=db)
+origins = app_settings.CORS_ORIGINS.split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=app_settings.CORS_ALLOW_METHODS,
+    allow_headers=app_settings.CORS_ALLOW_HEADERS,
+    expose_headers=app_settings.CORS_EXPOSE_HEADERS,
+)
 
-                print(response)
 
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_, exc):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
+
+
+logger.info("Guardian is reporting for duty 🛡️🌟🗡️")
+handler = Mangum(app, lifespan="off")
 
 if __name__ == "__main__":
-    main()
+    # run main.py to debug backend
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=5050)

@@ -1,14 +1,17 @@
 import os
 from contextlib import closing
-from typing import Union
+from typing import Union, Dict
 
 import pytest
 import structlog
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine.url import make_url, URL
+from sqlalchemy import create_engine
+from sqlalchemy import text
+from sqlalchemy.engine.url import URL
+from sqlalchemy.engine.url import make_url
 from sqlalchemy.orm.session import sessionmaker
+from starlette.testclient import TestClient
 
 from db import db
 from db.database import ENGINE_ARGUMENTS, SESSION_ARGUMENTS
@@ -145,3 +148,34 @@ def db_session(database):
             yield
         finally:
             transaction.rollback()
+
+
+@pytest.fixture(scope="session")
+def client(fastapi_app):
+    return TestClient(fastapi_app)
+
+
+@pytest.fixture()
+def superuser_token_headers(client, user_admin) -> Dict[str, str]:
+    login_data = {
+        "username": "Admin",
+        "password": "admin",
+    }
+    r = client.post("/api/login/access-token", data=login_data)
+    tokens = r.json()
+    a_token = tokens["access_token"]
+    headers = {"Authorization": f"Bearer {a_token}"}
+    return headers
+
+
+@pytest.fixture()
+def user_token_headers(client, user_non_admin) -> Dict[str, str]:
+    login_data = {
+        "username": "User",
+        "password": "user",
+    }
+    r = client.post("/api/login/access-token", data=login_data)
+    tokens = r.json()
+    a_token = tokens["access_token"]
+    headers = {"Authorization": f"Bearer {a_token}"}
+    return headers
