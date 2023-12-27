@@ -21,7 +21,7 @@
    If you want to add your own data, provide the website URL via KNOWLEDGE_URL, like this:
 
     ```bash
-    KNOWLEDGE_URLS=https://gosamurai.ai/,https://gosamurai.ai/payments python server/main.py vdb samurai --crawl_depth=1
+    KNOWLEDGE_URLS=https://gosamurai.ai/,https://gosamurai.ai/payments python server/run.py vdb samurai --crawl_depth=1
     ```
 
    The first parameter is the type of the operation, the second is the name of the organization.
@@ -32,18 +32,19 @@
 4. Chat with the Guardian bot
 
     ```bash
-    python server/main.py chat samurai
+    python server/run.py chat samurai
     ```
 
 5. Chat with the Librarian bot
 
     ```bash
-    python server/main.py librarian samurai
+    python server/run.py librarian samurai
     ```
 
 ## Development
 
-[Docs](docs/README.md)
+* [Docs](docs/README.md)
+* [Frontend instructions](frontend/README.md)
 
 ## Roadmap
 
