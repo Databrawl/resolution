@@ -14,7 +14,7 @@ notification_service = NotificationService()
     dependencies=[Depends(AuthBearer())],
     tags=["Notification"],
 )
-async def get_notifications(
+def get_notifications(
         chat_id: UUID,
 ):
     """

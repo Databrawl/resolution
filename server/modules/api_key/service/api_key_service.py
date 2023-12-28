@@ -20,7 +20,7 @@ class ApiKeyService:
     def __init__(self):
         self.repository = ApiKeys()
 
-    async def verify_api_key(
+    def verify_api_key(
             self,
             api_key: str,
     ) -> bool:
@@ -42,7 +42,7 @@ class ApiKeyService:
         except ValidationError:
             return False
 
-    async def get_user_from_api_key(
+    def get_user_from_api_key(
             self,
             api_key: str,
     ) -> UserIdentity:

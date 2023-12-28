@@ -49,12 +49,12 @@ brain_service = BrainService()
 
 
 # TODO: Move filter_file to a file service to avoid circular imports from models/files.py for File class
-async def filter_file(
+def filter_file(
         file,
         brain_id,
         original_file_name=None,
 ):
-    await file.compute_file_sha1()
+    file.compute_file_sha1()
 
     file_exists = file.file_already_exists()
     file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
@@ -85,7 +85,7 @@ async def filter_file(
 
     if file.file_extension in file_processors:
         try:
-            result = await file_processors[file.file_extension](
+            result = file_processors[file.file_extension](
                 file=file,
                 brain_id=brain_id,
             )

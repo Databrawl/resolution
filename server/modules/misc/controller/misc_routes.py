@@ -4,7 +4,7 @@ misc_router = APIRouter()
 
 
 @misc_router.get("/")
-async def root():
+def root():
     """
     Root endpoint to check the status of the API.
     """
@@ -12,5 +12,5 @@ async def root():
 
 
 @misc_router.get("/healthz", tags=["Health"])
-async def healthz():
+def healthz():
     return {"status": "ok"}

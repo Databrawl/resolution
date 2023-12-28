@@ -11,7 +11,7 @@ from packages.embeddings.vectors import Neurons
 logger = get_logger(__name__)
 
 
-async def process_file(
+def process_file(
         file: File,
         loader_class,
         brain_id,

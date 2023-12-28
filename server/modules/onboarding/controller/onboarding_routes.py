@@ -19,7 +19,7 @@ onboardingService = OnboardingService()
     dependencies=[Depends(AuthBearer())],
     tags=["Onboarding"],
 )
-async def get_user_onboarding_handler(
+def get_user_onboarding_handler(
         current_user: UserIdentity = Depends(get_current_user),
 ) -> OnboardingStates | None:
     """
@@ -34,7 +34,7 @@ async def get_user_onboarding_handler(
     dependencies=[Depends(AuthBearer())],
     tags=["Onboarding"],
 )
-async def update_user_onboarding_handler(
+def update_user_onboarding_handler(
         onboarding: OnboardingUpdatableProperties,
         current_user: UserIdentity = Depends(get_current_user),
 ) -> OnboardingStates:

@@ -8,7 +8,7 @@ logger = get_logger(__name__)
 
 def handle_request_validation_error(app: FastAPI):
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(
+    def validation_exception_handler(
             request: Request, exc: RequestValidationError
     ):
         exc_str = f"{exc}".replace("\n", " ").replace("   ", " ")

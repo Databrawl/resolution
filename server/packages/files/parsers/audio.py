@@ -10,7 +10,7 @@ from models import File, get_documents_vector_store
 from packages.files.file import compute_sha1_from_content
 
 
-async def process_audio(
+def process_audio(
         file: File,
         user,
 ):
@@ -26,9 +26,9 @@ async def process_audio(
                 delete=False,
                 suffix=upload_file.filename,  # pyright: ignore reportPrivateUsage=none
         ) as tmp_file:
-            await upload_file.seek(0)  # pyright: ignore reportPrivateUsage=none
+            upload_file.seek(0)  # pyright: ignore reportPrivateUsage=none
             content = (
-                await upload_file.read()  # pyright: ignore reportPrivateUsage=none
+                upload_file.read()  # pyright: ignore reportPrivateUsage=none
             )
             tmp_file.write(content)
             tmp_file.flush()

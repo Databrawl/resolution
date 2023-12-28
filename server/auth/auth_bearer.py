@@ -15,16 +15,16 @@ class AuthBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):
         super().__init__(auto_error=auto_error)
 
-    async def __call__(
+    def __call__(
             self,
             request: Request,
     ):
-        credentials: Optional[HTTPAuthorizationCredentials] = await super().__call__(
+        credentials: Optional[HTTPAuthorizationCredentials] = super().__call__(
             request
         )
         self.check_scheme(credentials)
         token = credentials.credentials  # pyright: ignore reportPrivateUsage=none
-        return await self.authenticate(
+        return self.authenticate(
             token,
         )
 
@@ -36,7 +36,7 @@ class AuthBearer(HTTPBearer):
                 status_code=403, detail="Authentication credentials missing"
             )
 
-    async def authenticate(
+    def authenticate(
             self,
             token: str,
     ) -> UserIdentity:
@@ -44,10 +44,10 @@ class AuthBearer(HTTPBearer):
             return self.get_test_user()
         elif verify_token(token):
             return decode_access_token(token)
-        elif await api_key_service.verify_api_key(
+        elif api_key_service.verify_api_key(
                 token,
         ):
-            return await api_key_service.get_user_from_api_key(
+            return api_key_service.get_user_from_api_key(
                 token,
             )
         else:

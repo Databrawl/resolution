@@ -24,13 +24,13 @@ chat_service = ChatService()
 
 
 @chat_router.get("/chat/healthz", tags=["Health"])
-async def healthz():
+def healthz():
     return {"status": "ok"}
 
 
 # get all chats
 @chat_router.get("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def get_chats(current_user: UserIdentity = Depends(get_current_user)):
+def get_chats(current_user: UserIdentity = Depends(get_current_user)):
     """
     Retrieve all chats for the current user.
 
@@ -48,7 +48,7 @@ async def get_chats(current_user: UserIdentity = Depends(get_current_user)):
 @chat_router.delete(
     "/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"]
 )
-async def delete_chat(chat_id: UUID):
+def delete_chat(chat_id: UUID):
     """
     Delete a specific chat by chat ID.
     """
@@ -62,7 +62,7 @@ async def delete_chat(chat_id: UUID):
 @chat_router.put(
     "/chat/{chat_id}/metadata", dependencies=[Depends(AuthBearer())], tags=["Chat"]
 )
-async def update_chat_metadata_handler(
+def update_chat_metadata_handler(
         chat_data: ChatUpdatableProperties,
         chat_id: UUID,
         current_user: UserIdentity = Depends(get_current_user),
@@ -85,7 +85,7 @@ async def update_chat_metadata_handler(
 
 # create new chat
 @chat_router.post("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def create_chat_handler(
+def create_chat_handler(
         chat_data: CreateChatProperties,
         current_user: UserIdentity = Depends(get_current_user),
 ):
@@ -106,7 +106,7 @@ async def create_chat_handler(
     ],
     tags=["Chat"],
 )
-async def create_question_handler(
+def create_question_handler(
         request: Request,
         chat_question: ChatQuestion,
         chat_id: UUID,
@@ -186,7 +186,7 @@ async def create_question_handler(
     ],
     tags=["Chat"],
 )
-async def create_stream_question_handler(
+def create_stream_question_handler(
         request: Request,
         chat_question: ChatQuestion,
         chat_id: UUID,
@@ -259,7 +259,7 @@ async def create_stream_question_handler(
 @chat_router.get(
     "/chat/{chat_id}/history", dependencies=[Depends(AuthBearer())], tags=["Chat"]
 )
-async def get_chat_history_handler(
+def get_chat_history_handler(
         chat_id: UUID,
 ) -> List[ChatItem]:
     # TODO: RBAC with current_user
@@ -271,7 +271,7 @@ async def get_chat_history_handler(
     dependencies=[Depends(AuthBearer())],
     tags=["Chat"],
 )
-async def add_question_and_answer_handler(
+def add_question_and_answer_handler(
         chat_id: UUID,
         question_and_answer: QuestionAndAnswer,
 ) -> Optional[Chat]:

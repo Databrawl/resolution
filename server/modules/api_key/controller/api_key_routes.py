@@ -24,7 +24,7 @@ api_keys_repository = ApiKeys()
     dependencies=[Depends(AuthBearer())],
     tags=["API Key"],
 )
-async def create_api_key(current_user: UserIdentity = Depends(get_current_user)):
+def create_api_key(current_user: UserIdentity = Depends(get_current_user)):
     """
     Create new API key for the current user.
 
@@ -54,7 +54,7 @@ async def create_api_key(current_user: UserIdentity = Depends(get_current_user))
 @api_key_router.delete(
     "/api-key/{key_id}", dependencies=[Depends(AuthBearer())], tags=["API Key"]
 )
-async def delete_api_key(
+def delete_api_key(
         key_id: str, current_user: UserIdentity = Depends(get_current_user)
 ):
     """
@@ -77,7 +77,7 @@ async def delete_api_key(
     dependencies=[Depends(AuthBearer())],
     tags=["API Key"],
 )
-async def get_api_keys(current_user: UserIdentity = Depends(get_current_user)):
+def get_api_keys(current_user: UserIdentity = Depends(get_current_user)):
     """
     Get all active API keys for the current user.
 

@@ -23,12 +23,12 @@ notification_service = NotificationService()
 
 
 @upload_router.get("/upload/healthz", tags=["Health"])
-async def healthz():
+def healthz():
     return {"status": "ok"}
 
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
-async def upload_file(
+def upload_file(
         request: Request,
         uploadFile: UploadFile,
         brain_id: UUID = Query(..., description="The ID of the brain"),
@@ -62,7 +62,7 @@ async def upload_file(
             )
         )
 
-    file_content = await uploadFile.read()
+    file_content = uploadFile.read()
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
     try:

@@ -16,7 +16,7 @@ promptService = PromptService()
 
 
 @prompt_router.get("/prompts", dependencies=[Depends(AuthBearer())], tags=["Prompt"])
-async def get_prompts() -> list[Prompt]:
+def get_prompts() -> list[Prompt]:
     """
     Retrieve all public prompt
     """
@@ -26,7 +26,7 @@ async def get_prompts() -> list[Prompt]:
 @prompt_router.get(
     "/prompts/{prompt_id}", dependencies=[Depends(AuthBearer())], tags=["Prompt"]
 )
-async def get_prompt(prompt_id: UUID) -> Prompt | None:
+def get_prompt(prompt_id: UUID) -> Prompt | None:
     """
     Retrieve a prompt by its id
     """
@@ -37,7 +37,7 @@ async def get_prompt(prompt_id: UUID) -> Prompt | None:
 @prompt_router.put(
     "/prompts/{prompt_id}", dependencies=[Depends(AuthBearer())], tags=["Prompt"]
 )
-async def update_prompt(
+def update_prompt(
         prompt_id: UUID, prompt: PromptUpdatableProperties
 ) -> Prompt | None:
     """
@@ -48,7 +48,7 @@ async def update_prompt(
 
 
 @prompt_router.post("/prompts", dependencies=[Depends(AuthBearer())], tags=["Prompt"])
-async def create_prompt_route(prompt: CreatePromptProperties) -> Prompt | None:
+def create_prompt_route(prompt: CreatePromptProperties) -> Prompt | None:
     """
     Create a prompt by its id
     """

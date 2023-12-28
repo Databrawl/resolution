@@ -12,7 +12,7 @@ user_repository = Users()
 
 
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
-async def get_user_endpoint(
+def get_user_endpoint(
         request: Request, current_user: UserIdentity = Depends(get_current_user)
 ):
     """

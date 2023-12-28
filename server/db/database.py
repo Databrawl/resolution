@@ -88,9 +88,9 @@ class DBSessionMiddleware(BaseHTTPMiddleware):
         self.commit_on_exit = commit_on_exit
         self.database = database
 
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+    def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         with self.database.session:
-            response = await call_next(request)
+            response = call_next(request)
         return response
 
 
