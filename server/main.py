@@ -92,14 +92,6 @@ app.add_middleware(
 )
 
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(_, exc):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail},
-    )
-
-
 logger.info("Guardian is reporting for duty 🛡️🌟🗡️")
 handler = Mangum(app, lifespan="off")
 
