@@ -3,7 +3,7 @@
 .vscode
 .idea
 .cache
-chroma_db
 __pycache__
 init.py
 wandb
+/deploy/.aws-sam/
