@@ -2,9 +2,9 @@ from secrets import token_hex
 from typing import List
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends
 from structlog import get_logger
 
+import helpers
 from auth import AuthBearer, get_current_user
 from modules.api_key.dto.outputs import ApiKeyInfo
 from modules.api_key.entity.api_key import ApiKey
@@ -13,16 +13,13 @@ from modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
 
-api_key_router = APIRouter()
-
+app = helpers.get_chalice_app()
 api_keys_repository = ApiKeys()
 
 
-@api_key_router.post(
+@app.route(
     "/api-key",
     response_model=ApiKey,
-    dependencies=[Depends(AuthBearer())],
-    tags=["API Key"],
 )
 def create_api_key(current_user: UserIdentity = Depends(get_current_user)):
     """
