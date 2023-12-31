@@ -48,3 +48,32 @@ I still had to remove some objects that were created somehow and thus caused dup
 
 Using `scoped_session` didn't work since this object keeps references to the initial DB URL in factories.
 Besides, it's an unnecessary complexity, as we can simply store the session in the context variable.
+
+# AWS
+
+## User configuration
+
+I went with new IAM Identity Center setup, which is a successor of AWS SSO. It's now a recommended way
+of managing user access to AWS resources, including AWS CLI.
+
+1. Created a new IAM Identity user for myself (called it Sergey Mosin, `serge-guardian`).
+2. Created a Permission Set `PowerUserAccess`.
+3. Assigned the permission set to the user in the `AWS Accounts` section in the dashboard.
+4. Completed aws cli setup via `aws configure sso` command.
+
+Now in the `~/.aws/config` file I have profile `PowerUserAccess-375747807787` section.
+In order to use this profile and the new Guardian AWS account, aws cli commands need to include
+`--profile PowerUserAccess-375747807787` flag, like this:
+
+```bash
+aws s3 ls --profile PowerUserAccess-375747807787
+```
+
+## SAM CLI
+
+1. `sam init` - only in the very beginning, to create a new project.
+2. `sam build` - to build the project. You can use `--use-container` flag to build in a Docker container. Good for
+   isolation.
+3. `sam deploy --profile=<profile_name>` - to deploy the project. You can use `--guided` flag to configure the
+   deployment step-by-step.
+   The configuration will be written to the `samconfig.toml` file, so it doesn't need to be repeated.
