@@ -41,7 +41,7 @@ def get_agent():
             description="When the customer’s query relates to the feedback, improvements or feature request.",
         ),
         Tool.from_function(
-            func=retrieval_chain_3().invoke,
+            func=get_agent_issuer().invoke,
             name="Issues_assistant",
             description="When the query of the customer is related to a bug, a problem or any difficulty that he is struggling with.",
         ),
@@ -119,26 +119,60 @@ def retrieval_chain_2() -> RunnableSerializable[str, str]:
             | StrOutputParser()
     )
 
-def retrieval_chain_3() -> RunnableSerializable[str, str]:
+def get_agent_issuer():
     """
     Issuer. Deals with any types of customers' problems.
     """
-
-    prompt = PromptTemplate.from_template(app_settings.PROMPTS['issuer'])
-    retriever = LlamaVectorIndexRetriever(metadata={"current_org": Org.current.get()})
-
+    memory = ConversationBufferMemory(memory_key="memory", return_messages=True)
     llm = ChatOpenAI(temperature=0,
-                     openai_api_key=app_settings.OPENAI_API_KEY,
-                     model_name=app_settings.GPT_35)
-    return (
-            {
-                "query": RunnablePassthrough(),
-                "context": RunnablePassthrough() | retriever | format_docs,
-            }
-            | prompt
-            | llm
-            | StrOutputParser()
+                     model=app_settings.GPT_35,
+                     openai_api_key=app_settings.OPENAI_API_KEY)
+    system_message = SystemMessage(content=app_settings.PROMPTS['issuer'])
+    
+    tools = [
+        Tool.from_function(
+            func=retrieval_chain_1().invoke,
+            name="Product_Knowledge_base",
+            description="When you need to retrieve the information from the product knowledge base",
+        )
+    ]
+
+    agent_kwargs = {
+        "system_message": system_message,
+        "extra_prompt_messages": [
+            MessagesPlaceholder(variable_name="memory")
+        ],
+    }
+        
+    return initialize_agent(
+        tools,
+        llm,
+        agent=AgentType.OPENAI_FUNCTIONS,
+        verbose=True,
+        agent_kwargs=agent_kwargs,
+        memory=memory,
     )
+
+# def retrieval_chain_3() -> RunnableSerializable[str, str]:
+#     """
+#     Issuer. Deals with any types of customers' problems.
+#     """
+
+#     prompt = PromptTemplate.from_template(app_settings.PROMPTS['issuer'])
+#     retriever = LlamaVectorIndexRetriever(metadata={"current_org": Org.current.get()})
+
+#     llm = ChatOpenAI(temperature=0,
+#                      openai_api_key=app_settings.OPENAI_API_KEY,
+#                      model_name=app_settings.GPT_35)
+#     return (
+#             {
+#                 "query": RunnablePassthrough(),
+#                 "context": RunnablePassthrough() | retriever | format_docs,
+#             }
+#             | prompt
+#             | llm
+#             | StrOutputParser()
+#     )
 
 # def retrieval_chain_4() -> RunnableSerializable[str, str]:
 #     """
