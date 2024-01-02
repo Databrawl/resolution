@@ -23,7 +23,8 @@ def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
     try:
         org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()
     except exc.NoResultFound:
-        org = OrgFactory.create(name=org)
+        org = Org(name=org)
+        db.session.add(org)
     Org.current.set(org)
 
     if mode == 'vdb':

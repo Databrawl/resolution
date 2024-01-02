@@ -19,7 +19,6 @@ class ChunkVectorStore(VectorStore):
     stores_text: bool = True
 
     def __init__(self) -> None:
-        self.dbsession: Session = db.session
         self.org: Org = Org.current.get()
 
     def client(self) -> Any:
@@ -45,19 +44,17 @@ class ChunkVectorStore(VectorStore):
             )
             # start a savepoint for each chunk
             try:
-                with self.dbsession.begin_nested():
-                    self.dbsession.add(chunk)
+                with db.session.begin_nested():
+                    db.session.add(chunk)
                     ids.append(node.node_id)
             except IntegrityError:
                 logger.info(f"Chunk with hash {node.hash} already exists in org {self.org.id}.")
-        self.dbsession.commit()
         return ids
 
     def delete(self, ref_doc_id: str, **delete_kwargs: Any) -> None:
         """Delete node from vector store."""
         stmt = delete(Chunk).where(Chunk.id == ref_doc_id)
-        self.dbsession.execute(stmt)
-        self.dbsession.commit()
+        db.session.execute(stmt)
 
     def query(self, query: VectorStoreQuery, **kwargs: Any) -> VectorStoreQueryResult:
         """Query vector store."""
