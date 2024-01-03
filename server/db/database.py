@@ -6,23 +6,12 @@ from typing import Iterator
 
 import structlog
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Query, Session, sessionmaker
-from sqlalchemy_searchable import SearchQueryMixin
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
-from starlette.responses import Response
-from starlette.types import ASGIApp
+from sqlalchemy.orm import Session, sessionmaker
 from structlog.stdlib import BoundLogger
 
 from utils.json import json_dumps, json_loads
 
 logger = structlog.get_logger(__name__)
-
-
-class SearchQuery(Query, SearchQueryMixin):
-    """Custom Query class to have search() property."""
-
-    pass
 
 
 class NoSessionError(RuntimeError):
@@ -53,7 +42,6 @@ SESSION_ARGUMENTS = {
     "class_": WrappedSession,
     "autocommit": False,
     "autoflush": True,
-    "query_cls": SearchQuery,
 }
 
 
@@ -80,18 +68,6 @@ class Database:
     @property
     def session(self) -> Session:
         return self.session_context_var.get()
-
-
-class DBSessionMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: ASGIApp, database: Database, commit_on_exit: bool = False):
-        super().__init__(app)
-        self.commit_on_exit = commit_on_exit
-        self.database = database
-
-    def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        with self.database.session:
-            response = call_next(request)
-        return response
 
 
 @contextmanager
