@@ -1,6 +1,6 @@
 from chalice import Chalice
 
-from modules.module_1.routes import bp as module_1_bp
+from chat_api import bp as chat_bp
 
 app = Chalice(app_name='blueprint-demo')
-app.register_blueprint(module_1_bp)
+app.register_blueprint(chat_bp)

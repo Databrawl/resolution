@@ -18,7 +18,7 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
   Api:
     TracingEnabled: true
 Resources:
-  ChaliceFunction:
+  APIHandler:
     Type: AWS::Serverless::Function     # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
     Properties:
       Handler: app.app
@@ -28,16 +28,11 @@ Resources:
         - x86_64
       Tracing: Active
       Events:
-        HelloPath:
+        SendMessagePath:
           Type: Api           # More info about API Event Source: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html
           Properties:
-            Path: /hello
-            Method: GET
-        HelloDetailsPath:
-          Type: Api           # More info about API Event Source: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html
-          Properties:
-            Path: /hello/{name}
-            Method: GET
+            Path: /send
+            Method: POST
       # Powertools for AWS Lambda (Python) env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
       Environment:
         Variables:
@@ -66,4 +61,4 @@ Outputs:
 
   LambdaFunction:
     Description: Chalice framework Lambda Function ARN
-    Value: !GetAtt ChaliceFunction.Arn
+    Value: !GetAtt APIHandler.Arn
