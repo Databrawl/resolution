@@ -77,3 +77,9 @@ aws s3 ls --profile PowerUserAccess-375747807787
 3. `sam deploy --profile=<profile_name>` - to deploy the project. You can use `--guided` flag to configure the
    deployment step-by-step.
    The configuration will be written to the `samconfig.toml` file, so it doesn't need to be repeated.
+
+For local testing, the following commands are quite useful:
+
+1. `sam local start-api` will start a local server on port 3000.
+2. `sam local invoke --env-vars env.json --event <path_to_event>.json` - for local testing.
+   [Here's detailed docs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html).
