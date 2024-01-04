@@ -159,7 +159,7 @@ class AppSettings(BaseSettings):
 
     # Project settings
     PROMPTS: dict[str, str] = read_prompts_to_dict()
-    KNOWLEDGE_URLS: str
+    KNOWLEDGE_URLS: Optional[str] = None
 
 
 app_settings = AppSettings()
