@@ -7,8 +7,8 @@ Description: >
 
 Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy-globals.html
   Function:
-    Timeout: 5
-    MemorySize: 128
+    Timeout: 300
+    MemorySize: 256
     Runtime: python3.10
 
     Tracing: Active
@@ -39,6 +39,11 @@ Resources:
           POWERTOOLS_SERVICE_NAME: PowertoolsAPI
           POWERTOOLS_METRICS_NAMESPACE: Powertools
           LOG_LEVEL: INFO
+          JWT_SECRET_KEY:
+          RESEND_API_KEY:
+          SUPABASE_URL:
+          SUPABASE_KEY:
+          OPENAI_API_KEY:
       Tags:
         LambdaPowertools: python
   ApplicationResourceGroup:
