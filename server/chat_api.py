@@ -12,6 +12,6 @@ bp = Blueprint(__name__)
 def send():
     body = bp.current_request.json_body
     agent = get_agent()
-    response = agent.run(body["user_input"])
+    response = agent.run(body["message"])
 
     return {"response": response}
