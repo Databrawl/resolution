@@ -44,6 +44,7 @@ Resources:
           SUPABASE_URL:
           SUPABASE_KEY:
           OPENAI_API_KEY:
+          DATABASE_URI:
       Tags:
         LambdaPowertools: python
   ApplicationResourceGroup:

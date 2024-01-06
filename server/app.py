@@ -2,5 +2,5 @@ from chalice import Chalice
 
 from chat_api import bp as chat_bp
 
-app = Chalice(app_name='blueprint-demo')
+app = Chalice(app_name='Guardian-API')
 app.register_blueprint(chat_bp)
