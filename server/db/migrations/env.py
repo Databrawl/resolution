@@ -48,8 +48,9 @@ def include_object(obj: SchemaItem,
                    type_: str,
                    reflected: Any,
                    compare_to: Any) -> bool:
-    if type_ == "table" and obj.schema == "auth":
-        # We don't track auth schema changes, as those tables are controlled by Supabase
+    if type_ == "table" and obj.schema != "public":
+        # We don't track other schema changes besides public,
+        # as those tables are controlled by Supabase
         return False
     else:
         return True
@@ -87,10 +88,21 @@ def run_migrations_online() -> None:
         target_metadata=target_metadata,
         process_revision_directives=process_revision_directives,
         compare_type=True,
-        include_object=include_object
+        include_object=include_object,
+
+        version_table_schema=target_metadata.schema,
+        include_schemas=True,
+        compare_server_default=True,
+
+
     )
     try:
         with context.begin_transaction():
+            """
+            By default search_path is set to "$user",public 
+            that why alembic can't create foreign keys correctly
+            """
+            context.execute('ALTER USER postgres SET search_path TO vault')
             context.run_migrations()
     finally:
         connection.close()

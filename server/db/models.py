@@ -3,27 +3,33 @@ from __future__ import annotations
 
 import re
 from contextvars import ContextVar
-from typing import Any, List, Set, Dict, Callable
+from datetime import datetime
+from typing import Any, List, Set, Dict
 from uuid import uuid4
 
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import String, UniqueConstraint, inspect as sa_inspect, UUID, ForeignKey
+from sqlalchemy import String, UniqueConstraint, inspect as sa_inspect, UUID, ForeignKey, Boolean, \
+    DateTime
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.ext.declarative import as_declarative, DeferredReflection
-from sqlalchemy.orm import Mapped, declared_attr, InstanceState
+from sqlalchemy.ext.declarative import DeferredReflection
+from sqlalchemy.orm import Mapped, declared_attr, InstanceState, DeclarativeBase
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from db import db
 
 
-@as_declarative()
-class _Base:
-    """SQLAlchemy base class."""
+class BaseModel(DeclarativeBase):
+    """
+    Separate BaseModel class to be able to include mixins and to Fix typing.
+
+    This should be used instead of Base.
+    """
 
     __abstract__ = True
+    __table_args__ = {"schema": "public"}
 
     _json_include: List = []
     _json_exclude: List = []
@@ -89,7 +95,6 @@ class _Base:
 
         return {key: getattr(self, key) for key in keys}
 
-    # noinspection PyMethodParameters
     @declared_attr
     def __tablename__(cls):
         """Convert class name to snake_case table name"""
@@ -101,21 +106,6 @@ class _Base:
         stmt = select(cls).where(cls.id == pk).limit(1)
         return db.session.execute(stmt).scalar_one()
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-
-
-class BaseModel(_Base):
-    """
-    Separate BaseModel class to be able to include mixins and to Fix typing.
-
-    This should be used instead of Base.
-    """
-
-    __abstract__ = True
-    __table_args__ = {"schema": "public"}
-
-    __init__: Callable[..., _Base]  # type: ignore
-
     def __repr__(self) -> str:
         inst_state: InstanceState = sa_inspect(self)
         attr_vals = [
@@ -124,6 +114,8 @@ class BaseModel(_Base):
             if attr.key not in ["tsv"]
         ]
         return f"{self.__class__.__name__}({', '.join(attr_vals)})"
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
 
 class Reflected(DeferredReflection):
@@ -140,6 +132,7 @@ class User(BaseModel, Reflected):
     __tablename__ = 'users'
     __table_args__ = {'schema': 'auth'}
 
+    email = mapped_column(String(255), nullable=False, unique=True)
     orgs = relationship("OrgUser", backref="user")
 
 
@@ -177,6 +170,19 @@ class Chunk(BaseModel):
     data: Mapped[dict[str, Any]] = mapped_column(JSON)
     hash_value: Mapped[str] = mapped_column(String(64))
     embedding: Mapped[Vector] = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))
+
+
+class Chat(BaseModel):
+    user_id: Mapped[str] = mapped_column(ForeignKeyCascade(User.id))
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+
+
+class Message(BaseModel):
+    chat_id: Mapped[str] = mapped_column(ForeignKeyCascade(Chat.id))
+    text: Mapped[str] = mapped_column(String(1024))
+    author: Mapped[str] = mapped_column(String(1024))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
 
 Reflected.prepare(db.engine)

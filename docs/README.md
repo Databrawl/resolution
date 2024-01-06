@@ -1,4 +1,6 @@
-# Dumping initial PostgreSQL schema with Supabase generated tables:
+# Database
+
+## Dumping initial PostgreSQL schema with Supabase generated tables:
 
 ```bash
 pg_dump -h localhost -p 54322 -U postgres -d postgres --schema-only --no-owner --no-acl > init.sql
@@ -44,10 +46,19 @@ I still had to remove some objects that were created somehow and thus caused dup
        FROM vault.secrets;
 ```
 
-# Database session architecture
+## Restoring the dump
+
+```bash
+psql -h localhost -p 54322 -U postgres -d postgres < supabase/dump-data-06.01.2024.sql
+```
+
+## Session architecture
 
 Using `scoped_session` didn't work since this object keeps references to the initial DB URL in factories.
 Besides, it's an unnecessary complexity, as we can simply store the session in the context variable.
+
+**Update:** Since we're using Serverless architecture, we don't need to worry about concurrency (all requests run in
+separate invocations of lambda), so we can just use a global session object.
 
 # AWS
 
