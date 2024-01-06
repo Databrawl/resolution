@@ -8,7 +8,7 @@ from sqlalchemy.orm import exc
 
 from bots.agent_5 import get_agent
 from bots.librarian import librarian_agent
-from db import db
+from db import db, transactional
 from db.models import Org
 from db.tests.factories import OrgFactory
 from memory.utils import archive_urls, retrieve
@@ -21,36 +21,36 @@ logger = logging.getLogger(__name__)
 # TODO:
 # 1. Fix URL parsing list error
 # 2. Fix Wandb session serializing
+@transactional
 def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
-    with db.session:
-        try:
-            org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()
-        except exc.NoResultFound:
-            org = OrgFactory.create(name=org)
-        Org.current.set(org)
+    try:
+        org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()
+    except exc.NoResultFound:
+        org = OrgFactory.create(name=org)
+    Org.current.set(org)
 
-        if mode == 'vdb':
-            if not query:
-                # no query provided, let's store the documents
-                archive_urls(app_settings.KNOWLEDGE_URLS.split(','), crawl_depth)
-            else:
-                results = retrieve(query)
-                pprint(results)
-        elif mode == "librarian":
-            while True:
-                user_input = input('>>> ')
-                response = librarian_agent().run(user_input)
-                print(response)
-        elif mode == "chat":
-            agent = get_agent()
+    if mode == 'vdb':
+        if not query:
+            # no query provided, let's store the documents
+            archive_urls(app_settings.KNOWLEDGE_URLS.split(','), crawl_depth)
+        else:
+            results = retrieve(query)
+            pprint(results)
+    elif mode == "librarian":
+        while True:
+            user_input = input('>>> ')
+            response = librarian_agent().run(user_input)
+            print(response)
+    elif mode == "chat":
+        agent = get_agent()
 
-            set_verbose(True)
-            # set_debug(True)
-            while True:
-                user_input = input('>>> ')
-                response = agent.run(user_input)
+        set_verbose(True)
+        # set_debug(True)
+        while True:
+            user_input = input('>>> ')
+            response = agent.run(user_input)
 
-                print(response)
+            print(response)
 
 
 if __name__ == "__main__":

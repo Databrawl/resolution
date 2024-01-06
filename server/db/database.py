@@ -90,7 +90,7 @@ def disable_commit(db: Database, log: BoundLogger) -> Iterator:
 
 
 @contextmanager
-def transactional(db: Database, log: BoundLogger) -> Iterator:
+def with_transactional(db: Database, log: BoundLogger) -> Iterator:
     """Run a step function in an implicit transaction with automatic rollback or commit.
 
     It will roll back in case of error, commit otherwise. It will also disable the `commit()` method
