@@ -16,7 +16,7 @@ pnpm dev
 ### Docker
 
 ```bash
-docker run --env-file .env.prod -p 3000:3000 guardian-fe:dev
+docker run --env-file .env.prod -p 3000:3000 -v ${pwd}/client:/app guardian-fe:dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
