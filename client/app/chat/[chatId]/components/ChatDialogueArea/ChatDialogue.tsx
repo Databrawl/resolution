@@ -1,8 +1,6 @@
 import {useChatContext} from "@/lib/context";
-import {useOnboarding} from "@/lib/hooks/useOnboarding";
 
 import {ChatDialogue} from "./components/ChatDialogue";
-import {ShortCuts} from "./components/ShortCuts";
 import {
     getMergedChatMessagesWithDoneStatusNotificationsReduced
 } from "./utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
@@ -14,13 +12,22 @@ export const ChatDialogueArea = (): JSX.Element => {
         messages,
         notifications
     );
-    const {isOnboarding} = useOnboarding();
+    // Guardian: This logic displays a chat dialogue area if there are messages in the chat, otherwise it displays
+    // shortcuts. Shortcuts is basically a couple of text pieces: command button icon on top, and some shortcut examples
+    // in the middle of the screen. It's all rendered on the base canvas, so the style is nicely preserved.
 
-    const shouldDisplayShortcuts = chatItems.length === 0 && !isOnboarding;
+    // import {useOnboarding} from "@/lib/hooks/useOnboarding";
+    // import {ShortCuts} from "./components/ShortCuts";
+    // const {isOnboarding} = useOnboarding();
 
-    if (!shouldDisplayShortcuts) {
-        return <ChatDialogue chatItems={chatItems}/>;
-    }
+    // const shouldDisplayShortcuts = chatItems.length === 0 && !isOnboarding;
+    //
+    // if (!shouldDisplayShortcuts) {
+    //     return <ChatDialogue chatItems={chatItems}/>;
+    // }
+    //
+    // return <ShortCuts/>;
 
-    return <ShortCuts/>;
+    return <ChatDialogue chatItems={chatItems}/>;
+
 };

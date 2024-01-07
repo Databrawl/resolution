@@ -4,9 +4,7 @@ import {useTranslation} from "react-i18next";
 import Button from "@/lib/components/ui/Button";
 
 import {OnboardingQuestions} from "./components";
-import {ActionsModal} from "./components/ActionsModal/ActionsModal";
 import {ChatEditor} from "./components/ChatEditor/ChatEditor";
-import {MenuControlButton} from "./components/MenuControlButton";
 import {useChatInput} from "./hooks/useChatInput";
 
 export const ChatInput = (): JSX.Element => {
@@ -28,7 +26,8 @@ export const ChatInput = (): JSX.Element => {
                     }}
                     className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
                 >
-                    <MenuControlButton/>
+                    {/*Guardian: disable menu control button, as for now we don't have a menu*/}
+                    {/*<MenuControlButton/>*/}
 
                     <div className="flex flex-1">
                         <ChatEditor
@@ -49,7 +48,8 @@ export const ChatInput = (): JSX.Element => {
                                 ? t("thinking", {ns: "chat"})
                                 : t("chat", {ns: "chat"})}
                         </Button>
-                        <ActionsModal/>
+                        {/*Guardian: disable Actions "+" button, as for now we don't provide these*/}
+                        {/*<ActionsModal/>*/}
                     </div>
                 </form>
             </div>

@@ -38,12 +38,14 @@ const SelectedChatPage = (): JSX.Element => {
                     <ActionsBar/>
                 </div>
             </div>
-            {shouldDisplayRightSideBar && (
-                <div
-                    className="h-full bg-highlight"
-                    style={{width: OPENED_MENU_WIDTH}}
-                />
-            )}
+            {/*Guardian: Disable right side bar menu, we don't have it*/}
+            {/*{shouldDisplayRightSideBar && (*/}
+            {/*    <div*/}
+            {/*        className="h-full bg-highlight"*/}
+            {/*        // This restricts the width for the right side bar menu and forces the chat to not fill entire screen*/}
+            {/*        style={{width: OPENED_MENU_WIDTH}}*/}
+            {/*    />*/}
+            {/*)}*/}
         </div>
     );
 };
