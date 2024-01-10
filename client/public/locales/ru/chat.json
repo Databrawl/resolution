@@ -6,7 +6,7 @@
   "brain": "мозг",
   "brains": "мозги",
   "change_brain": "Изменить мозг",
-  "chat": "Чат",
+  "chat": "Отправить",
   "chatDeleted": "Чат успешно удален. Id: {{id}}",
   "chatNameUpdated": "Имя чата обновлено",
   "error_occurred": "Произошла ошибка при получении ответа",

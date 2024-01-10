@@ -4,12 +4,9 @@ import {AxiosError} from "axios";
 import {useParams, useRouter} from "next/navigation";
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
-
-import {CHATS_DATA_KEY} from "@/lib/api/chat/config";
 import {useChatApi} from "@/lib/api/chat/useChatApi";
 import {useChatContext} from "@/lib/context";
 import {useBrainContext} from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import {getChatNameFromQuestion} from "@/lib/helpers/getChatNameFromQuestion";
 import {useToast} from "@/lib/hooks";
 import {useOnboarding} from "@/lib/hooks/useOnboarding";
 import {useOnboardingTracker} from "@/lib/hooks/useOnboardingTracker";
@@ -40,7 +37,7 @@ export const useChat = () => {
         chatConfig: {model, maxTokens, temperature},
     } = useLocalStorageChatConfig();
 
-    const {addStreamQuestion} = useQuestion();
+    const {send} = useQuestion();
     const {t} = useTranslation(["chat"]);
 
     const addQuestion = async (question: string, callback?: () => void) => {
@@ -60,16 +57,17 @@ export const useChat = () => {
 
             let shouldUpdateUrl = false;
 
+            // Guardian: don't create chat separately, let it be handled upon first message insertion
             //if chatId is not set, create a new chat. Chat name is from the first question
-            if (currentChatId === undefined) {
-                const chat = await createChat(getChatNameFromQuestion(question));
-                currentChatId = chat.chat_id;
-                setChatId(currentChatId);
-                shouldUpdateUrl = true;
-                void queryClient.invalidateQueries({
-                    queryKey: [CHATS_DATA_KEY],
-                });
-            }
+            // if (currentChatId === undefined) {
+            //     const chat = await createChat(getChatNameFromQuestion(question));
+            //     currentChatId = chat.chat_id;
+            //     setChatId(currentChatId);
+            //     shouldUpdateUrl = true;
+            //     void queryClient.invalidateQueries({
+            //         queryKey: [CHATS_DATA_KEY],
+            //     });
+            // }
 
             if (isOnboarding) {
                 void trackOnboardingEvent("QUESTION_ASKED", {
@@ -84,16 +82,12 @@ export const useChat = () => {
             }
 
             const chatQuestion: ChatQuestion = {
-                model,
                 question,
-                temperature: temperature,
-                max_tokens: maxTokens,
-                brain_id: currentBrain?.id,
-                prompt_id: currentPromptId ?? undefined,
+                chat_id: currentChatId,
             };
 
             callback?.();
-            await addStreamQuestion(currentChatId, chatQuestion);
+            await send(currentChatId, chatQuestion);
 
             if (shouldUpdateUrl) {
                 router.replace(`/chat/${currentChatId}`);

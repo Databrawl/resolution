@@ -6,7 +6,7 @@
   "brain": "brain",
   "brains": "brains",
   "change_brain": "Change brain",
-  "chat": "Chat",
+  "chat": "Send",
   "chatDeleted": "Chat successfully deleted. Id: {{id}}",
   "chatNameUpdated": "Chat name updated",
   "error_occurred": "Error occurred while getting answer",

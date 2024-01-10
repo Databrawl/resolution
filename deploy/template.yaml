@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  api
+  API stack for working with LLM capabilities of Guardian.
 
   Guardian API
 
@@ -9,7 +9,7 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
   Function:
     Timeout: 300
     MemorySize: 256
-    Runtime: python3.10
+    Runtime: python3.11
 
     Tracing: Active
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
@@ -17,6 +17,11 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
       LogFormat: JSON
   Api:
     TracingEnabled: true
+    Cors:
+      AllowOrigin: "'*'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowCredentials: "'*'"
+
 Resources:
   APIHandler:
     Type: AWS::Serverless::Function     # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
@@ -36,7 +41,7 @@ Resources:
       # Powertools for AWS Lambda (Python) env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
       Environment:
         Variables:
-          POWERTOOLS_SERVICE_NAME: PowertoolsAPI
+          POWERTOOLS_SERVICE_NAME: APIHandler
           POWERTOOLS_METRICS_NAMESPACE: Powertools
           LOG_LEVEL: INFO
           JWT_SECRET_KEY:
@@ -60,11 +65,12 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
+
 Outputs:
   GuardianApi:
     Description: API Gateway endpoint URL for Prod environment for the Lambda Function
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
 
   LambdaFunction:
-    Description: Chalice framework Lambda Function ARN
+    Description: API monolith Lambda Function ARN
     Value: !GetAtt APIHandler.Arn

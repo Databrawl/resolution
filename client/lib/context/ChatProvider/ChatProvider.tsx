@@ -25,6 +25,8 @@ export const ChatProvider = ({
             )
                 ? prevHistory.map((item: ChatMessage) =>
                     item.message_id === streamedChat.message_id
+                        // if it finds the same message, it will update the message from the assistant value,
+                        // since it's streaming the data
                         ? {...item, assistant: item.assistant + streamedChat.assistant}
                         : item
                 )

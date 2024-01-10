@@ -1,15 +1,12 @@
 import {useTranslation} from "react-i18next";
 
 import {useChatContext} from "@/lib/context";
-import {useBrainContext} from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import {useFetch, useToast} from "@/lib/hooks";
-
-import {useHandleStream} from "./useHandleStream";
 import {ChatQuestion} from "../types";
 import {generatePlaceHolderMessage} from "../utils/generatePlaceHolderMessage";
 
 interface UseChatService {
-    addStreamQuestion: (
+    send: (
         chatId: string,
         chatQuestion: ChatQuestion
     ) => Promise<void>;
@@ -17,12 +14,10 @@ interface UseChatService {
 
 export const useQuestion = (): UseChatService => {
     const {fetchInstance} = useFetch();
-    const {currentBrain} = useBrainContext();
 
     const {t} = useTranslation(["chat"]);
     const {publish} = useToast();
-    const {handleStream} = useHandleStream();
-    const {removeMessage, updateStreamingHistory} = useChatContext();
+    const {updateStreamingHistory} = useChatContext();
 
     const handleFetchError = async (response: Response) => {
         if (response.status === 429) {
@@ -41,17 +36,17 @@ export const useQuestion = (): UseChatService => {
         });
     };
 
-    const addStreamQuestion = async (
+    const send = async (
         chatId: string,
         chatQuestion: ChatQuestion
     ): Promise<void> => {
         const headers = {
             "Content-Type": "application/json",
-            Accept: "text/event-stream",
+            // Accept: "text/event-stream",
         };
 
         const placeHolderMessage = generatePlaceHolderMessage({
-            user_message: chatQuestion.question ?? "",
+            user_message: chatQuestion.message ?? "",
             chat_id: chatId,
         });
         updateStreamingHistory(placeHolderMessage);
@@ -60,7 +55,7 @@ export const useQuestion = (): UseChatService => {
 
         try {
             const response = await fetchInstance.post(
-                `/chat/${chatId}/question/stream?brain_id=${currentBrain?.id ?? ""}`,
+                `/send`,
                 body,
                 headers
             );
@@ -74,9 +69,11 @@ export const useQuestion = (): UseChatService => {
                 throw new Error(t("resposeBodyNull", {ns: "chat"}));
             }
 
-            await handleStream(response.body.getReader(), () =>
-                removeMessage(placeHolderMessage.message_id)
-            );
+            //TODO: fix ChatMessage and enable this
+            // const responseBody: never = await response.json();
+            // const message = ChatMessage.fromJSON(responseBody);
+            //
+            // updateStreamingHistory(message);
         } catch (error) {
             publish({
                 variant: "danger",
@@ -86,6 +83,6 @@ export const useQuestion = (): UseChatService => {
     };
 
     return {
-        addStreamQuestion,
+        send,
     };
 };
