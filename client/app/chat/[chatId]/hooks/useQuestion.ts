@@ -2,7 +2,8 @@ import {useTranslation} from "react-i18next";
 
 import {useChatContext} from "@/lib/context";
 import {useFetch, useToast} from "@/lib/hooks";
-import {ChatQuestion} from "../types";
+
+import {ChatMessage, ChatQuestion} from "../types";
 import {generatePlaceHolderMessage} from "../utils/generatePlaceHolderMessage";
 
 interface UseChatService {
@@ -70,10 +71,10 @@ export const useQuestion = (): UseChatService => {
             }
 
             //TODO: fix ChatMessage and enable this
-            // const responseBody: never = await response.json();
-            // const message = ChatMessage.fromJSON(responseBody);
+            const responseBody: never = await response.json();
+            const message = ChatMessage.fromJSON(responseBody);
             //
-            // updateStreamingHistory(message);
+            updateStreamingHistory(message);
         } catch (error) {
             publish({
                 variant: "danger",
