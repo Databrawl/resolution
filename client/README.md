@@ -16,10 +16,17 @@ pnpm dev
 ### Docker
 
 ```bash
-set -a; source .env.prod; set +a;
 cd client
 docker build -t guardian-fe:dev -f Dockerfile.dev ./
 docker run --env-file .env.prod -p 3000:3000 -v ${PWD}/client:/app guardian-fe:dev
+```
+
+### Local
+
+```bash
+set -a; source .env.prod; set +a;
+cd client
+yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

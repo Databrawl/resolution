@@ -92,5 +92,6 @@ aws s3 ls --profile PowerUserAccess-375747807787
 For local testing, the following commands are quite useful:
 
 1. `sam local start-api` will start a local server on port 3000.
+   * `sam local start-api --env-vars env.json --port 5050` - start with env vars on 5050 port
 2. `sam local invoke --env-vars env.json --event <path_to_event>.json` - for local testing.
    [Here's detailed docs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html).
