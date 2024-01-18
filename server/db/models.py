@@ -173,6 +173,7 @@ class Chunk(BaseModel):
 
 
 class Chat(BaseModel):
+    name: Mapped[str] = mapped_column(String(1024))
     user_id: Mapped[str] = mapped_column(ForeignKeyCascade(User.id))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
