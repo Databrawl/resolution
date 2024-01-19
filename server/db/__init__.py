@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 # an Engine, which the Session will use for connection
 # resources
-engine = create_engine("postgresql://postgres:postgres@localhost:54322/postgres")
+engine = create_engine(app_settings.DATABASE_URI)
 
 # create session and add objects
 session = Session(engine)

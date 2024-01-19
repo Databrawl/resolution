@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from contextvars import ContextVar
 from typing import Iterator
 
 import structlog
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 from structlog.stdlib import BoundLogger
 
 from utils.json import json_dumps, json_loads
@@ -61,14 +60,7 @@ class Database:
 
     def __init__(self, db_url: str) -> None:
         self.engine = create_engine(db_url, **ENGINE_ARGUMENTS)
-        self.session_factory = sessionmaker(bind=self.engine, **SESSION_ARGUMENTS)
-        self.session_context_var: ContextVar[Session] = ContextVar("session_context_var",
-                                                                   default=self.session_factory())
-
-    @property
-    def session(self) -> Session:
-        return self.session_context_var.get()
-
+        self.session = Session(self.engine)
 
 @contextmanager
 def disable_commit(db: Database, log: BoundLogger) -> Iterator:
