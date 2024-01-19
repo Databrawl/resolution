@@ -1,2 +1,2 @@
-cd deploy
+cd ../deploy
 ./run_local.sh
