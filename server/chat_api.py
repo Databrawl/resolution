@@ -55,9 +55,3 @@ def add_message():
     response = body
     response["assistant"] = "Hello, how can I help you?"
     return response
-
-    # return {"chat_id": body["chat_id"],
-    #         "message_id": body["message_id"],
-    #         "user_message": body["question"],
-    #         "assistant": "Hello, how can I help you?"}
-    # return {"assistant": "Hello, how can I help you?"}

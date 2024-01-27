@@ -8,13 +8,12 @@ from __future__ import annotations
 import logging
 
 from langchain.agents import AgentType, Tool, initialize_agent
-from langchain.chat_models import ChatOpenAI
-#from langchain.memory import ConversationBufferMemory
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser, SystemMessage
 from langchain.schema.runnable import RunnableSerializable, RunnablePassthrough
+from langchain_community.chat_models import ChatOpenAI
 
 from db.models import Org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
