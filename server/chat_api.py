@@ -1,7 +1,7 @@
 from chalice import Blueprint
 from structlog import get_logger
 
-from db import transactional, session
+from db import db
 from db.models import User, Chat
 
 logger = get_logger(__name__)
@@ -9,27 +9,32 @@ bp = Blueprint(__name__)
 
 
 @bp.route('/chats', methods=['POST'])
-@transactional
 def create_chat():
     body = bp.current_request.json_body
     # TODO: retrieve user from the request
-    user = session.query(User).first()
+    chat, user = _create_chat(body)
+    return {
+        "chat_id": str(chat.id),
+        "user_id": str(user.id),
+        "creation_time": chat.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        "chat_name": body["name"],
+    }
+
+
+@db.transactional
+def _create_chat(body):
+    user = db.session.query(User).first()
     chat = Chat(
         user=user,
         active=True,
         name=body["name"]
     )
-    session.add(chat)
-    return {
-        "chat_id": chat.id,
-        "user_id": user.id,
-        "creation_time": chat.created_at,
-        "chat_name": body["name"],
-    }
+    db.session.add(chat)
+    return chat, user
 
 
 @bp.route('/messages', methods=['POST'])
-@transactional
+@db.transactional
 def add_message():
     body = bp.current_request.json_body
 
