@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from functools import wraps
 from typing import Iterator
 
 import structlog
@@ -61,6 +62,15 @@ class Database:
     def __init__(self, db_url: str) -> None:
         self.engine = create_engine(db_url, **ENGINE_ARGUMENTS)
         self.session = Session(self.engine)
+
+    def transactional(self, f):
+        @wraps(f)
+        def wrapper(*args, **kwds):
+            with self.session.begin():
+                return f(*args, **kwds)
+
+        return wrapper
+
 
 @contextmanager
 def disable_commit(db: Database, log: BoundLogger) -> Iterator:
