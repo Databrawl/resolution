@@ -3,6 +3,7 @@ import structlog
 from sqlalchemy.orm.session import Session
 
 from db import db
+from db.database import SESSION_ARGUMENTS
 
 logger = structlog.getLogger(__name__)
 
@@ -17,7 +18,7 @@ def db_session():
     transaction, resetting the database except for migrations.
     """
     with db.engine.connect() as test_connection:
-        test_session = Session(bind=test_connection)
+        test_session = Session(bind=test_connection, **SESSION_ARGUMENTS)
         db.session = test_session
         transaction = test_connection.begin()
         try:
