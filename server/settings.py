@@ -16,7 +16,7 @@ ENV = os.getenv('ENV', 'prod')
 
 def read_prompts_to_dict():
     files_content = {}
-    directory = os.path.join(SRC_ROOT, "bots", "prompts", "_default prompts")
+    directory = os.path.join(SRC_ROOT, "bots", "prompts", "cryptocom")
     for file in os.listdir(directory):
         file_path = os.path.join(directory, file)
         if os.path.isfile(file_path):
