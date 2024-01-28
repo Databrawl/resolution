@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from contextvars import ContextVar
+from functools import wraps
 from typing import Iterator
 
 import structlog
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 from structlog.stdlib import BoundLogger
 
 from utils.json import json_dumps, json_loads
@@ -18,19 +18,6 @@ class NoSessionError(RuntimeError):
     pass
 
 
-class WrappedSession(Session):
-    """This Session class allows us to disable commit during steps."""
-
-    def commit(self) -> None:
-        if self.info.get("disabled", False):
-            self.info.get("logger", logger).warning(
-                "Step function tried to issue a commit. It should not! "
-                "Will execute commit on behalf of step function when it returns."
-            )
-        else:
-            super().commit()
-
-
 ENGINE_ARGUMENTS = {
     "connect_args": {"connect_timeout": 10, "options": "-c timezone=UTC"},
     "pool_pre_ping": True,
@@ -39,9 +26,7 @@ ENGINE_ARGUMENTS = {
     "json_deserializer": json_loads,
 }
 SESSION_ARGUMENTS = {
-    "class_": WrappedSession,
-    "autocommit": False,
-    "autoflush": True,
+    "expire_on_commit": False,  # this is needed, so we can use ORM objects after session is closed
 }
 
 
@@ -61,13 +46,17 @@ class Database:
 
     def __init__(self, db_url: str) -> None:
         self.engine = create_engine(db_url, **ENGINE_ARGUMENTS)
-        self.session_factory = sessionmaker(bind=self.engine, **SESSION_ARGUMENTS)
-        self.session_context_var: ContextVar[Session] = ContextVar("session_context_var",
-                                                                   default=self.session_factory())
+        self.session = Session(self.engine, **SESSION_ARGUMENTS)
 
-    @property
-    def session(self) -> Session:
-        return self.session_context_var.get()
+    def transactional(self, f):
+        @wraps(f)
+        def wrapper(*args, **kwds):
+            # first context manager creates the session and closes on exit,
+            # second one starts the transaction and commits/rolls back on exit
+            with self.session, self.session.begin():
+                return f(*args, **kwds)
+
+        return wrapper
 
 
 @contextmanager

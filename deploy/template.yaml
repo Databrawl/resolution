@@ -33,10 +33,15 @@ Resources:
         - x86_64
       Tracing: Active
       Events:
-        SendMessagePath:
+        CreateChatPath:
           Type: Api           # More info about API Event Source: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html
           Properties:
-            Path: /send
+            Path: /chats
+            Method: POST
+        SendMessagePath:
+          Type: Api
+          Properties:
+            Path: /messages
             Method: POST
       # Powertools for AWS Lambda (Python) env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
       Environment:

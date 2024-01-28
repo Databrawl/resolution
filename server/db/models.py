@@ -134,6 +134,7 @@ class User(BaseModel, Reflected):
 
     email = mapped_column(String(255), nullable=False, unique=True)
     orgs = relationship("OrgUser", backref="user")
+    chats = relationship("Chat", backref="user")
 
 
 class Org(BaseModel):
