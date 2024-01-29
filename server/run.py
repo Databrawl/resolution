@@ -8,7 +8,7 @@ from sqlalchemy.orm import exc
 
 from bots.agent_5 import get_agent
 from bots.librarian import librarian_agent
-from db import db, transactional
+from db import db
 from db.models import Org
 from db.tests.factories import OrgFactory
 from memory.utils import archive_urls, retrieve
@@ -18,10 +18,7 @@ logging.basicConfig(level=app_settings.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
 
-# TODO:
-# 1. Fix URL parsing list error
-# 2. Fix Wandb session serializing
-@transactional
+@db.transactional
 def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
     try:
         org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()
