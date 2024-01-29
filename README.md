@@ -21,7 +21,7 @@
 1. Create environment file(s)
    Each environment has its own configuration file. `.env.local` for local, `.env.prod` for Production.
    Create each file in the root of the repo with all the necessary variables (look
-   at `[settings.py](server/settings.py)`).
+   at [settings.py](server/settings.py)).
 
 2. Install dependencies
 
