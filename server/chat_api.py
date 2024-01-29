@@ -46,8 +46,6 @@ def add_message():
 
 @db.transactional
 def _add_message(data: dict):
-    # TODO: add org parameter to the request
-    # org = body["org"]
     org = "cryptocom"
     user_message = data["user_message"]
     try:
