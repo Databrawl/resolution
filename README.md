@@ -4,11 +4,24 @@
 
 ## Setup
 
+1. Install AWS SAM
+   CLI ([tutorial](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html))
+2. Go to the `scripts` directory and then run these two commands in separate terminal windows:
+
+    ```bash
+    ./be.sh
+    ```
+
+    ```bash
+    ./fe.sh
+    ```
+
+## Developer Setup
+
 1. Create environment file(s)
-   Each environment has its own configuration file. `local.env` for local, `prod.env` for
-   Production.
+   Each environment has its own configuration file. `.env.local` for local, `.env.prod` for Production.
    Create each file in the root of the repo with all the necessary variables (look
-   at `config/settings.py`).
+   at `[settings.py](server/settings.py)`).
 
 2. Install dependencies
 
