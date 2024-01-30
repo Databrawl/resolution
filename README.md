@@ -1,6 +1,6 @@
-# Guardian
+# REsolution 🧙🏻‍♂️
 
-*Chatbot that protects your customers and your team*
+*Chatbot that resolves the customer problems*
 
 ## Setup
 
@@ -42,7 +42,7 @@
    Also, you can provide the crawling depth via `--crawl_depth=N`, where N denotes the number of nested levels of pages
    to crawl. By default, it's disabled.
 
-4. Chat with the Guardian bot
+4. Chat with the REsolution bot
 
     ```bash
     python server/run.py chat samurai
