@@ -34,7 +34,7 @@ export const useChat = () => {
     const {publish} = useToast();
     const {createChat} = useChatApi();
 
-    const {send} = useQuestion();
+    const {addQuestion} = useQuestion();
     const {t} = useTranslation(["chat"]);
 
     const trackEvent = (currentChatId: string, question: string) => {
@@ -86,7 +86,7 @@ export const useChat = () => {
             };
 
             callback?.();
-            await send(currentChatId, chatQuestion);
+            await addQuestion(currentChatId, chatQuestion);
 
             if (shouldUpdateUrl) {
                 router.replace(`/chat/${currentChatId}`);

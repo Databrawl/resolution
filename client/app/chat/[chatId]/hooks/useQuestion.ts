@@ -6,7 +6,7 @@ import type {ChatMessage, ChatQuestion} from "../types";
 import {generatePlaceHolderMessage} from "../utils/generatePlaceHolderMessage";
 
 interface UseChatService {
-    send: (
+    addQuestion: (
         chatId: string,
         chatQuestion: ChatQuestion
     ) => Promise<void>;
@@ -17,7 +17,7 @@ export const useQuestion = (): UseChatService => {
     const {updateStreamingHistory} = useChatContext();
     const {postMessage} = useChatApi();
 
-    const send = async (
+    const addQuestion = async (
         chatId: string,
         chatQuestion: ChatQuestion
     ): Promise<void> => {
@@ -40,6 +40,6 @@ export const useQuestion = (): UseChatService => {
     };
 
     return {
-        send,
+        addQuestion
     };
 };
