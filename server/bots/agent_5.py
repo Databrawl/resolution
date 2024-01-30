@@ -13,7 +13,7 @@ from langchain.prompts import MessagesPlaceholder
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser, SystemMessage
 from langchain.schema.runnable import RunnableSerializable, RunnablePassthrough
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai.chat_models import ChatOpenAI
 
 from db.models import Org
 from memory.retriever import LlamaVectorIndexRetriever, format_docs

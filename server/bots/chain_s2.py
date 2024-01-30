@@ -15,11 +15,11 @@ import re
 import sys
 from typing import Any
 
-from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.schema import BaseMessage, HumanMessage, StrOutputParser, AIMessage
 from langchain.schema.runnable import RunnableBranch, Runnable, RunnableLambda, RunnablePassthrough
+from langchain_community.chat_models import ChatOpenAI
 
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
 

@@ -14,10 +14,10 @@ https://python.langchain.com/docs/use_cases/question_answering/chat_vector_db
 import os
 import sys
 
-from langchain.chat_models import ChatOpenAI
 from langchain.output_parsers import BooleanOutputParser
 from langchain.prompts import PromptTemplate
 from langchain.schema.runnable import RunnableBranch
+from langchain_community.chat_models import ChatOpenAI
 
 from bots.chain_s1 import final_chain
 from bots.librarian import librarian_agent

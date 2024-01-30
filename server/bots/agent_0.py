@@ -6,10 +6,10 @@ import os
 import sys
 
 from langchain.agents import initialize_agent, AgentType, Tool
-from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
+from langchain_community.chat_models import ChatOpenAI
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(SRC_ROOT)

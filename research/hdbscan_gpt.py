@@ -7,13 +7,13 @@ https://dylancastillo.co/clustering-documents-with-openai-langchain-hdbscan/
 import hdbscan
 import pandas as pd
 from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.prompts.chat import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
+from langchain_community.chat_models import ChatOpenAI
 
 
 def get_prompt():

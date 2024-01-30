@@ -9,9 +9,9 @@ import os
 import sys
 
 from langchain.chains.openai_functions import create_structured_output_runnable
-from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
+from langchain_community.chat_models import ChatOpenAI
 
 from memory.functions import update_documents, search_native_formatted, Node
 

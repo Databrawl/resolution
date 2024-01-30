@@ -3,13 +3,13 @@ from __future__ import annotations
 import logging
 
 from langchain.agents import AgentType, Tool, initialize_agent
-from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import MessagesPlaceholder
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser, BaseMemory, \
     SystemMessage
 from langchain.schema.runnable import RunnableSerializable
+from langchain_community.chat_models import ChatOpenAI
 
 from memory.retriever import LlamaVectorIndexRetriever, format_docs
 
