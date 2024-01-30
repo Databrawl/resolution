@@ -10,7 +10,9 @@ describe("useChatApi", () => {
     it("should make http request while creating chat", async () => {
         const chatName = "Test Chat";
 
-        const scope = getNock().post("/chat").reply(200, {chat_name: chatName});
+        const scope = getNock();
+        scope.options("/chats").reply(200);
+        scope.post("/chats").reply(200, {chat_name: chatName});
 
         const {
             result: {

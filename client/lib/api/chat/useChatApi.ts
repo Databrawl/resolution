@@ -1,14 +1,14 @@
+import {ChatMessage} from "@/app/chat/[chatId]/types";
 import {useAxios} from "@/lib/hooks";
 
 import {addQuestionAndAnswer, QuestionAndAnwser,} from "./addQuestionAndAnswer";
 import {
-    addQuestion,
-    AddQuestionParams,
     ChatUpdatableProperties,
     createChat,
     deleteChat,
     getChatItems,
     getChats,
+    postMessage,
     updateChat,
 } from "./chat";
 
@@ -21,8 +21,7 @@ export const useChatApi = () => {
         createChat: async (chatName: string) => createChat(chatName, axiosInstance),
         getChats: async () => getChats(axiosInstance),
         deleteChat: async (chatId: string) => deleteChat(chatId, axiosInstance),
-        addQuestion: async (props: AddQuestionParams) =>
-            addQuestion(props, axiosInstance),
+        postMessage: async (props: ChatMessage) => postMessage(props, axiosInstance),
         getChatItems: async (chatId: string) => getChatItems(chatId, axiosInstance),
         updateChat: async (chatId: string, props: ChatUpdatableProperties) =>
             updateChat(chatId, props, axiosInstance),

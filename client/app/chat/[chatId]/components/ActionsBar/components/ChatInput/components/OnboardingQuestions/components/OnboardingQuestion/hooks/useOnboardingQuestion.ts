@@ -70,7 +70,6 @@ export const useOnboardingQuestion = (questionId: QuestionId) => {
                 user_message: question,
                 assistant: lastStream,
                 message_time: Date.now().toLocaleString(),
-                brain_name: "Quivr",
             };
             void updateStreamingHistory(chatMessage);
         }

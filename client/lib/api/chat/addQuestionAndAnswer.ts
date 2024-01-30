@@ -13,7 +13,7 @@ export const addQuestionAndAnswer = async (
     axiosInstance: AxiosInstance
 ): Promise<ChatMessage> => {
     const response = await axiosInstance.post<ChatMessage>(
-        `/chat/${chatId}/question/answer`,
+        `/chats/${chatId}/question/answer`,
         questionAndAnswer
     );
 

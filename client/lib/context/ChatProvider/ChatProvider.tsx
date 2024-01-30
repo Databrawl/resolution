@@ -20,19 +20,16 @@ export const ChatProvider = ({
 
     const updateStreamingHistory = (streamedChat: ChatMessage): void => {
         setMessages((prevHistory: ChatMessage[]) => {
-            const updatedHistory = prevHistory.find(
+            return prevHistory.find(
                 (item) => item.message_id === streamedChat.message_id
             )
                 ? prevHistory.map((item: ChatMessage) =>
                     item.message_id === streamedChat.message_id
-                        // if it finds the same message, it will update the message from the assistant value,
-                        // since it's streaming the data
-                        ? {...item, assistant: item.assistant + streamedChat.assistant}
+                        // if we find the original user message, we update the assistant response
+                        ? {...item, assistant: streamedChat.assistant}
                         : item
                 )
                 : [...prevHistory, streamedChat];
-
-            return updatedHistory;
         });
     };
 

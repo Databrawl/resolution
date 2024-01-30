@@ -1,1 +1,1 @@
-export const CHATS_DATA_KEY = "quivr-chats";
+export const CHATS_DATA_KEY = "resolution-chats";

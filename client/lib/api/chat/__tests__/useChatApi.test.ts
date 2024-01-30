@@ -2,7 +2,7 @@
 import {renderHook} from "@testing-library/react";
 import {afterEach, describe, expect, it, vi} from "vitest";
 
-import {ChatQuestion} from "@/app/chat/[chatId]/types";
+import {ChatMessage} from "@/app/chat/[chatId]/types";
 
 import {useChatApi} from "../useChatApi";
 
@@ -38,7 +38,7 @@ describe("useChatApi", () => {
         await createChat(chatName);
 
         expect(axiosPostMock).toHaveBeenCalledTimes(1);
-        expect(axiosPostMock).toHaveBeenCalledWith("/chat", {
+        expect(axiosPostMock).toHaveBeenCalledWith("/chats", {
             name: chatName,
         });
     });
@@ -54,7 +54,7 @@ describe("useChatApi", () => {
         await getChats();
 
         expect(axiosGetMock).toHaveBeenCalledTimes(1);
-        expect(axiosGetMock).toHaveBeenCalledWith("/chat");
+        expect(axiosGetMock).toHaveBeenCalledWith("/chats");
     });
 
     it("should call deleteChat with the correct parameters", async () => {
@@ -69,33 +69,30 @@ describe("useChatApi", () => {
         await deleteChat(chatId);
 
         expect(axiosDeleteMock).toHaveBeenCalledTimes(1);
-        expect(axiosDeleteMock).toHaveBeenCalledWith(`/chat/${chatId}`);
+        expect(axiosDeleteMock).toHaveBeenCalledWith(`/chats/${chatId}`);
     });
 
     it("should call addQuestion with the correct parameters", async () => {
-        const chatId = "test-chat-id";
-
-        const chatQuestion: ChatQuestion = {
-            question: "test-question",
-            max_tokens: 10,
-            model: "test-model",
-            temperature: 0.5,
+        const chatMessage: ChatMessage = {
+            chat_id: "test-chat-id",
+            message_id: "test-message-id",
+            user_message: "Hello, how are you?",
+            assistant: "",
+            message_time: "2021-01-01T00:00:00.000Z",
         };
-
-        const brainId = "test-brain-id";
 
         const {
             result: {
-                current: {addQuestion},
+                current: {postMessage},
             },
         } = renderHook(() => useChatApi());
 
-        await addQuestion({chatId, chatQuestion, brainId});
+        await postMessage(chatMessage);
 
         expect(axiosPostMock).toHaveBeenCalledTimes(1);
         expect(axiosPostMock).toHaveBeenCalledWith(
-            `/chat/${chatId}/question?brain_id=${brainId}`,
-            chatQuestion
+            `/messages`,
+            chatMessage
         );
     });
 
@@ -111,7 +108,7 @@ describe("useChatApi", () => {
         await getHistory(chatId);
 
         expect(axiosGetMock).toHaveBeenCalledTimes(1);
-        expect(axiosGetMock).toHaveBeenCalledWith(`/chat/${chatId}/history`);
+        expect(axiosGetMock).toHaveBeenCalledWith(`/chats/${chatId}/history`);
     });
 
     it("should call updateChat with the correct parameters", async () => {
@@ -127,7 +124,7 @@ describe("useChatApi", () => {
         await updateChat(chatId, {chat_name: chatName});
 
         expect(axiosPutMock).toHaveBeenCalledTimes(1);
-        expect(axiosPutMock).toHaveBeenCalledWith(`/chat/${chatId}/metadata`, {
+        expect(axiosPutMock).toHaveBeenCalledWith(`/chats/${chatId}/metadata`, {
             chat_name: chatName,
         });
     });
@@ -147,7 +144,7 @@ describe("useChatApi", () => {
 
         expect(axiosPostMock).toHaveBeenCalledTimes(1);
         expect(axiosPostMock).toHaveBeenCalledWith(
-            `/chat/${chatId}/question/answer`,
+            `/chats/${chatId}/question/answer`,
             {question, answer}
         );
     });

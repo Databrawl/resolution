@@ -1,12 +1,8 @@
 import {UUID} from "crypto";
 
 export type ChatQuestion = {
-    model?: string;
-    question?: string;
-    temperature?: number;
-    max_tokens?: number;
-    brain_id?: string;
-    prompt_id?: string;
+    chat_id: string;
+    question: string;
 };
 export type ChatMessage = {
     chat_id: string;
@@ -14,8 +10,6 @@ export type ChatMessage = {
     user_message: string;
     assistant: string;
     message_time: string;
-    prompt_title?: string;
-    brain_name?: string;
 };
 
 type NotificationStatus = "Pending" | "Done";
