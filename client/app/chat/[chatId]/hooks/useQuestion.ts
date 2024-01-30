@@ -14,7 +14,7 @@ interface UseChatService {
 
 export const useQuestion = (): UseChatService => {
     const {publish} = useToast();
-    const {updateStreamingHistory} = useChatContext();
+    const {updateChatHistory} = useChatContext();
     const {postMessage} = useChatApi();
 
     const addQuestion = async (
@@ -25,11 +25,11 @@ export const useQuestion = (): UseChatService => {
             user_message: chatQuestion.question,
             chat_id: chatId,
         });
-        updateStreamingHistory(userMessage);
+        updateChatHistory(userMessage);
 
         try {
             const responseMessage: ChatMessage = await postMessage(userMessage);
-            updateStreamingHistory(responseMessage);
+            updateChatHistory(responseMessage);
         } catch (error) {
             // TODO: Move error handling to error.tsx
             publish({

@@ -18,18 +18,18 @@ export const ChatProvider = ({
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [notifications, setNotifications] = useState<Notification[]>([]);
 
-    const updateStreamingHistory = (streamedChat: ChatMessage): void => {
+    const updateChatHistory = (message: ChatMessage): void => {
         setMessages((prevHistory: ChatMessage[]) => {
             return prevHistory.find(
-                (item) => item.message_id === streamedChat.message_id
+                (item) => item.message_id === message.message_id
             )
                 ? prevHistory.map((item: ChatMessage) =>
-                    item.message_id === streamedChat.message_id
+                    item.message_id === message.message_id
                         // if we find the original user message, we update the assistant response
-                        ? {...item, assistant: streamedChat.assistant}
+                        ? {...item, assistant: message.assistant}
                         : item
                 )
-                : [...prevHistory, streamedChat];
+                : [...prevHistory, message];
         });
     };
 
@@ -44,7 +44,7 @@ export const ChatProvider = ({
             value={{
                 messages,
                 setMessages,
-                updateStreamingHistory,
+                updateChatHistory,
                 removeMessage,
                 notifications,
                 setNotifications,

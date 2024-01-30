@@ -11,7 +11,7 @@ export type ChatConfig = {
 export type ChatContextProps = {
     messages: ChatMessage[];
     setMessages: (history: ChatMessage[]) => void;
-    updateStreamingHistory: (streamedChat: ChatMessage) => void;
+    updateChatHistory: (message: ChatMessage) => void;
     notifications: Notification[];
     setNotifications: (notifications: Notification[]) => void;
     removeMessage: (id: string) => void;
