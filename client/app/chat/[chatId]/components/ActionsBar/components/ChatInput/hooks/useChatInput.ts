@@ -5,13 +5,13 @@ import {useChat} from "@/app/chat/[chatId]/hooks/useChat";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChatInput = () => {
     const [message, setMessage] = useState<string>("");
-    const {addQuestion, generatingAnswer, chatId} = useChat();
+    const {addChatQuestion, generatingAnswer, chatId} = useChat();
 
     const submitQuestion = useCallback(() => {
         if (!generatingAnswer) {
-            void addQuestion(message, () => setMessage(""));
+            void addChatQuestion(message, () => setMessage(""));
         }
-    }, [addQuestion, generatingAnswer, message]);
+    }, [addChatQuestion, generatingAnswer, message]);
 
     return {
         message,

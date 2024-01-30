@@ -51,7 +51,7 @@ export const useChat = () => {
         }
     }
 
-    const addQuestion = async (question: string, callback?: () => void) => {
+    const addChatQuestion = async (question: string, callback?: () => void) => {
         if (question === "") {
             publish({
                 variant: "danger",
@@ -115,7 +115,7 @@ export const useChat = () => {
 
     return {
         messages,
-        addQuestion,
+        addChatQuestion,
         generatingAnswer,
         chatId,
     };
