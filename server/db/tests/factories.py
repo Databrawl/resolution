@@ -23,12 +23,18 @@ class Options(factory.alchemy.SQLAlchemyOptions):
             pass
 
 
+def _session_factory():
+    """It's simply making the property call delayed, until the session object is set"""
+    return db.session
+
+
 class ModelFactory(factory.alchemy.SQLAlchemyModelFactory):
     _options_class = Options
 
     class Meta:
         abstract = True
         sqlalchemy_session = db.session
+        sqlalchemy_session_persistence = 'commit'
 
 
 class UserFactory(ModelFactory):
