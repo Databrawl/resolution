@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument('--query', type=str, help='String to query Vector Database for',
                         default=None)
     parser.add_argument('--crawl_depth', type=int,
-                        help='Depth of crawl of the URLs, default is 0 - no crawl',
+                        help='Depth of crawl of the URLs, default is 0 - no crawling, just scrape the given URLs',
                         default=0)
     args = parser.parse_args()
 
