@@ -24,7 +24,7 @@ from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain_community.chat_models import ChatOpenAI
 
-from memory.utils import archive_text, archive_urls
+from memory.utils import archive_text, archive_urls, search_knowledge_base
 from settings import app_settings
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,8 +33,6 @@ PROJECT_ROOT = os.path.dirname(SRC_ROOT)
 # setting path
 sys.path.append(SRC_ROOT)
 sys.path.append(PROJECT_ROOT)
-
-from memory.functions import search_knowledge_base
 
 memory = ConversationBufferWindowMemory(memory_key="librarian_memory", return_messages=True, k=8)
 tickets = {}

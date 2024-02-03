@@ -28,13 +28,12 @@ def _clean(text: str) -> str:
         clean_bullets,
         clean_dashes,
         clean_extra_whitespace,
-        clean_non_ascii_chars,
+        clean_non_ascii_chars,  # TODO: test if it removes non-latin characters
         clean_ordered_bullets,
         clean_trailing_punctuation,
         group_broken_paragraphs,
         replace_unicode_quotes
     ]
-
     # Apply each cleaner function to the text in sequence
     return reduce(lambda x, cleaner: cleaner(x), cleaners, text)
 
@@ -96,3 +95,10 @@ def retrieve(query: str, retriever_top_k: int = 5) -> list[NodeWithScore]:
     nodes = retriever.retrieve(query_bundle)
 
     return nodes
+
+
+def search_knowledge_base(query, k=5):
+    """Searches the knowledge base for relevant information"""
+    docs = retrieve(query, retriever_top_k=k)
+
+    return '\n'.join([d.text for d in docs])
