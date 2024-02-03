@@ -14,16 +14,20 @@ SRC_ROOT = os.path.dirname(os.path.abspath(__file__))
 ENV = os.getenv('ENV', 'prod')
 
 
-def read_prompts_to_dict():
-    files_content = {}
-    directory = os.path.join(SRC_ROOT, "bots", "prompts", "cryptocom")
+def read_prompts_to_dict(org_name: str) -> dict[str, str]:
+    directory = os.path.join(SRC_ROOT, "bots", "prompts", org_name)
+    if not os.path.exists(directory):
+        directory = os.path.join(SRC_ROOT, "bots", "prompts", "default")
+
+    prompts_dict = {}
     for file in os.listdir(directory):
         file_path = os.path.join(directory, file)
         if os.path.isfile(file_path):
             with open(file_path, "r") as f:
                 base_name = os.path.splitext(file)[0]
-                files_content[base_name] = f.read()
-    return files_content
+                prompts_dict[base_name] = f.read()
+
+    return prompts_dict
 
 
 class AppSettings(BaseSettings):
@@ -145,6 +149,7 @@ class AppSettings(BaseSettings):
     SUPABASE_URL: str
     SUPABASE_KEY: str
 
+    # Analytics
     LANGCHAIN_WANDB_TRACING: bool = False
     WANDB_PROJECT: str = "guardian"
 
@@ -158,7 +163,6 @@ class AppSettings(BaseSettings):
     CHUNK_OVERLAP: int = 50
 
     # Project settings
-    PROMPTS: dict[str, str] = read_prompts_to_dict()
     KNOWLEDGE_URLS: Optional[str] = None
 
 
