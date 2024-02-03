@@ -22,7 +22,11 @@ from settings import app_settings, read_prompts_to_dict
 logger = logging.getLogger(__name__)
 
 
-def get_agent() -> AgentExecutor:
+def call_manager() -> AgentExecutor:
+    """
+    Call your best man: Customer Support Manager. He knows how to resolve any issue, and find the proper solution to any
+    problem with the help of his crew.
+    """
     memory = ConversationBufferWindowMemory(k=5, memory_key="memory", return_messages=True)
     llm = ChatOpenAI(temperature=0,
                      model=app_settings.GPT_4,

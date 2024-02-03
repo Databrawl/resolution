@@ -6,11 +6,10 @@ from langchain.globals import set_verbose
 from sqlalchemy import select
 from sqlalchemy.orm import exc
 
-from bots.agent_5 import get_agent
 from bots.librarian import librarian_agent
+from bots.team import call_manager
 from db import db
 from db.models import Org
-from db.tests.factories import OrgFactory
 from memory.utils import archive_urls, retrieve
 from settings import app_settings
 
@@ -40,7 +39,7 @@ def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
             response = librarian_agent().run(user_input)
             print(response)
     elif mode == "chat":
-        agent = get_agent()
+        agent = call_manager()
 
         set_verbose(True)
         # set_debug(True)
