@@ -179,11 +179,13 @@ class Chat(BaseModel):
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
+    messages = relationship("Message", backref="chat")
+
 
 class Message(BaseModel):
     chat_id: Mapped[str] = mapped_column(ForeignKeyCascade(Chat.id))
-    text: Mapped[str] = mapped_column(String(1024))
-    author: Mapped[str] = mapped_column(String(1024))
+    user_message: Mapped[str] = mapped_column(String(1024), nullable=False)
+    ai_message: Mapped[str] = mapped_column(String(1024))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
 
