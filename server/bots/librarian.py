@@ -24,7 +24,7 @@ from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain_community.chat_models import ChatOpenAI
 
-from memory.utils import archive_text, archive_urls, search_knowledge_base
+from vdb.utils import archive_text, archive_urls, search_knowledge_base
 from settings import app_settings
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

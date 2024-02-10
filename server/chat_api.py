@@ -3,10 +3,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import exc
 from structlog import get_logger
 
-from bots.agent_5 import get_agent
+import memory
+from bots.team import call_manager
 from db import db
 from db.models import User, Chat, Org
-from db.tests.factories import OrgFactory
 
 logger = get_logger(__name__)
 bp = Blueprint(__name__)
@@ -48,14 +48,17 @@ def add_message():
 def _add_message(data: dict):
     org = "cryptocom"
     user_message = data["user_message"]
+    # TODO: replace with get_or_create
     try:
         org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()
     except exc.NoResultFound:
-        org = OrgFactory.create(name=org)
+        org = Org(name=org)
+        db.session.add(org)
     Org.current.set(org)
-    agent = get_agent()
-    agent_response = agent.run(user_message)
-    logger.info(f"User message: {user_message} \n Agent response: {agent_response}")
+    chat_memory = memory.load(data["chat_id"])
+    manager = call_manager(chat_memory)
+    team_response = manager.run(user_message)
+    logger.info(f"User message: {user_message} \n Support team response: {team_response}")
     response = data
-    response["assistant"] = agent_response
+    response["assistant"] = team_response
     return response

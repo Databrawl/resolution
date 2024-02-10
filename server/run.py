@@ -10,7 +10,7 @@ from bots.librarian import librarian_agent
 from bots.team import call_manager
 from db import db
 from db.models import Org
-from memory.utils import archive_urls, retrieve
+from vdb.utils import archive_urls, retrieve
 from settings import app_settings
 
 logging.basicConfig(level=app_settings.LOG_LEVEL)
