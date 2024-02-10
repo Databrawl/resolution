@@ -163,6 +163,7 @@ class AppSettings(BaseSettings):
     CHUNK_OVERLAP: int = 50
 
     # Project settings
+    DEFAULT_CHAT_MEMORY_SIZE: int = 5
     KNOWLEDGE_URLS: Optional[str] = None
 
 
