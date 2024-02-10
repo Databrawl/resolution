@@ -76,7 +76,7 @@ def _readmedocs_reader(
                 for child in element.descendants:
                     if child.name == "a" and child.has_attr("href"):
                         if include_url_in_text:
-                            url = child.get("href")
+                            url = child.load("href")
                             if url is not None and "edit" in url:
                                 text += child.text
                             else:

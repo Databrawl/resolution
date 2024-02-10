@@ -5,7 +5,7 @@ from langchain.pydantic_v1 import Field
 from langchain.schema import BaseRetriever, Document
 
 from db.models import Org
-from memory.utils import retrieve
+from vdb.utils import retrieve
 
 
 class LlamaVectorIndexRetriever(BaseRetriever):

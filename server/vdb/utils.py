@@ -16,8 +16,8 @@ from unstructured.cleaners.core import clean_bullets, clean_dashes, clean_extra_
     group_broken_paragraphs, \
     replace_unicode_quotes
 
-from memory.crawler import WebCrawler
-from memory.store import ChunkVectorStore
+from vdb.crawler import WebCrawler
+from vdb.store import ChunkVectorStore
 from settings import app_settings
 
 logger = logging.getLogger(__name__)

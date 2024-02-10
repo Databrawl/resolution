@@ -10,7 +10,7 @@ from sqlalchemy import select
 from db import db
 from db.models import Chunk, Org
 from db.tests.factories import OrgFactory
-from memory.store import ChunkVectorStore
+from vdb.store import ChunkVectorStore
 
 
 class TestChunkVectorStore:
