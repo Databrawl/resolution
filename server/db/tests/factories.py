@@ -6,7 +6,7 @@ from factory import lazy_attribute
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 
 from db import db
-from db.models import User, Org, Chunk, OrgUser
+from db.models import User, Org, Chunk, OrgUser, Message, Chat
 
 
 class Options(factory.alchemy.SQLAlchemyOptions):
@@ -33,7 +33,8 @@ class ModelFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     class Meta:
         abstract = True
-        sqlalchemy_session = db.session
+        sqlalchemy_session_factory = _session_factory
+        sqlalchemy_session = None
         sqlalchemy_session_persistence = 'commit'
 
 
@@ -82,3 +83,21 @@ class ChunkFactory(ModelFactory):
     @lazy_attribute
     def embedding(self):
         return [round(random.random(), 2) for _ in range(DEFAULT_EMBEDDING_DIM)]
+
+
+class ChatFactory(ModelFactory):
+    class Meta:
+        model = Chat
+
+    name = factory.Faker("text")
+    user = factory.SubFactory(UserFactory)
+    active = True
+
+
+class MessageFactory(ModelFactory):
+    class Meta:
+        model = Message
+
+    chat = factory.SubFactory(ChatFactory)
+    user_message = factory.Faker("text")  # TODO: switch to sentence
+    ai_message = factory.Faker("text")  # TODO: switch to sentence
