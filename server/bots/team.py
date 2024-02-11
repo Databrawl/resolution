@@ -137,7 +137,7 @@ def get_agent_issuer(prompts: dict[str, str]) -> AgentExecutor:
 
     tools = [
         Tool.from_function(
-            func=retrieval_chain_1().invoke,
+            func=retrieval_chain_1(prompts).invoke,
             name="Product_Knowledge_base",
             description="When you need to retrieve the information from the product knowledge base",
         )
