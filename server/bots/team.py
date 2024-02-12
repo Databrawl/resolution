@@ -30,7 +30,7 @@ def call_manager(memory: ConversationBufferWindowMemory) -> AgentExecutor:
     llm = ChatOpenAI(temperature=0,
                      model=app_settings.GPT_4,
                      openai_api_key=app_settings.OPENAI_API_KEY)
-    org_prompts = read_prompts_to_dict(Org.current.name)
+    org_prompts = read_prompts_to_dict(Org.current.get().name)
     system_message = SystemMessage(content=org_prompts['manager'])
 
     tools = [
