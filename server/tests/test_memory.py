@@ -1,9 +1,12 @@
 from uuid import uuid4
 
+import psycopg2.errors
+import pytest
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.messages import HumanMessage, AIMessage
 from sqlalchemy import select, func
+from sqlalchemy.exc import IntegrityError
 
 from db import db
 from db.models import Message
@@ -57,53 +60,24 @@ class TestLoad:
 
 
 class TestSave:
-    def test_existing_messages(self):
-        """Test that we can correctly save existing LangChain memory object to the Database"""
-        raw_messages = [
-            HumanMessage(content="Hello"),
-            AIMessage(content="Hey, how can I help you?"),
-            HumanMessage(content="What is the time?"),
-            AIMessage(content="It's high time!"),
-            HumanMessage(content="Really?"),
-            AIMessage(content="Yup, exactly.")
-        ]
-        retrieved_chat_history = ChatMessageHistory(messages=raw_messages)
-
-        memory = ConversationBufferWindowMemory(k=5, memory_key="memory", return_messages=True,
-                                                chat_memory=retrieved_chat_history)
+    def test_existing_chat(self):
         chat = ChatFactory.create()
+        user_message = "Hello, dear REsolution team!"
+        ai_message = "Hey, how can I help you?"
 
-        save(chat.id, memory)
+        save(chat.id, user_message, ai_message)
 
-        stmt = select(Message).where(Message.chat_id == chat.id).order_by(Message.created_at)
-        db_messages = list(db.session.execute(stmt).scalars())
+        stmt = select(Message)
+        messages = list(db.session.execute(stmt).scalars())
+        assert len(messages) == 1
+        assert messages[0].user_message == user_message
+        assert messages[0].ai_message == ai_message
 
-        assert len(list(db_messages)) == 3
-        assert db_messages[0].user_message == "Hello"
-        assert db_messages[0].ai_message == "Hey, how can I help you?"
-        assert db_messages[1].user_message == "What is the time?"
-        assert db_messages[1].ai_message == "It's high time!"
-        assert db_messages[2].user_message == "Really?"
-        assert db_messages[2].ai_message == "Yup, exactly."
+    def test_no_chat(self):
+        user_message = "Hello, dear REsolution team!"
+        ai_message = "Hey, how can I help you?"
 
-    def test_empty_history(self):
-        chat = ChatFactory.create()
-        memory = ConversationBufferWindowMemory(k=5, memory_key="memory", return_messages=True)
-
-        save(chat.id, memory)
-
-        stmt = select(func.count()).select_from(Message).where(Message.chat_id == chat.id)
-        count = db.session.execute(stmt).scalar()
-        assert count == 0
-
-    def test_non_existing_chat(self):
-        memory = ConversationBufferWindowMemory(k=5, memory_key="memory", return_messages=True)
-
-        save(str(uuid4()), memory)
-
-        stmt = select(func.count()).select_from(Message)
-        count = db.session.execute(stmt).scalar()
-        assert count == 0
-
-    def test_history_longer_than_k(self):
-        pass
+        save(str(uuid4()), user_message, ai_message)
+        # this should raise an exception
+        with pytest.raises(IntegrityError):
+            db.session.flush()

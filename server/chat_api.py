@@ -58,6 +58,7 @@ def _add_message(data: dict):
     chat_memory = memory.load(data["chat_id"])
     manager = call_manager(chat_memory)
     team_response = manager.run(user_message)
+    memory.save(data["chat_id"], user_message, team_response)
     logger.info(f"User message: {user_message} \n Support team response: {team_response}")
     response = data
     response["assistant"] = team_response

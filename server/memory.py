@@ -48,17 +48,6 @@ def load(chat_id: str, k: int = app_settings.DEFAULT_CHAT_MEMORY_SIZE) -> Conver
     return memory
 
 
-def save(chat_id: str, chat_memory: ConversationBufferWindowMemory):
-    extracted_messages = chat_memory.chat_memory.messages
-    ingest_to_db = messages_to_dict(extracted_messages)
-    message_pairs = [ingest_to_db[i:i + 2] for i in range(0, len(ingest_to_db), 2)]
-    messages_to_save = []
-    for human_msg, ai_msg in message_pairs:
-        msg = Message(
-            user_message=human_msg["data"]["content"],
-            ai_message=ai_msg["data"]["content"],
-            chat_id=chat_id,
-            # created_at=
-        )
-        messages_to_save.append(msg)
-    db.session.add_all(messages_to_save)
+def save(chat_id: str, user_message: str, team_response: str):
+    msg = Message(user_message=user_message, ai_message=team_response, chat_id=chat_id)
+    db.session.add(msg)
