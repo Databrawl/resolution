@@ -95,3 +95,14 @@ For local testing, the following commands are quite useful:
    * `sam local start-api --env-vars env.json --port 5050` - start with env vars on 5050 port
 2. `sam local invoke --env-vars env.json --event <path_to_event>.json` - for local testing.
    [Here's detailed docs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html).
+
+
+## Supabase CLI
+
+1. Migrate production database from local changes
+
+While supabase CLI [isn't updated to support IPv6](https://github.com/supabase/cli/issues/1625),
+use this command:
+```bash
+npx supabase@beta db push --db-url postgresql://postgres.khbybtymvfmhdakalayr:oNGhdBRtaaOUEHfe@aws-0-us-east-1.pooler.supabase.com:5432
+```
