@@ -102,4 +102,4 @@ class TestGeneric:
 
         assert chunk.id is not None
         assert chunk.org == org
-        assert all(chunk.embedding == embedding)
+        assert chunk.embedding == embedding

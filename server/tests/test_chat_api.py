@@ -1,5 +1,6 @@
 import json
 from unittest.mock import patch
+from uuid import uuid4
 
 from chalice.test import Client
 from sqlalchemy import func
@@ -7,7 +8,7 @@ from sqlalchemy import func
 from app import app
 from db import db
 from db.models import Chat
-from db.tests.factories import UserFactory
+from db.tests.factories import UserFactory, ChatFactory
 
 
 def test_create_chat():
@@ -27,22 +28,22 @@ def test_create_chat():
         assert body["chat_name"] == "Test Chat"
 
 
-@patch("chat_api.get_agent")
-def test_create_message(mock_get_agent):
+@patch("chat_api.call_manager")
+def test_create_message(mock_call_manager):
     agent_message = "Hello, how can I help you?"
+    chat = ChatFactory.create()
 
-    mock_get_agent.return_value.run.return_value = agent_message
+    mock_call_manager.return_value.run.return_value = agent_message
 
     with Client(app) as client:
         response = client.http.post(
             "/messages",
             headers={"Content-Type": "application/json"},
-            body=json.dumps({"question": "How are you?"})
+            body=json.dumps({"user_message": "How are you?", "chat_id": str(chat.id)})
         )
         body = response.json_body
 
-        assert "question" in body
-        assert "assistant" in body
+        assert "user_message" in body
         assert body["assistant"] == agent_message
 
 

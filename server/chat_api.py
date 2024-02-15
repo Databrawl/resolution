@@ -46,13 +46,13 @@ def add_message():
 
 @db.transactional
 def _add_message(data: dict):
-    org = "cryptocom"
+    org_name = "cryptocom"
     user_message = data["user_message"]
     # TODO: replace with get_or_create
     try:
-        org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()
+        org = db.session.execute(select(Org).where(Org.name == org_name)).scalar_one()
     except exc.NoResultFound:
-        org = Org(name=org)
+        org = Org(name=org_name)
         db.session.add(org)
     Org.current.set(org)
     chat_memory = memory.load(data["chat_id"])
