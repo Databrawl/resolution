@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Call this before tests or when you need a fresh DB restored from migrations
+supabase db reset
