@@ -1,12 +1,11 @@
 from chalice import Blueprint
-from sqlalchemy import select
-from sqlalchemy.orm import exc
 from structlog import get_logger
 
 import memory
 from bots.team import call_manager
 from db import db
 from db.models import User, Chat, Org
+from db.utlis import get_or_create
 
 logger = get_logger(__name__)
 bp = Blueprint(__name__)
@@ -48,18 +47,19 @@ def add_message():
 def _add_message(data: dict):
     org_name = "cryptocom"
     user_message = data["user_message"]
-    # TODO: replace with get_or_create
-    try:
-        org = db.session.execute(select(Org).where(Org.name == org_name)).scalar_one()
-    except exc.NoResultFound:
-        org = Org(name=org_name)
-        db.session.add(org)
+
+    org = get_or_create(org_name)
     Org.current.set(org)
+
     chat_memory = memory.load(data["chat_id"])
+
     manager = call_manager(chat_memory)
     team_response = manager.run(user_message)
+
     memory.save(data["chat_id"], user_message, team_response)
+
     logger.info(f"User message: {user_message} \n Support team response: {team_response}")
+
     response = data
     response["assistant"] = team_response
     return response
