@@ -18,7 +18,9 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
   Api:
     TracingEnabled: true
     Cors:
-      AllowOrigin: "'*'"
+      AllowMethods: "'GET,POST,OPTIONS'"
+#      AllowOrigin: "'*'"
+      AllowOrigin: "'http://localhost:3000'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
       AllowCredentials: "'*'"
 
@@ -31,6 +33,8 @@ Resources:
       Description: Main API entrypoint
       Architectures:
         - x86_64
+#        - arm64
+
       Tracing: Active
       Events:
         CreateChatPath:
@@ -43,6 +47,32 @@ Resources:
           Properties:
             Path: /messages
             Method: POST
+        ### temp endpoints to stub QuivrUI
+        GetChatsPath:
+          Type: Api
+          Properties:
+            Path: /chats
+            Method: GET
+        GetBrainsPath:
+          Type: Api
+          Properties:
+            Path: /brains
+            Method: GET
+        GetDefaultBrainPath:
+          Type: Api
+          Properties:
+            Path: /brains/default
+            Method: GET
+        GetOnboardingPath:
+          Type: Api
+          Properties:
+            Path: /onboarding
+            Method: GET
+        GetPromptsPath:
+          Type: Api
+          Properties:
+            Path: /prompts
+            Method: GET
       # Powertools for AWS Lambda (Python) env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
       Environment:
         Variables:

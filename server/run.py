@@ -1,15 +1,17 @@
 import argparse
 import logging
 from pprint import pprint
+from uuid import uuid4
 
 from langchain.globals import set_verbose
 from sqlalchemy import select
 from sqlalchemy.orm import exc
 
+import memory
 from bots.librarian import librarian_agent
 from bots.team import call_manager
 from db import db
-from db.models import Org
+from db.models import Org, Chat, User
 from vdb.utils import archive_urls, retrieve
 from settings import app_settings
 
@@ -39,13 +41,20 @@ def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
             response = librarian_agent().run(user_input)
             print(response)
     elif mode == "chat":
-        agent = call_manager()
+        chat_name = str(uuid4())
+        user = db.session.query(User).first()
+        chat = Chat(name=chat_name, user=user)
+        db.session.add(chat)
+        chat_memory = memory.load(chat.id)
+
+        agent = call_manager(chat_memory)
 
         set_verbose(True)
         # set_debug(True)
         while True:
             user_input = input('>>> ')
             response = agent.run(user_input)
+            memory.save(chat.id, user_input, response)
 
             print(response)
 
