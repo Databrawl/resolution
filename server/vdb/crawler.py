@@ -133,6 +133,24 @@ DEFAULT_WEBSITE_EXTRACTOR: Dict[
 }
 
 
+def is_downloadable(url):
+    response = requests.get(url, stream=True)
+
+    headers = response.headers
+
+    content_type = headers.get('Content-Type', '')
+    content_disposition = headers.get('Content-Disposition', '')
+
+    if 'attachment' in content_disposition:
+        logger.info(f"The URL points to a downloadable file: {url}")
+        return True
+    elif any(file_type in content_type for file_type in ['application', 'image', 'audio', 'video']):
+        logger.info(f"The URL points to a file based on Content-Type: {url}")
+        return True
+    else:
+        return False
+
+
 class WebCrawler(BaseReader):
     """BeautifulSoup web page crawler.
 
@@ -181,7 +199,7 @@ class WebCrawler(BaseReader):
         return documents
 
     def _crawl_url(self, url, custom_hostname, include_url_in_text, cur_depth=0):
-        if cur_depth > self.depth:
+        if cur_depth > self.depth or is_downloadable(url):
             # stop condition
             return []
 
