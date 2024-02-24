@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 bp = Blueprint(__name__)
 
 
-@bp.route('/chats', methods=['POST'])
+@bp.route('/chats', methods=['POST'], cors=True)
 def create_chat():
     body = bp.current_request.json_body
     # TODO: retrieve user from the request
@@ -36,10 +36,9 @@ def _create_chat(body):
     return chat, user
 
 
-@bp.route('/messages', methods=['POST'])
+@bp.route('/messages', methods=['POST'], cors=True)
 def add_message():
     body = bp.current_request.json_body
-
     return _add_message(body)
 
 
@@ -63,3 +62,28 @@ def _add_message(data: dict):
     response = data
     response["assistant"] = team_response
     return response
+
+
+@bp.route('/chats', methods=['GET'], cors=True)
+def chats():
+    return [{"chat_id": "1", "chat_name": "chat1"}]
+
+
+@bp.route('/brains', methods=['GET'], cors=True)
+def brains():
+    return [{"name": "default"}]
+
+
+@bp.route('/brains/default', methods=['GET'], cors=True)
+def brains_default():
+    return {"name": "default", "description": "Default brain", "version": "1.0.0"}
+
+
+@bp.route('/onboarding', methods=['GET'], cors=True)
+def onboarding():
+    return {"name": "onboarding", "description": "Onboarding bot", "version": "1.0.0"}
+
+
+@bp.route('/prompts', methods=['GET'], cors=True)
+def prompts():
+    return [{"name": "default"}]
