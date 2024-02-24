@@ -44,7 +44,7 @@ class AppSettings(BaseSettings):
     """
     model_config = SettingsConfigDict(env_file=f'.env.{ENV}', extra='allow')
 
-    PROJECT_NAME: str = "Guardian Support Defender"
+    PROJECT_NAME: str = "REsolution Team"
     TESTING: bool = True
 
     SESSION_SECRET: str = "".join(
@@ -143,7 +143,6 @@ class AppSettings(BaseSettings):
             info.data["SMTP_HOST"] and info.data["SMTP_PORT"] and info.data["EMAILS_FROM_EMAIL"])
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
-    RESEND_API_KEY: str = None
 
     # Supabase
     SUPABASE_URL: str
