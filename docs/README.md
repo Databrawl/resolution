@@ -72,12 +72,17 @@ of managing user access to AWS resources, including AWS CLI.
 3. Assigned the permission set to the user in the `AWS Accounts` section in the dashboard.
 4. Completed aws cli setup via `aws configure sso` command.
 
-Now in the `~/.aws/config` file I have profile `PowerUserAccess-375747807787` section.
-In order to use this profile and the new Guardian AWS account, aws cli commands need to include
-`--profile PowerUserAccess-375747807787` flag, like this:
+Now in the `~/.aws/config` file I have profile `serge-guardian-admin` section.
+First, in order to authenticate in AWS SSO tool, you need to launch:
+```
+aws sso login --sso-session serge-guardian
+```
+
+In order to use this profile and the new REsolution AWS account, aws cli commands need to include
+`--profile serge-guardian-admin` flag, like this:
 
 ```bash
-aws s3 ls --profile PowerUserAccess-375747807787
+aws s3 ls --profile serge-guardian-admin
 ```
 
 ## SAM CLI
@@ -96,6 +101,22 @@ For local testing, the following commands are quite useful:
 2. `sam local invoke --env-vars env.json --event <path_to_event>.json` - for local testing.
    [Here's detailed docs](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html).
 
+## ECR (Elastic Container Registry)
+
+1. `aws ecr create-repository --repository-name resolution-hub \
+--image-tag-mutability IMMUTABLE --image-scanning-configuration scanOnPush=true --region us-east-1`
+   creates container called `resolution-hub` in the `us-east-1` region.
+2. `aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com`
+   logs in to the ECR.
+
+## Helper commands
+
+1. Quick 
+### Template structure
+
+`template.yaml` is the main file, where all the resources are defined.
+
+Secret configuration is explained [here](https://stackoverflow.com/a/65777849/1573766).
 
 ## Supabase CLI
 
