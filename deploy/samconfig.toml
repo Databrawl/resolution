@@ -15,12 +15,12 @@ lint = true
 
 [default.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
-confirm_changeset = true
+confirm_changeset = false
 resolve_s3 = true
 s3_prefix = "api"
 region = "us-east-1"
 profile = "serge-guardian-admin"
-image_repositories = []
+image_repositories = ["APIHandler=375747807787.dkr.ecr.us-east-1.amazonaws.com/api8a5da52e/apihandler982459barepo"]
 
 [default.package.parameters]
 resolve_s3 = true

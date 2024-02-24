@@ -1,16 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  API stack for working with LLM capabilities of Guardian.
+  API stack for working with LLM capabilities of REsolution team.
 
-  Guardian API
+  REsolution API
 
 Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy-globals.html
   Function:
     Timeout: 300
-    MemorySize: 256
-    Runtime: python3.11
-
+    MemorySize: 1024
     Tracing: Active
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
@@ -19,8 +17,7 @@ Globals: # https://docs.aws.amazon.com/serverless-application-model/latest/devel
     TracingEnabled: true
     Cors:
       AllowMethods: "'GET,POST,OPTIONS'"
-#      AllowOrigin: "'*'"
-      AllowOrigin: "'http://localhost:3000'"
+      AllowOrigin: "'*'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
       AllowCredentials: "'*'"
 
@@ -28,14 +25,25 @@ Resources:
   APIHandler:
     Type: AWS::Serverless::Function     # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
     Properties:
-      Handler: app.app
+      PackageType: Image
       CodeUri: ../server/
       Description: Main API entrypoint
       Architectures:
         - x86_64
-#        - arm64
-
       Tracing: Active
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/DATABASE_URI-Tnq04k"
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/OPENAI_API_KEY-T8Foxj"
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/SUPABASE_KEY-UoHnHj"
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/SUPABASE_URL-1ZGSwe"
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/OPENAI_API_KEY-T8Foxj"
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/JWT_SECRET_KEY-mO7PzQ"
       Events:
         CreateChatPath:
           Type: Api           # More info about API Event Source: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html
@@ -76,17 +84,20 @@ Resources:
       # Powertools for AWS Lambda (Python) env vars: https://awslabs.github.io/aws-lambda-powertools-python/#environment-variables
       Environment:
         Variables:
+          LOG_LEVEL: INFO
+          JWT_SECRET_KEY: '{{resolve:secretsmanager:prod/JWT_SECRET_KEY}}'
+          SUPABASE_URL: '{{resolve:secretsmanager:prod/SUPABASE_URL}}'
+          SUPABASE_KEY: '{{resolve:secretsmanager:prod/SUPABASE_KEY}}'
+          OPENAI_API_KEY: '{{resolve:secretsmanager:prod/OPENAI_API_KEY}}'
+          DATABASE_URI: '{{resolve:secretsmanager:prod/DATABASE_URI}}'
           POWERTOOLS_SERVICE_NAME: APIHandler
           POWERTOOLS_METRICS_NAMESPACE: Powertools
-          LOG_LEVEL: INFO
-          JWT_SECRET_KEY:
-          RESEND_API_KEY:
-          SUPABASE_URL:
-          SUPABASE_KEY:
-          OPENAI_API_KEY:
-          DATABASE_URI:
       Tags:
         LambdaPowertools: python
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ../server/
+      DockerTag: python3.12-v1
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -102,9 +113,9 @@ Resources:
       AutoConfigurationEnabled: 'true'
 
 Outputs:
-  GuardianApi:
+  REsolutionApi:
     Description: API Gateway endpoint URL for Prod environment for the Lambda Function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
 
   LambdaFunction:
     Description: API monolith Lambda Function ARN
