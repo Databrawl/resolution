@@ -56,14 +56,15 @@ export const getDefaultBrain = async (
     //     (await axiosInstance.get<BackendMinimalBrainForUser>(`/brains/default/`))
     //         .data
     // );
-    return {
-        id: "1234-1234-1234-1234-1234",
-        name: "test",
-        role: "Owner",
-        status: "private",
-        brain_type: "api",
-        description: "test"
-    } as MinimalBrainForUser;
+    return undefined;
+    // return {
+    //     id: "1234-1234-1234-1234-1234",
+    //     name: "test",
+    //     role: "Owner",
+    //     status: "private",
+    //     brain_type: "api",
+    //     description: "test"
+    // } as MinimalBrainForUser;
 };
 
 export const getBrains = async (
