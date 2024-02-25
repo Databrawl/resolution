@@ -31,6 +31,11 @@ Resources:
       Architectures:
         - x86_64
       Tracing: Active
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: AllAtOnce
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/DATABASE_URI-Tnq04k"
