@@ -38,6 +38,8 @@ def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
     elif mode == "librarian":
         while True:
             user_input = input('>>> ')
+            if user_input == "exit":
+                break
             response = librarian_agent().run(user_input)
             print(response)
     elif mode == "chat":
@@ -50,7 +52,6 @@ def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
         agent = call_manager(chat_memory)
 
         set_verbose(True)
-        # set_debug(True)
         while True:
             user_input = input('>>> ')
             response = agent.run(user_input)
