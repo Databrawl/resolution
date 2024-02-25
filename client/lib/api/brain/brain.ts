@@ -2,11 +2,21 @@
 import {AxiosInstance} from "axios";
 
 import {BrainRoleType} from "@/lib/components/BrainUsers/types";
-import {BackendMinimalBrainForUser, Brain, MinimalBrainForUser, PublicBrain,} from "@/lib/context/BrainProvider/types";
+import {
+    BackendMinimalBrainForUser,
+    Brain,
+    MinimalBrainForUser,
+    PublicBrain,
+} from "@/lib/context/BrainProvider/types";
 
-import {CreateBrainInput, ListFilesProps, SubscriptionUpdatableProperties, UpdateBrainInput,} from "./types";
+import {
+    CreateBrainInput,
+    ListFilesProps,
+    SubscriptionUpdatableProperties,
+    UpdateBrainInput,
+} from "./types";
 import {mapBackendMinimalBrainToMinimalBrain} from "./utils/mapBackendMinimalBrainToMinimalBrain";
-import {BackendSubscription, mapSubscriptionToBackendSubscription,} from "./utils/mapSubscriptionToBackendSubscription";
+import {BackendSubscription,} from "./utils/mapSubscriptionToBackendSubscription";
 import {
     mapSubscriptionUpdatablePropertiesToBackendSubscriptionUpdatableProperties
 } from "./utils/mapSubscriptionUpdatablePropertiesToBackendSubscriptionUpdatableProperties";
@@ -25,11 +35,11 @@ export const getBrain = async (
     brainId: string,
     axiosInstance: AxiosInstance
 ): Promise<Brain | undefined> => {
-    const brain = (
-        await axiosInstance.get<Brain | undefined>(`/brains/${brainId}/`)
-    ).data;
+    // const brain = (
+    //     await axiosInstance.get<Brain | undefined>(`/brains/${brainId}/`)
+    // ).data;
 
-    return brain;
+    return undefined;
 };
 
 export const deleteBrain = async (
@@ -42,22 +52,40 @@ export const deleteBrain = async (
 export const getDefaultBrain = async (
     axiosInstance: AxiosInstance
 ): Promise<MinimalBrainForUser | undefined> => {
-    return mapBackendMinimalBrainToMinimalBrain(
-        (await axiosInstance.get<BackendMinimalBrainForUser>(`/brains/default/`))
-            .data
-    );
+    // return mapBackendMinimalBrainToMinimalBrain(
+    //     (await axiosInstance.get<BackendMinimalBrainForUser>(`/brains/default/`))
+    //         .data
+    // );
+    return {
+        id: "1234-1234-1234-1234-1234",
+        name: "test",
+        role: "Owner",
+        status: "private",
+        brain_type: "api",
+        description: "test"
+    } as MinimalBrainForUser;
 };
 
 export const getBrains = async (
     axiosInstance: AxiosInstance
 ): Promise<MinimalBrainForUser[]> => {
-    const {brains} = (
-        await axiosInstance.get<{ brains: BackendMinimalBrainForUser[] }>(
-            `/brains/`
-        )
-    ).data;
+    // const {brains} = (
+    //     await axiosInstance.get<{ brains: BackendMinimalBrainForUser[] }>(
+    //         `/brains/`
+    //     )
+    // ).data;
 
-    return brains.map(mapBackendMinimalBrainToMinimalBrain);
+    return [
+        {
+            id: "1234-1234-1234-1234-1234",
+            name: "test",
+            role: "Owner",
+            status: "private",
+            brain_type: "api",
+            description: "test"
+        }] as MinimalBrainForUser[];
+
+    // return brains.map(mapBackendMinimalBrainToMinimalBrain);
 };
 
 export type Subscription = { email: string; role: BrainRoleType };
@@ -67,10 +95,10 @@ export const addBrainSubscriptions = async (
     subscriptions: Subscription[],
     axiosInstance: AxiosInstance
 ): Promise<void> => {
-    await axiosInstance.post(
-        `/brains/${brainId}/subscription`,
-        subscriptions.map(mapSubscriptionToBackendSubscription)
-    );
+    // await axiosInstance.post(
+    //     `/brains/${brainId}/subscription`,
+    //     subscriptions.map(mapSubscriptionToBackendSubscription)
+    // );
 };
 
 export const getBrainUsers = async (

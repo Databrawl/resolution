@@ -11,7 +11,12 @@ export const createPrompt = async (
     prompt: CreatePromptProps,
     axiosInstance: AxiosInstance
 ): Promise<Prompt> => {
-    return (await axiosInstance.post<Prompt>("/prompts", prompt)).data;
+    return {
+        id: "1234-1234-1234-1234-1234",
+        title: 'p for prompt"',
+        content: "this is prompt"
+    } as Prompt;
+    // return (await axiosInstance.post<Prompt>("/prompts", prompt)).data;
 };
 
 export const getPrompt = async (

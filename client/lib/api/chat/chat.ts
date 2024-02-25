@@ -44,7 +44,7 @@ export const getChatItems = async (
     chatId: string,
     axiosInstance: AxiosInstance
 ): Promise<ChatItem[]> =>
-    (await axiosInstance.get<ChatItem[]>(`/chats/${chatId}/history`)).data;
+    (await axiosInstance.get<ChatItem[]>(`/messages?chat_id=${chatId}`)).data;
 
 export type ChatUpdatableProperties = {
     chat_name?: string;

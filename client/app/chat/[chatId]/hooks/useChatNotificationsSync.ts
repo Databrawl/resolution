@@ -66,10 +66,12 @@ export const useChatNotificationsSync = () => {
             }
 
             const chatItems = await getChatItems(chatId);
+            // const chatItems = [];
 
             setMessages(getMessagesFromChatItems(chatItems));
             setNotifications(getNotificationsFromChatItems(chatItems));
         };
-        void fetchHistory();
+        // Don't call this function, as we don't have the chat history yet
+        // void fetchHistory();
     }, [chatId]);
 };
