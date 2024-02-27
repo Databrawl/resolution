@@ -32,4 +32,5 @@ class LlamaVectorIndexRetriever(BaseRetriever):
 
 
 def format_docs(docs):
-    return "\n\n".join(doc.page_content + f"\nURL: {doc.metadata['URL']}" for doc in docs)
+    return "\n\n".join(doc.page_content + f"\nURL: {doc.metadata['URL'] if 'URL' in doc.metadata else ''}"
+                       for doc in docs)
