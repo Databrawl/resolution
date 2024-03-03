@@ -8,23 +8,24 @@ import {Onboarding} from "../types/Onboarding";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useOnboarding = () => {
-    const {getOnboarding} = useOnboardingApi();
     const params = useParams();
     const {updateOnboarding} = useOnboardingApi();
     const queryClient = useQueryClient();
 
-    const chatId = params?.chatId as string | undefined;
+    // const chatId = params?.chatId as string | undefined;
 
-    const {data} = useQuery({
-        queryFn: getOnboarding,
-        queryKey: [ONBOARDING_DATA_KEY],
-    });
+    // const {data} = useQuery({
+    //     queryFn: getOnboarding,
+    //     queryKey: [ONBOARDING_DATA_KEY],
+    // });
 
-    const onboarding: Onboarding = data ?? {
-        onboarding_a: false,
-        onboarding_b1: false,
-        onboarding_b2: false,
-        onboarding_b3: false,
+    // REsolution: removed data usage here, using constant value to always show onboarding first
+    // const onboarding: Onboarding = data ?? {
+    const onboarding: Onboarding = {
+        onboarding_a: true,
+        onboarding_b1: true,
+        onboarding_b2: true,
+        onboarding_b3: true,
     };
 
     const isOnboarding = Object.values(onboarding).some((value) => value);
@@ -39,7 +40,13 @@ export const useOnboarding = () => {
     const shouldDisplayWelcomeChat = onboarding.onboarding_a;
 
     const shouldDisplayOnboardingAInstructions =
-        chatId === undefined && shouldDisplayWelcomeChat;
+        // REsolution team: we display onboarding always, not just for a new chat
+        // chatId === undefined && shouldDisplayWelcomeChat;
+        shouldDisplayWelcomeChat;
+
+    // console.log("shouldDisplayOnboardingAInstructions", shouldDisplayOnboardingAInstructions);
+    // console.log("chatId", chatId);
+    // console.log("shouldDisplayWelcomeChat", shouldDisplayWelcomeChat);
 
     return {
         onboarding,

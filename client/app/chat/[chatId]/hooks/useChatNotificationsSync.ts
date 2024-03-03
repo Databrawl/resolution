@@ -55,23 +55,23 @@ export const useChatNotificationsSync = () => {
         setNotifications(fetchedNotifications);
     }, [fetchedNotifications]);
 
-    useEffect(() => {
-        setShouldDisplayFeedCard(false);
-        const fetchHistory = async () => {
-            if (chatId === undefined) {
-                setMessages([]);
-                setNotifications([]);
-
-                return;
-            }
-
-            const chatItems = await getChatItems(chatId);
-            // const chatItems = [];
-
-            setMessages(getMessagesFromChatItems(chatItems));
-            setNotifications(getNotificationsFromChatItems(chatItems));
-        };
-        // Don't call this function, as we don't have the chat history yet
-        // void fetchHistory();
-    }, [chatId]);
+    // useEffect(() => {
+    //     setShouldDisplayFeedCard(false);
+    //     const fetchHistory = async () => {
+    //         if (chatId === undefined) {
+    //             setMessages([]);
+    //             setNotifications([]);
+    //
+    //             return;
+    //         }
+    //
+    //         const chatItems = await getChatItems(chatId);
+    //         // const chatItems = [];
+    //
+    //         setMessages(getMessagesFromChatItems(chatItems));
+    //         setNotifications(getNotificationsFromChatItems(chatItems));
+    //     };
+    //     // I added it back temporarily to fix the Onboarding issue
+    //     void fetchHistory();
+    // }, [chatId]);
 };

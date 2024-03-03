@@ -42,6 +42,13 @@ def add_message():
     return _add_message(body)
 
 
+saved_messages = {
+    "What is Quivr?": "it's a chatbot platform",
+    "How to use Quivr?": "you can use it to build chatbots",
+    "What is a brain?": "Brain is what's inside your head, dude"
+}
+
+
 @db.transactional
 def _add_message(data: dict):
     org_name = "cryptocom"
@@ -53,7 +60,12 @@ def _add_message(data: dict):
     chat_memory = memory.load(data["chat_id"])
 
     manager = call_manager(chat_memory)
-    team_response = manager.run(user_message)
+    if user_message not in saved_messages:
+        team_response = manager.run(user_message)
+    else:
+        # TODO: replace with db access
+        # onboarding flow, where we have the answer ready
+        team_response = saved_messages[user_message]
 
     memory.save(data["chat_id"], user_message, team_response)
 
