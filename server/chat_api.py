@@ -93,7 +93,13 @@ def brains_default():
 
 @bp.route('/onboarding', methods=['GET'], cors=True)
 def onboarding():
-    return {"name": "onboarding", "description": "Onboarding bot", "version": "1.0.0"}
+    # TODO: extract this from db
+    return {
+        "greeting": "Hello, this is Crypto.com. I am a manager of a top-class Support team. You can do magic with us.",
+        "onboarding_b1": "How to open an account?",
+        "onboarding_b2": "How to deposit funds?",
+        "onboarding_b3": "How to withdraw my money?"
+    }
 
 
 @bp.route('/prompts', methods=['GET'], cors=True)

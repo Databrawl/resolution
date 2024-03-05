@@ -1,64 +1,38 @@
 import {UUID} from "crypto";
 import {useParams, useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
-import {useTranslation} from "react-i18next";
 
 import {ChatMessage} from "@/app/chat/[chatId]/types";
 import {useChatApi} from "@/lib/api/chat/useChatApi";
+import {useOnboardingApi} from "@/lib/api/onboarding/useOnboardingApi";
+import {useChatContext} from "@/lib/context";
 import {getChatNameFromQuestion} from "@/lib/helpers/getChatNameFromQuestion";
-import {useOnboardingTracker} from "@/lib/hooks/useOnboardingTracker";
 
 import {QuestionId} from "../../../types";
-import {questionIdToTradPath} from "../utils";
-import {useChatContext} from "@/lib/context";
+
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useOnboardingQuestion = (questionId: QuestionId) => {
     const params = useParams();
     const {postMessage} = useChatApi();
-    const {t} = useTranslation("chat");
+    const {getOnboardingData} = useOnboardingApi();
+
     const {createChat} = useChatApi();
     const {updateChatHistory} = useChatContext();
-    const {trackOnboardingEvent} = useOnboardingTracker();
     const [isAnswerRequested, setIsAnswerRequested] = useState(false);
+    const [question, setQuestion] = useState<string>('');
 
     const [chatId, setChatId] = useState(params?.chatId as UUID | undefined);
     const router = useRouter();
 
-    const onboardingStep = questionIdToTradPath[questionId];
-    const question = t(`onboarding.${onboardingStep}`, {});
-    // const answer = t(`onboarding.answer.${onboardingStep}`);
-
-    // const {addQuestionAndAnswer} = useChatApi();
-    // const {lastStream, isDone} = useStreamText({
-    //     text: answer,
-    //     enabled: isAnswerRequested && chatId !== undefined,
-    // });
-
-    // const addQuestionAndAnswerToChat = async () => {
-    //     if (chatId === undefined) {
-    //         return;
-    //     }
-    //
-    //     // await addQuestionAndAnswer(chatId, {
-    //     //     question: question,
-    //     //     answer: answer,
-    //     // });
-    //     const shouldUpdateUrl = chatId !== params?.chatId;
-    //     if (shouldUpdateUrl) {
-    //         router.replace(`/chat/${chatId}`);
-    //     }
-    // };
-    //
-    // void addQuestionAndAnswerToChat();
-
-
-    // useEffect(() => {
-    //     if (!isDone) {
-    //         return;
-    //     }
-    //     void addQuestionAndAnswerToChat();
-    // }, [isDone]);
+    useEffect(() => {
+        getOnboardingData().then(data => {
+            setQuestion(data[questionId]);
+        }).catch((error) => {
+            // Handle any errors that occur during postMessage or updateChatHistory
+            console.error("Error retrieving Onboarding data:", error);
+        });
+    }, [getOnboardingData, questionId]);
 
     useEffect(() => {
         if (chatId === undefined) {
@@ -71,7 +45,6 @@ export const useOnboardingQuestion = (questionId: QuestionId) => {
             const chatMessage: ChatMessage = {
                 message_id: new Date().getTime().toString(),
                 chat_id: chatId,
-                // message_id: questionId,
                 assistant: "",
                 user_message: question,
                 message_time: Date.now().toLocaleString(),
@@ -85,7 +58,6 @@ export const useOnboardingQuestion = (questionId: QuestionId) => {
                         console.log("response message is undefined! Something is wrong!");
                     }
                     void updateChatHistory(responseMessage);
-                    // setIsAnswerRequested(false);
                 })
                 .catch((error) => {
                     // Handle any errors that occur during postMessage or updateChatHistory
@@ -98,17 +70,8 @@ export const useOnboardingQuestion = (questionId: QuestionId) => {
         if (chatId === undefined) {
             const newChat = await createChat(getChatNameFromQuestion(question));
             setChatId(newChat.chat_id);
-
-            // void router.push(`/chat/${newChat.chat_id}`);
-            // console.log("chatId is now", chatId);
-            // console.log("the chatId from newChat is ", newChat.chat_id);
         }
-        trackOnboardingEvent(onboardingStep);
         setIsAnswerRequested(true);
-
-        // TODO: this uses PUT /onboarding API, that we don't have. Instead, we update the chat
-        //  history with onboarding messages
-        // await updateOnboarding({[questionId]: false});
     };
 
     useEffect(() => {
