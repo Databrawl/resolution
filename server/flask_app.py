@@ -36,7 +36,7 @@ def before_request():
         user_response = supabase_client.auth.get_user(jwt)
     except AuthApiError:
         abort(401)
-    g.user_id = user_response["user"]["id"]
+    g.user_id = user_response.user.id
 
 
 @app.route("/")
