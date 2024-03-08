@@ -4,6 +4,7 @@ from sqlalchemy.orm.session import Session
 
 from db import db
 from db.database import SESSION_ARGUMENTS
+from flask_app import app
 
 logger = structlog.getLogger(__name__)
 
@@ -25,3 +26,9 @@ def db_session():
             yield
         finally:
             transaction.rollback()
+
+
+@pytest.fixture
+def client():
+    with app.test_client() as client:
+        yield client
