@@ -117,13 +117,3 @@ For local testing, the following commands are quite useful:
 `template.yaml` is the main file, where all the resources are defined.
 
 Secret configuration is explained [here](https://stackoverflow.com/a/65777849/1573766).
-
-## Supabase CLI
-
-1. Migrate production database from local changes
-
-While supabase CLI [isn't updated to support IPv6](https://github.com/supabase/cli/issues/1625),
-use this command:
-```bash
-npx supabase@beta db push --db-url postgresql://postgres.khbybtymvfmhdakalayr:oNGhdBRtaaOUEHfe@aws-0-us-east-1.pooler.supabase.com:5432
-```
