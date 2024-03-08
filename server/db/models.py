@@ -10,7 +10,7 @@ from uuid import uuid4
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import String, UniqueConstraint, inspect as sa_inspect, UUID, ForeignKey, Boolean, \
-    DateTime
+    DateTime, Text
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.declarative import DeferredReflection
@@ -133,7 +133,7 @@ class User(BaseModel, Reflected):
     __table_args__ = {'schema': 'auth'}
 
     email = mapped_column(String(255), nullable=False, unique=True)
-    orgs = relationship("OrgUser", backref="user")
+    org_users = relationship("OrgUser", backref="user")
     chats = relationship("Chat", backref="user")
 
 
@@ -141,7 +141,7 @@ class Org(BaseModel):
     name: Mapped[str] = mapped_column(String(30))
     # relationships
     chunks = relationship("Chunk", backref="org")
-    users = relationship("OrgUser", backref="org")
+    org_users = relationship("OrgUser", backref="org")
 
     # Not a column
     current: ContextVar[Org] = ContextVar('current')
@@ -187,6 +187,16 @@ class Message(BaseModel):
     user_message: Mapped[str] = mapped_column(String(1024), nullable=False)
     ai_message: Mapped[str] = mapped_column(String(1024))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+
+
+class Onboarding(BaseModel):
+    org_id: Mapped[str] = mapped_column(ForeignKeyCascade(Org.id))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+
+    greeting: Mapped[str] = mapped_column(Text, nullable=False)
+    quick_1: Mapped[str] = mapped_column(Text)
+    quick_2: Mapped[str] = mapped_column(Text)
+    quick_3: Mapped[str] = mapped_column(Text)
 
 
 Reflected.prepare(db.engine)

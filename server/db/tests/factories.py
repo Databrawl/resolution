@@ -6,7 +6,7 @@ from factory import lazy_attribute
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 
 from db import db
-from db.models import User, Org, Chunk, OrgUser, Message, Chat
+from db.models import User, Org, Chunk, OrgUser, Message, Chat, Onboarding
 
 
 class Options(factory.alchemy.SQLAlchemyOptions):
@@ -101,3 +101,14 @@ class MessageFactory(ModelFactory):
     chat = factory.SubFactory(ChatFactory)
     user_message = factory.Faker("text")  # TODO: switch to sentence
     ai_message = factory.Faker("text")  # TODO: switch to sentence
+
+
+class OnboardingFactory(ModelFactory):
+    class Meta:
+        model = Onboarding
+
+    org = factory.SubFactory(OrgFactory)
+    greeting = factory.Faker("sentence")
+    quick_1 = factory.Faker("sentence")
+    quick_2 = factory.Faker("sentence")
+    quick_3 = factory.Faker("sentence")
