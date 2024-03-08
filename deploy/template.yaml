@@ -102,7 +102,7 @@ Resources:
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ../server/
-      DockerTag: python3.12-v1
+      DockerTag: python3.11-v1
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
