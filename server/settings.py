@@ -37,7 +37,7 @@ class AppSettings(BaseSettings):
     The goal is to provide some sensible default for developers here. All constants can be
     overloaded via ENV vars. The validators are used to ensure that you get readable error
     messages when an ENV var isn't correctly formatted; for example when you provide an incorrect
-    formatted DATABASE_URI.
+    formatted SQLALCHEMY_DATABASE_URI.
 
     ".env" loading is also supported. FastAPI will autoload "<env>.env" file, where <env> is the
     value of ENV environment variable (use local, dev, prod for example) if one can be found.
@@ -86,9 +86,9 @@ class AppSettings(BaseSettings):
     ENVIRONMENT: str = "local"
     SWAGGER_HOST: str = "localhost"
     GUI_URI: str = "http://localhost:3000"
-    DATABASE_URI: str = "postgresql://postgres:postgres@localhost/postgres"
+    SQLALCHEMY_DATABASE_URI: str = "postgresql://postgres:postgres@localhost/postgres"
 
-    @field_validator("DATABASE_URI", mode="before")
+    @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")
     @classmethod
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
@@ -167,4 +167,5 @@ class AppSettings(BaseSettings):
 
 
 app_settings = AppSettings()
+app_settings.SQLALCHEMY_DATABASE_URI = app_settings.SQLALCHEMY_DATABASE_URI
 os.environ['OPENAI_API_KEY'] = app_settings.OPENAI_API_KEY

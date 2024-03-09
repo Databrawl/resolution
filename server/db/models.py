@@ -1,150 +1,42 @@
 from __future__ import annotations
 from __future__ import annotations
 
-import re
 from contextvars import ContextVar
 from datetime import datetime
-from typing import Any, List, Set, Dict
-from uuid import uuid4
+from typing import Any
 
 from llama_index.constants import DEFAULT_EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import String, UniqueConstraint, inspect as sa_inspect, UUID, ForeignKey, Boolean, \
+from sqlalchemy import String, UniqueConstraint, Boolean, \
     DateTime, Text
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.ext.declarative import DeferredReflection
-from sqlalchemy.orm import Mapped, declared_attr, InstanceState, DeclarativeBase
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from db import db
+from db import db, ForeignKeyCascade
 
 
-class BaseModel(DeclarativeBase):
-    """
-    Separate BaseModel class to be able to include mixins and to Fix typing.
-
-    This should be used instead of Base.
-    """
-
-    __abstract__ = True
-    __table_args__ = {"schema": "public"}
-
-    _json_include: List = []
-    _json_exclude: List = []
-
-    def __json__(self, excluded_keys: Set = None) -> Dict:  # noqa: B006
-        if excluded_keys is None:
-            excluded_keys = set()
-        ins = sa_inspect(self)
-
-        columns = set(ins.mapper.column_attrs.keys())
-        relationships = set(ins.mapper.relationships.keys())
-        unloaded = ins.unloaded
-        expired = ins.expired_attributes
-        include = set(self._json_include)
-        exclude = set(self._json_exclude) | set(excluded_keys)
-
-        # This set of keys determines which fields will be present in
-        # the resulting JSON object.
-        # Here we initialize it with properties defined by the model class,
-        # and then add/delete some columns below in a tricky way.
-        keys = columns | relationships
-
-        # 1. Remove not yet loaded properties.
-        # Basically this is needed to serialize only .join()'ed relationships
-        # and omit all other lazy-loaded things.
-        if not ins.transient:
-            # If the entity is not transient -- exclude unloaded keys
-            # Transient entities won't load these anyway, so it's safe to
-            # include all columns and get defaults
-            keys -= unloaded
-
-        # 2. Re-load expired attributes.
-        # At the previous step (1) we substracted unloaded keys, and usually
-        # that includes all expired keys. Actually we don't want to remove the
-        # expired keys, we want to refresh them, so here we have to re-add them
-        # back. And they will be refreshed later, upon first read.
-        if ins.expired:
-            keys |= expired
-
-        # 3. Add keys explicitly specified in _json_include list.
-        # That allows you to override those attributes unloaded above.
-        # For example, you may include some lazy-loaded relationship() there
-        # (which is usually removed at the step 1).
-        keys |= include
-
-        # 4. For objects in `deleted` or `detached` state, remove all
-        # relationships and lazy-loaded attributes, because they require
-        # refreshing data from the DB, but this cannot be done in these states.
-        # That is:
-        #  - if the object is deleted, you can't refresh data from the DB
-        #    because there is no data in the DB, everything is deleted
-        #  - if the object is detached, then there is no DB session associated
-        #    with the object, so you don't have a DB connection to send a query
-        # So in both cases you get an error if you try to read such attributes.
-        if ins.deleted or ins.detached:
-            keys -= relationships
-            keys -= unloaded
-
-        # 5. Delete all explicitly black-listed keys.
-        # That should be done last, since that may be used to hide some
-        # sensitive data from JSON representation.
-        keys -= exclude
-
-        return {key: getattr(self, key) for key in keys}
-
-    @declared_attr
-    def __tablename__(cls):
-        """Convert class name to snake_case table name"""
-        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', cls.__name__).lower()
-
-    @classmethod
-    def get(cls, pk: str) -> Any:
-        """Get an instance by primary key"""
-        stmt = select(cls).where(cls.id == pk).limit(1)
-        return db.session.execute(stmt).scalar_one()
-
-    def __repr__(self) -> str:
-        inst_state: InstanceState = sa_inspect(self)
-        attr_vals = [
-            f"{attr.key}={getattr(self, attr.key)}"
-            for attr in inst_state.mapper.column_attrs
-            if attr.key not in ["tsv"]
-        ]
-        return f"{self.__class__.__name__}({', '.join(attr_vals)})"
-
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-
-
-class Reflected(DeferredReflection):
-    __abstract__ = True
-
-
-class ForeignKeyCascade(ForeignKey):
-    def __init__(self, *args, **kwargs):
-        kwargs['ondelete'] = "CASCADE"
-        super().__init__(*args, **kwargs)
-
-
-class User(BaseModel, Reflected):
+class User(db.Model):
     __tablename__ = 'users'
     __table_args__ = {'schema': 'auth'}
 
-    email = mapped_column(String(255), nullable=False, unique=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     org_users = relationship("OrgUser", backref="user")
     chats = relationship("Chat", backref="user")
 
+    current: ContextVar[Org] = ContextVar('current_user')
 
-class Org(BaseModel):
+
+class Org(db.Model):
     name: Mapped[str] = mapped_column(String(30))
     # relationships
     chunks = relationship("Chunk", backref="org")
     org_users = relationship("OrgUser", backref="org")
 
     # Not a column
-    current: ContextVar[Org] = ContextVar('current')
+    current: ContextVar[Org] = ContextVar('current_org')
 
     def similarity_search(self, embedding: list[float], k: int = 10) -> list[tuple[Chunk, float]]:
         """Search for similar chunks in this org"""
@@ -155,13 +47,13 @@ class Org(BaseModel):
         return list(map(tuple, db.session.execute(q).all()))
 
 
-class OrgUser(BaseModel):
+class OrgUser(db.Model):
     # Many-to-many between users and orgs, we need since we cannot modify Users table that is set by Supabase
     user_id: Mapped[str] = mapped_column(ForeignKeyCascade('auth.users.id'))
     org_id: Mapped[str] = mapped_column(ForeignKeyCascade(Org.id))
 
 
-class Chunk(BaseModel):
+class Chunk(db.Model):
     __table_args__ = (
         UniqueConstraint("org_id", "hash_value", name="org_hash_unique_together"),
     )
@@ -173,7 +65,7 @@ class Chunk(BaseModel):
     embedding: Mapped[Vector] = mapped_column(Vector(DEFAULT_EMBEDDING_DIM))
 
 
-class Chat(BaseModel):
+class Chat(db.Model):
     name: Mapped[str] = mapped_column(String(1024))
     user_id: Mapped[str] = mapped_column(ForeignKeyCascade(User.id))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -182,14 +74,14 @@ class Chat(BaseModel):
     messages = relationship("Message", backref="chat")
 
 
-class Message(BaseModel):
+class Message(db.Model):
     chat_id: Mapped[str] = mapped_column(ForeignKeyCascade(Chat.id))
     user_message: Mapped[str] = mapped_column(String(1024), nullable=False)
     ai_message: Mapped[str] = mapped_column(String(1024))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
 
-class Onboarding(BaseModel):
+class Onboarding(db.Model):
     org_id: Mapped[str] = mapped_column(ForeignKeyCascade(Org.id))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
@@ -197,6 +89,3 @@ class Onboarding(BaseModel):
     quick_1: Mapped[str] = mapped_column(Text)
     quick_2: Mapped[str] = mapped_column(Text)
     quick_3: Mapped[str] = mapped_column(Text)
-
-
-Reflected.prepare(db.engine)

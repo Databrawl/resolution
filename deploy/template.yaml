@@ -38,7 +38,7 @@ Resources:
         ProvisionedConcurrentExecutions: 1
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/DATABASE_URI-Tnq04k"
+            SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/SQLALCHEMY_DATABASE_URI-Tnq04k"
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: "arn:aws:secretsmanager:us-east-1:375747807787:secret:prod/OPENAI_API_KEY-T8Foxj"
         - AWSSecretsManagerGetSecretValuePolicy:
@@ -94,7 +94,7 @@ Resources:
           SUPABASE_URL: '{{resolve:secretsmanager:prod/SUPABASE_URL}}'
           SUPABASE_KEY: '{{resolve:secretsmanager:prod/SUPABASE_KEY}}'
           OPENAI_API_KEY: '{{resolve:secretsmanager:prod/OPENAI_API_KEY}}'
-          DATABASE_URI: '{{resolve:secretsmanager:prod/DATABASE_URI}}'
+          SQLALCHEMY_DATABASE_URI: '{{resolve:secretsmanager:prod/SQLALCHEMY_DATABASE_URI}}'
           POWERTOOLS_SERVICE_NAME: APIHandler
           POWERTOOLS_METRICS_NAMESPACE: Powertools
       Tags:

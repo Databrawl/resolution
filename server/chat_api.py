@@ -1,10 +1,11 @@
 from chalice import Blueprint
+from sqlalchemy import select
 from structlog import get_logger
 
 import memory
 from bots.team import call_manager
 from db import db
-from db.models import User, Chat, Org
+from db.models import User, Chat, Org, Onboarding
 from db.utlis import get_or_create
 
 logger = get_logger(__name__)
@@ -92,13 +93,19 @@ def brains_default():
 
 
 @bp.route('/onboarding', methods=['GET'], cors=True)
+@db.transactional
 def onboarding():
-    # TODO: extract this from db
+    # TODO: first, check that this works and commit models + this view change
+    # TODO: replace with the actual org_id retrieved from auth flow
+    # TODO: consult Quivr on how they authenticate users on Backend
+    org_id = "98ff1a31-423a-4435-9ff1-704c58a1f38f"
+    onboarding_data_q = select(Onboarding).where(Onboarding.org_id == org_id)
+    onboarding_data = db.session.execute(onboarding_data_q).scalar_one()
     return {
-        "greeting": "Hello, this is Crypto.com. I am a manager of a top-class Support team. You can do magic with us.",
-        "onboarding_b1": "How to open an account?",
-        "onboarding_b2": "How to deposit funds?",
-        "onboarding_b3": "How to withdraw my money?"
+        "greeting": onboarding_data.greeting,
+        "onboarding_b1": onboarding_data.quick_1,
+        "onboarding_b2": onboarding_data.quick_2,
+        "onboarding_b3": onboarding_data.quick_3
     }
 
 

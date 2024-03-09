@@ -5,7 +5,8 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.sql.schema import SchemaItem
 
-from db.models import BaseModel, Reflected
+from db.models import Reflected
+from db import BaseModel
 from settings import app_settings
 
 # this is the Alembic Config object, which provides
@@ -14,7 +15,7 @@ config = context.config
 
 logger = structlog.get_logger()
 
-config.set_main_option("sqlalchemy.url", app_settings.DATABASE_URI)
+config.set_main_option("sqlalchemy.url", app_settings.SQLALCHEMY_DATABASE_URI)
 
 target_metadata = BaseModel.metadata
 

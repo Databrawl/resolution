@@ -6,7 +6,7 @@ from typing import Iterator
 
 import structlog
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 from structlog.stdlib import BoundLogger
 
 from utils.json import json_dumps, json_loads
@@ -46,7 +46,9 @@ class Database:
 
     def __init__(self, db_url: str) -> None:
         self.engine = create_engine(db_url, **ENGINE_ARGUMENTS)
-        self.session = Session(self.engine, **SESSION_ARGUMENTS)
+        # self.session = Session(self.engine, **SESSION_ARGUMENTS)
+        self.session_maker = sessionmaker(self.engine, **SESSION_ARGUMENTS)
+        self.session_maker = sessionmaker(self.engine, **SESSION_ARGUMENTS)
 
     def transactional(self, f):
         @wraps(f)
