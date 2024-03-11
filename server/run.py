@@ -1,5 +1,6 @@
 import argparse
 import logging
+from functools import wraps
 from pprint import pprint
 from uuid import uuid4
 
@@ -12,6 +13,7 @@ from bots.librarian import librarian_agent
 from bots.team import call_manager
 from db import db
 from db.models import Org, Chat, User
+from flask_app import app
 from vdb.utils import archive_urls, retrieve
 from settings import app_settings
 
@@ -19,7 +21,16 @@ logging.basicConfig(level=app_settings.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
 
-@db.transactional
+def with_app_context(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        with app.app_context():
+            return f(*args, **kwargs)
+
+    return decorated_function
+
+
+@with_app_context
 def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
     try:
         org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()

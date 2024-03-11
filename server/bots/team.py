@@ -6,6 +6,8 @@ To change the product, go to settings.py and change the default prompt folder.
 from __future__ import annotations
 
 import logging
+from functools import wraps
+from operator import itemgetter
 
 from langchain.agents import AgentType, Tool, initialize_agent, AgentExecutor
 from langchain.memory import ConversationBufferWindowMemory
@@ -13,13 +15,24 @@ from langchain.prompts import MessagesPlaceholder
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser, SystemMessage
 from langchain.schema.runnable import RunnableSerializable, RunnablePassthrough
+from langchain_core.tools import StructuredTool
 from langchain_openai.chat_models import ChatOpenAI
+from pydantic.v1 import BaseModel, Field
 
 from db.models import Org
 from vdb.retriever import LlamaVectorIndexRetriever, format_docs
 from settings import app_settings, read_prompts_to_dict
 
 logger = logging.getLogger(__name__)
+
+
+def chain_to_tool(chain):
+    @wraps(chain)
+    def decorated_function(**kwargs):
+        # convert kwargs to a dict
+        return chain(kwargs)
+
+    return decorated_function
 
 
 def call_manager(memory: ConversationBufferWindowMemory) -> AgentExecutor:
@@ -34,10 +47,11 @@ def call_manager(memory: ConversationBufferWindowMemory) -> AgentExecutor:
     system_message = SystemMessage(content=org_prompts['manager'])
 
     tools = [
-        Tool.from_function(
-            func=retrieval_chain_1(org_prompts).invoke,
+        StructuredTool.from_function(
+            func=chain_to_tool(retrieval_chain(org_prompts).invoke),
             name="Product_Knowledge_Assistant",
-            description="When the query of the customer is related to the product knowledge and any details about it.\nHow to interact: Provide what search keywords he should look for in the product knowledge base and give you back the relevant information he has retrieved.",
+            description="When the query of the customer is related to the product knowledge and any details about it.",
+            args_schema=RetrievalChainInput,
         ),
         Tool.from_function(
             func=feedback_chain(org_prompts).invoke,
@@ -78,9 +92,15 @@ def call_manager(memory: ConversationBufferWindowMemory) -> AgentExecutor:
     )
 
 
-def retrieval_chain_1(prompts: dict[str, str]) -> RunnableSerializable[str, str]:
+class RetrievalChainInput(BaseModel):
+    user_question: str = Field(description="Forward the current user question")
+    query: str = Field(description="keyword search query")
+
+
+def retrieval_chain(prompts: dict[str, str]):
     """
-    Product knowledge assistant. Retrieve relevant documents and produce the response based on that context.
+    Product knowledge assistant.
+    Retrieve relevant documents from the knowledge base and produce the response based on that context.
     """
 
     prompt = PromptTemplate.from_template(prompts['product_knowledge'])
@@ -91,9 +111,8 @@ def retrieval_chain_1(prompts: dict[str, str]) -> RunnableSerializable[str, str]
                      model_name=app_settings.GPT_35)
     return (
             {
-                "user_question": RunnablePassthrough(),
-                "query": RunnablePassthrough(),
-                "context": RunnablePassthrough() | retriever | format_docs,
+                "query": itemgetter("user_question"),
+                "context": itemgetter("query") | retriever | format_docs,
             }
             | prompt
             | llm
@@ -132,10 +151,11 @@ def get_agent_issuer(prompts: dict[str, str]) -> AgentExecutor:
     system_message = SystemMessage(content=prompts['issuer'])
 
     tools = [
-        Tool.from_function(
-            func=retrieval_chain_1(prompts).invoke,
-            name="Product_Knowledge_base",
+        StructuredTool.from_function(
+            func=chain_to_tool(retrieval_chain(prompts).invoke),
+            name="Product_Knowledge_Assistant",
             description="When you need to retrieve the information from the product knowledge base",
+            args_schema=RetrievalChainInput,
         )
     ]
 
