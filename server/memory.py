@@ -50,4 +50,4 @@ def load(chat_id: str, k: int = app_settings.DEFAULT_CHAT_MEMORY_SIZE) -> Conver
 
 def save(chat_id: str, user_message: str, team_response: str):
     msg = Message(user_message=user_message, ai_message=team_response, chat_id=chat_id)
-    db.session.add(msg)
+    msg.save()

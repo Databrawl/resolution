@@ -101,6 +101,11 @@ class BaseModel(DeclarativeBase):
         stmt = select(cls).where(cls.id == pk).limit(1)
         return db.session.execute(stmt).scalar_one()
 
+    def save(self):
+        """Save the instance to the database"""
+        db.session.add(self)
+        db.session.commit()
+
     def __repr__(self) -> str:
         inst_state: InstanceState = sa_inspect(self)
         attr_vals = [
@@ -132,3 +137,16 @@ SESSION_ARGUMENTS = {
 
 
 db = SQLAlchemy(model_class=BaseModel, engine_options=ENGINE_ARGUMENTS, session_options=SESSION_ARGUMENTS)
+
+
+def transactional(f):
+    """
+    Auto commit operations at the end of the decorated function.
+
+    We use begin_nested since the outer transaction should already be open by Flask-SQLAlchemy object.
+    """
+    def decorated_function(*args, **kwargs):
+        with db.session.begin_nested():
+            return f(*args, **kwargs)
+
+    return decorated_function

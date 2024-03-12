@@ -1,6 +1,5 @@
 import supabase
 from flask import Flask, request, abort
-from flask import g
 from flask_cors import CORS
 from gotrue.errors import AuthApiError
 from sqlalchemy import select
@@ -13,10 +12,16 @@ from db import db
 from db.models import User, Chat, Org, Onboarding, OrgUser
 from settings import app_settings
 
-app = Flask("REsolution API")
-app.config.update(app_settings.__dict__)
-db.init_app(app)
-CORS(app)
+
+def create_app():
+    _app = Flask("REsolution API")
+    _app.config.update(app_settings.__dict__)
+    db.init_app(_app)
+    CORS(_app)
+    return _app
+
+
+app = create_app()
 logger = get_logger(__name__)
 
 
@@ -36,14 +41,12 @@ def before_request():
         user_response = supabase_client.auth.get_user(jwt)
     except AuthApiError:
         abort(401)
-    # g.user = db.User.get(user_response.user.id)
     User.current.set(User.get(user_response.user.id))
 
 
 @app.route('/chats', methods=['POST'])
 def create_chat():
     body = request.json
-    # TODO: retrieve user from the request
     chat = _create_chat(body)
     return {
         "chat_id": str(chat.id),
@@ -53,20 +56,17 @@ def create_chat():
     }
 
 
-# @db.transactional
 def _create_chat(body):
     chat = Chat(
         user=User.current.get(),
         active=True,
         name=body["name"]
     )
-    db.session.add(chat)
-    db.session.commit()
+    chat.save()
     return chat
 
 
 @app.route('/messages', methods=['POST'])
-# @db.transactional
 def add_message():
     query = (
         select(Org)
@@ -92,7 +92,6 @@ def add_message():
 
 
 @app.route('/onboarding', methods=['GET'])
-# @db.transactional
 def onboarding():
     query = (
         select(Onboarding)

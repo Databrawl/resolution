@@ -24,9 +24,8 @@ logger = logging.getLogger(__name__)
 def with_app_context(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        with app.app_context():
+        with app.app_context(), db.session.begin():
             return f(*args, **kwargs)
-
     return decorated_function
 
 
@@ -53,6 +52,7 @@ def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
                 break
             response = librarian_agent().run(user_input)
             print(response)
+            db.session.commit()
     elif mode == "chat":
         chat_name = str(uuid4())
         user = db.session.query(User).first()
