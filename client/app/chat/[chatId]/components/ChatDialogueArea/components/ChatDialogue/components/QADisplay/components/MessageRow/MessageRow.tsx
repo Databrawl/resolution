@@ -4,6 +4,7 @@ import {CopyButton} from "./components/CopyButton";
 import {MessageContent} from "./components/MessageContent";
 import {SourcesButton} from "./components/SourcesButton";
 import {useMessageRow} from "./hooks/useMessageRow";
+import {FaSpinner} from "react-icons/fa";
 
 type MessageRowProps = {
     speaker: "user" | "assistant";
@@ -15,7 +16,7 @@ type MessageRowProps = {
 
 export const MessageRow = React.forwardRef(
     (
-        {speaker, text, children}: MessageRowProps,
+        {speaker, text, brainName, children}: MessageRowProps,
         ref: React.Ref<HTMLDivElement>
     ) => {
         const {
@@ -35,6 +36,7 @@ export const MessageRow = React.forwardRef(
 
         const sourcesIndex = messageContent.lastIndexOf("**Sources:**");
         const hasSources = sourcesIndex !== -1;
+        const emptyMessage = messageContent.trim() === "" && brainName !== "Quivr" ;
 
         if (hasSources) {
             sourcesContent = messageContent
@@ -51,6 +53,7 @@ export const MessageRow = React.forwardRef(
                             {!isUserSpeaker && (
                                 <>
                                     {hasSources && <SourcesButton sources={sourcesContent}/>}
+                                    {emptyMessage && <FaSpinner className="animate-spin"/>}
                                     <CopyButton handleCopy={handleCopy} isCopied={isCopied}/>
                                 </>
                             )}
