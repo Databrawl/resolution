@@ -66,11 +66,13 @@ class ChunkVectorStore(VectorStore):
         similarities = []
         ids = []
         nodes = []
+        logger.info("Similarity search found the following chunks:")
         for chunk, similarity in chunks_with_similarities:
             node = metadata_dict_to_node(chunk.data)
 
             nodes.append(node)
             similarities.append(similarity)
             ids.append(node.node_id)
+            logger.info(f"score {similarity:.2f}: {node.text}\n")
 
         return VectorStoreQueryResult(nodes=nodes, similarities=similarities, ids=ids)
