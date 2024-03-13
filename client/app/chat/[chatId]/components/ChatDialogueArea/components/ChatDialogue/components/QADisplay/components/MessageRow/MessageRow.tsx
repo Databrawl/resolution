@@ -46,13 +46,7 @@ export const MessageRow = React.forwardRef(
         return (
             <div className={containerWrapperClasses}>
                 <div ref={ref} className={containerClasses}>
-                    <div className="flex justify-between items-start w-full">
-                        {/* Left section for the question and prompt */}
-                        {/*<div className="flex gap-1">*/}
-                        {/*    <QuestionBrain brainName={brainName}/>*/}
-                        {/*    <QuestionPrompt promptName={promptName}/>*/}
-                        {/*</div>*/}
-                        {/* Right section for buttons */}
+                    <div className="flex justify-end">
                         <div className="flex items-center gap-2">
                             {!isUserSpeaker && (
                                 <>
