@@ -7,9 +7,8 @@ from llama_index.vector_stores.types import VectorStore
 from llama_index.vector_stores.utils import node_to_metadata_dict, metadata_dict_to_node
 from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
 
-from db import db, transactional
+from db import db
 from db.models import Org, Chunk
 
 logger = logging.getLogger(__name__)
@@ -24,7 +23,6 @@ class ChunkVectorStore(VectorStore):
     def client(self) -> Any:
         return
 
-    @transactional
     def add(
             self,
             nodes: List[BaseNode],
