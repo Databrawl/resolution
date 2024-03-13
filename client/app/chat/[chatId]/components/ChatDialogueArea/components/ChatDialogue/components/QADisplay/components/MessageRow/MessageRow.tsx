@@ -2,8 +2,6 @@ import React from "react";
 
 import {CopyButton} from "./components/CopyButton";
 import {MessageContent} from "./components/MessageContent";
-import {QuestionBrain} from "./components/QuestionBrain";
-import {QuestionPrompt} from "./components/QuestionPrompt";
 import {SourcesButton} from "./components/SourcesButton";
 import {useMessageRow} from "./hooks/useMessageRow";
 
@@ -17,7 +15,7 @@ type MessageRowProps = {
 
 export const MessageRow = React.forwardRef(
     (
-        {speaker, text, brainName, promptName, children}: MessageRowProps,
+        {speaker, text, children}: MessageRowProps,
         ref: React.Ref<HTMLDivElement>
     ) => {
         const {
@@ -50,10 +48,10 @@ export const MessageRow = React.forwardRef(
                 <div ref={ref} className={containerClasses}>
                     <div className="flex justify-between items-start w-full">
                         {/* Left section for the question and prompt */}
-                        <div className="flex gap-1">
-                            <QuestionBrain brainName={brainName}/>
-                            <QuestionPrompt promptName={promptName}/>
-                        </div>
+                        {/*<div className="flex gap-1">*/}
+                        {/*    <QuestionBrain brainName={brainName}/>*/}
+                        {/*    <QuestionPrompt promptName={promptName}/>*/}
+                        {/*</div>*/}
                         {/* Right section for buttons */}
                         <div className="flex items-center gap-2">
                             {!isUserSpeaker && (

@@ -28,13 +28,16 @@ export const useMessageRow = ({speaker, text}: UseMessageRowProps) => {
         isUserSpeaker ? "bg-msg-gray bg-opacity-10" : "bg-msg-purple bg-opacity-40",
         "dark:bg-gray-800 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
     );
+    // const containerClasses = "";
 
     const containerWrapperClasses = cn(
         "flex flex-col",
         isUserSpeaker ? "items-end" : "items-start"
     );
+    // const containerWrapperClasses = "";
 
     const markdownClasses = cn("prose", "dark:prose-invert");
+    // const markdownClasses = "";
 
     return {
         isUserSpeaker,
