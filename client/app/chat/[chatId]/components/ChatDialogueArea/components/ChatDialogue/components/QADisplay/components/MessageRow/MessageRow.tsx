@@ -54,7 +54,8 @@ export const MessageRow = React.forwardRef(
                                 <>
                                     {hasSources && <SourcesButton sources={sourcesContent}/>}
                                     {emptyMessage && <FaSpinner className="animate-spin"/>}
-                                    <CopyButton handleCopy={handleCopy} isCopied={isCopied}/>
+                                    {!emptyMessage &&
+                                        <CopyButton handleCopy={handleCopy} isCopied={isCopied}/>}
                                 </>
                             )}
                         </div>
