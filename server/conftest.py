@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import Session
 
 from db import db
 from db.database import SESSION_ARGUMENTS
-from flask_app import app
+from app import app
 
 logger = structlog.getLogger(__name__)
 

@@ -1,9 +1,10 @@
+import logging
+
 import supabase
-from flask import Flask, request, abort
-from flask_cors import CORS
+from flask import Blueprint, abort
+from flask import request
 from gotrue.errors import AuthApiError
 from sqlalchemy import select
-from structlog import get_logger
 from supabase import create_client
 
 import memory
@@ -12,20 +13,11 @@ from db import db
 from db.models import User, Chat, Org, Onboarding, OrgUser
 from settings import app_settings
 
-
-def create_app():
-    _app = Flask("REsolution API")
-    _app.config.update(app_settings.__dict__)
-    db.init_app(_app)
-    CORS(_app)
-    return _app
+api = Blueprint('api', __name__)
+logger = logging.getLogger(__name__)
 
 
-app = create_app()
-logger = get_logger(__name__)
-
-
-@app.before_request
+@api.before_request
 def before_request():
     if request.method == "OPTIONS":
         return
@@ -44,7 +36,7 @@ def before_request():
     User.current.set(User.get(user_response.user.id))
 
 
-@app.route('/chats', methods=['POST'])
+@api.route('/chats', methods=['POST'])
 def create_chat():
     body = request.json
     chat = _create_chat(body)
@@ -66,7 +58,7 @@ def _create_chat(body):
     return chat
 
 
-@app.route('/messages', methods=['POST'])
+@api.route('/messages', methods=['POST'])
 def add_message():
     query = (
         select(Org)
@@ -91,7 +83,7 @@ def add_message():
     return response
 
 
-@app.route('/onboarding', methods=['GET'])
+@api.route('/onboarding', methods=['GET'])
 def onboarding():
     query = (
         select(Onboarding)
@@ -107,20 +99,21 @@ def onboarding():
     }
 
 
-@app.route('/chats', methods=['GET'])
+@api.route('/chats', methods=['GET'])
 def chats():
     return [{"chat_id": "1", "chat_name": "chat1"}]
 
 
-@app.route('/brains', methods=['GET'])
+@api.route('/brains', methods=['GET'])
 def brains():
     return [{"name": "default"}]
 
 
-@app.route('/brains/default', methods=['GET'])
+@api.route('/brains/default', methods=['GET'])
 def brains_default():
     return {"name": "default", "description": "Default brain", "version": "1.0.0"}
 
-@app.route('/prompts', methods=['GET'])
+
+@api.route('/prompts', methods=['GET'])
 def prompts():
     return [{"name": "default"}]
