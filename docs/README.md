@@ -103,11 +103,15 @@ For local testing, the following commands are quite useful:
 
 ## ECR (Elastic Container Registry)
 
-1. `aws ecr create-repository --repository-name resolution-hub \
---image-tag-mutability IMMUTABLE --image-scanning-configuration scanOnPush=true --region us-east-1`
+1. `docker build -t resolution-api:latest .` - build the image (from `server` directory)
+2. `aws ecr get-login-password --region us-east-1 --profile serge-guardian-admin | docker login --username AWS --password-stdin 375747807787.dkr.ecr.us-east-1.amazonaws.com`
+   logs in docker to the ECR, so it can push images there.
+2. `aws ecr create-repository --repository-name resolution --region us-east-1 --profile serge-guardian-admin`
    creates container called `resolution-hub` in the `us-east-1` region.
-2. `aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com`
-   logs in to the ECR.
+3. `docker tag resolution-api:latest 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution`
+   tag the image
+4. `docker push 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution` - push the image to the ECR
+   This is the operation to be repeated
 
 ## Helper commands
 
