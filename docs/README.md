@@ -62,6 +62,16 @@ separate invocations of lambda), so we can just use a global session object.
 
 # AWS
 
+## Infra TL;DR
+
+We run on AWS Fargate, which is an auto-provisioning service on top of ECS. It's a serverless service, which means we
+don't need to worry about the underlying infrastructure.
+
+The service is accessed via an Application Load Balancer (ALB) called `GateKeeper`. It routes both
+HTTP and HTTPS traffic to the Target Group consisting of only one target - the ECS cluster. The target
+group forwards any traffic to the 5050 port of the container. So any traffic ends up uniformly
+in the same place.
+
 ## User configuration
 
 I went with new IAM Identity Center setup, which is a successor of AWS SSO. It's now a recommended way
