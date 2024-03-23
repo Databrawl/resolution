@@ -1,8 +1,13 @@
-FROM public.ecr.aws/lambda/python:3.12
+FROM public.ecr.aws/docker/library/python:3.12-alpine
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN python3.11 -m pip install -r requirements.txt -t .
+EXPOSE 5050:5050
 
-# Command can be overwritten by providing a different command in the template directly.
-CMD ["app.app"]
+ENV FLASK_APP=app.py
+CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5050"]
