@@ -1,10 +1,11 @@
 import React from "react";
+import {FaSpinner} from "react-icons/fa";
 
 import {CopyButton} from "./components/CopyButton";
 import {MessageContent} from "./components/MessageContent";
 import {SourcesButton} from "./components/SourcesButton";
 import {useMessageRow} from "./hooks/useMessageRow";
-import {FaSpinner} from "react-icons/fa";
+
 
 type MessageRowProps = {
     speaker: "user" | "assistant";
@@ -16,7 +17,7 @@ type MessageRowProps = {
 
 export const MessageRow = React.forwardRef(
     (
-        {speaker, text, brainName, children}: MessageRowProps,
+        {speaker, text, brainName}: MessageRowProps,
         ref: React.Ref<HTMLDivElement>
     ) => {
         const {
@@ -60,12 +61,10 @@ export const MessageRow = React.forwardRef(
                             )}
                         </div>
                     </div>
-                    {children ?? (
-                        <MessageContent
-                            text={messageContent}
-                            markdownClasses={markdownClasses}
-                        />
-                    )}
+                    <MessageContent
+                        text={messageContent}
+                        markdownClasses={markdownClasses}
+                    />
                 </div>
             </div>
         );

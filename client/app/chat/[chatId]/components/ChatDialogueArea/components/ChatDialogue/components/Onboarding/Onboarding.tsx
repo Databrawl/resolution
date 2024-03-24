@@ -2,7 +2,6 @@ import {useEffect, useState} from "react";
 
 import {useOnboardingApi} from "@/lib/api/onboarding/useOnboardingApi";
 
-import {stepsContainerStyle} from "./styles";
 import {MessageRow} from "../QADisplay";
 
 
@@ -21,11 +20,7 @@ export const Onboarding = (): JSX.Element => {
 
     return (
         <div className="flex flex-col gap-2 mb-3">
-            <MessageRow speaker={"assistant"} brainName={"Quivr"}>
-                <div className={stepsContainerStyle}>
-                    {greeting}
-                </div>
-            </MessageRow>
+            <MessageRow speaker={"assistant"} brainName={"Quivr"} text={greeting}/>
         </div>
     );
 };
