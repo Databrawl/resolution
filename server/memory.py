@@ -4,7 +4,7 @@ from typing import Any
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.messages import messages_to_dict, BaseMessage, messages_from_dict
-from sqlalchemy import select
+from sqlalchemy import select, desc
 
 from db import db
 from db.models import Message
@@ -36,7 +36,7 @@ def _deserialize_messages(messages: list[Message]) -> list[BaseMessage]:
 
 def load(chat_id: str, k: int = app_settings.DEFAULT_CHAT_MEMORY_SIZE) -> ConversationBufferWindowMemory:
     """Deserialize messages from the Database and return memory object in LangChain format"""
-    stmt = select(Message).where(Message.chat_id == chat_id).order_by(Message.created_at).limit(k)
+    stmt = select(Message).where(Message.chat_id == chat_id).order_by(desc(Message.created_at)).limit(k)
     messages = list(db.session.execute(stmt).scalars())
 
     retrieved_messages = _deserialize_messages(messages)
