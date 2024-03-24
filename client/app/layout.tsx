@@ -13,9 +13,9 @@ import "./globals.css";
 const inter = Outfit({subsets: ["latin"]});
 
 export const metadata = {
-    title: "Quivr - Get a Second Brain with Generative AI",
+    title: "REsolution Team Demo",
     description:
-        "Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information.",
+        "REsolution Team is an autonomous team of AI agents that resolves the Customer Support issues",
 };
 
 const RootLayout = async ({
