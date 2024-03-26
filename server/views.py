@@ -21,6 +21,9 @@ logger = logging.getLogger(__name__)
 def before_request():
     if request.method == "OPTIONS":
         return
+    if request.path == "/api/notification-banner":
+        # TODO: this is a hack. Remove once we move away from the old FE
+        return
     jwt = request.headers.get('Authorization')
     if not jwt:
         abort(401)
@@ -117,3 +120,23 @@ def brains_default():
 @api.route('/prompts', methods=['GET'])
 def prompts():
     return [{"name": "default"}]
+
+
+@api.route('/api/notification-banner', methods=['GET'])
+def notification_banner():
+    text = "[Want to hire me to cover your customer support? — Let’s schedule a quick call 🧑‍💻](https://calendly.com/resolution-vlad/30min)\n"
+    return {
+        "data":
+            {
+                "id": 2,
+                "attributes": {
+                    "notification_id": "notification-banner-111",
+                    "text": text,
+                    "dismissible": True, "isSticky": True,
+                    "style": {"color": "#FFF", "height": 50, "fontSize": "20px",
+                              "backgroundColor": "#11243E"},
+                    "createdAt": "2024-03-26T00:00:00.000Z",
+                    "updatedAt": "2024-03-26T00:00:00.000Z",
+                    "publishedAt": "2024-03-26T00:00:00.000Z", "locale": "en"}
+            }, "meta": {}
+    }
