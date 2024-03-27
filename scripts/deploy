@@ -2,7 +2,10 @@
 
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-cd "$SCRIPT_DIR/../deploy" || exit
+cd "$SCRIPT_DIR/../server" || exit
 
-sam build
-sam deploy
+docker build -t resolution-api:latest .
+aws sso login --sso-session serge-guardian
+aws ecr get-login-password --region us-east-1 --profile serge-guardian-admin | docker login --username AWS --password-stdin 375747807787.dkr.ecr.us-east-1.amazonaws.com
+docker tag resolution-api:latest 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution:latest
+docker push 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution:latest
