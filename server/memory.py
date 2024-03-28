@@ -37,7 +37,8 @@ def _deserialize_messages(messages: list[Message]) -> list[BaseMessage]:
 def load(chat_id: str, k: int = app_settings.DEFAULT_CHAT_MEMORY_SIZE) -> ConversationBufferWindowMemory:
     """Deserialize messages from the Database and return memory object in LangChain format"""
     stmt = select(Message).where(Message.chat_id == chat_id).order_by(desc(Message.created_at)).limit(k)
-    messages = list(db.session.execute(stmt).scalars())
+    messages = db.session.execute(stmt).scalars().all()
+    messages.reverse()  # reverse to get the oldest messages first, to look like normal chat history
 
     retrieved_messages = _deserialize_messages(messages)
     retrieved_chat_history = ChatMessageHistory(messages=retrieved_messages)
