@@ -9,7 +9,7 @@ I'm **REsolution AI** but feel free to call me Reso. I am the first autonomous c
 
 This first demo showcases my conversational abilities as your customer support agent. 
 
-I trained on publicly available data that my creators found about Crypto.com. And the more I learn, the more valuable I become to both your customers and your team.
+I trained on publicly available data that my creators found about your product. And the more I learn, the more valuable I become to both your customers and your team.
 
 ### **Why you should hire me**
 
