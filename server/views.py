@@ -134,7 +134,7 @@ def notification_banner():
                     "text": text,
                     "dismissible": True, "isSticky": True,
                     "style": {"color": "#FFF", "height": 50, "fontSize": "20px",
-                              "backgroundColor": "#11243E"},
+                              "backgroundColor": "#0B7FAB"},
                     "createdAt": "2024-03-26T00:00:00.000Z",
                     "updatedAt": "2024-03-26T00:00:00.000Z",
                     "publishedAt": "2024-03-26T00:00:00.000Z", "locale": "en"}

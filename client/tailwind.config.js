@@ -9,25 +9,25 @@ module.exports = {
     ],
     theme: {
         extend: {
-            backgroundImage: {
-                "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-                "gradient-conic":
-                    "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-            },
+            // backgroundImage: {
+            //     "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+            //     "gradient-conic":
+            //         "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+            // },
             colors: {
                 black: "#11243E",
-                primary: "#6142D4",
+                primary: "#0B7FAB",
                 secondary: "#F3ECFF",
-                tertiary: "#F6F4FF",
+                tertiary: "#FFFFFF",
                 accent: "#13ABBA",
                 highlight: "#FAFAFA",
-                "accent-hover": "#008491",
-                "chat-bg-gray": "#D9D9D9",
-                "msg-gray": "#9B9B9B",
+                "accent-hover": "#11243e",
+                "chat-bg-gray": "#FFFFFF",
+                "msg-gray": "#0B7FAB",
                 "msg-header-gray": "#8F8F8F",
-                "msg-purple": "#E0DDFC",
-                "onboarding-yellow-bg": "#F6EFDE",
-                ivory: "#FCFAF6",
+                "msg-purple": "#F2F2F2",
+                "onboarding-yellow-bg": "#D8EDF5",
+                ivory: "#FFFFFF",
             },
         },
     },

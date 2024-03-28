@@ -25,19 +25,18 @@ export const useMessageRow = ({speaker, text}: UseMessageRowProps) => {
 
     const containerClasses = cn(
         "py-3 px-5 w-fit",
-        isUserSpeaker ? "bg-msg-gray bg-opacity-10" : "bg-msg-purple bg-opacity-40",
+        isUserSpeaker ? "bg-msg-gray" : "bg-msg-purple bg-opacity-80",
         "dark:bg-gray-800 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
     );
-    // const containerClasses = "";
 
     const containerWrapperClasses = cn(
         "flex flex-col",
         isUserSpeaker ? "items-end" : "items-start"
     );
-    // const containerWrapperClasses = "";
 
-    const markdownClasses = cn("prose", "dark:prose-invert");
-    // const markdownClasses = "";
+    const markdownClasses = cn("prose", "dark:prose-invert", {
+        "text-slate-100": isUserSpeaker,
+    });
 
     return {
         isUserSpeaker,
