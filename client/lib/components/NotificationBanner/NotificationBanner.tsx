@@ -32,6 +32,7 @@ export const NotificationBanner = (): JSX.Element => {
                 ...notificationBanner.style,
             }}
         >
+            <div className="hover:bg-gray-300">
             <ReactMarkdown
                 rehypePlugins={[
                     //@ts-expect-error bad typing from rehype-raw
@@ -40,6 +41,7 @@ export const NotificationBanner = (): JSX.Element => {
             >
                 {notificationBanner.text}
             </ReactMarkdown>
+            </div>
             {Boolean(notificationBanner.dismissible) && (
                 <Button
                     variant="tertiary"
