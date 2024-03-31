@@ -124,7 +124,7 @@ def prompts():
 
 @api.route('/api/notification-banner', methods=['GET'])
 def notification_banner():
-    text = "[Want to hire me to cover your customer support? — Let’s schedule a quick call 🧑‍💻](https://calendly.com/resolution-vlad/30min)\n"
+    text = "[Hire me to cover your customer support 👨‍💻](https://calendly.com/resolution-vlad/30min)\n"
     return {
         "data":
             {
