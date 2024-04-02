@@ -42,6 +42,7 @@ def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
         if not query:
             # no query provided, let's store the documents
             archive_urls(app_settings.KNOWLEDGE_URLS.split(','), crawl_depth)
+            db.session.commit()
         else:
             results = retrieve(query)
             pprint(results)
