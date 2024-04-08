@@ -24,7 +24,7 @@ from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain_community.chat_models import ChatOpenAI
 
-from vdb.utils import archive_text, archive_urls, search_knowledge_base
+from vdb.utils import archive_text, archive_urls, search_knowledge_base, archive_file
 from settings import app_settings
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -42,8 +42,8 @@ logger = logging.getLogger(__name__)
 
 def librarian_agent():
     instructions = """
-    You are an experienced Data analyst working for Crypto.com. You are chatting with your manager.
-    You are being given text data and URLs to store in the Knowledge base or being asked about the data that is
+    You are an experienced Data analyst. You are chatting with your manager.
+    You are being given text data, URLs or files to store in the Knowledge base or being asked about the data that is
     available in the knowledge base. Therefore, your tasks include either accessing the knowledge base or storing the
     data there.
 
@@ -52,6 +52,8 @@ def librarian_agent():
     2. Then, store the text data in the knowledge base using Archive_text_data if there's anything besides the URLs.
     3. Finally, use the Archive_URLs tool to scrape and store the data from the URLs found on step 1. Call this tool
     with all URLs at once. Separate them with a ; (semicolon).
+
+    If you've been asked "Store file", then use the tool "Archive_file".
 
     If you need to retrieve data use the Retrieve_data tool. Don't use any other data if you're being asked a specific
     question. Don't make things up. Use only the data from the knowledge base.
@@ -83,6 +85,11 @@ def librarian_agent():
             name="Retrieve_data",
             func=search_knowledge_base,
             description="Retrieve data from the knowledge base."
+        ),
+        Tool(
+            name="Archive_file",
+            func=archive_file,
+            description="Store text data from a file into knowledge base"
         )
     ]
 

@@ -32,6 +32,7 @@ jose==1.0.0
 chalice==1.30.0
 openai==1.10.0
 python-rapidjson==1.14
+fitz #TODO need version?
 
 ## Test dependencies
 pytest==7.4.3

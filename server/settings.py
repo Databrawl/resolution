@@ -17,7 +17,7 @@ ENV = os.getenv('ENV', 'prod')
 def read_prompts_to_dict(org_name: str) -> dict[str, str]:
     directory = os.path.join(SRC_ROOT, "bots", "prompts", org_name)
     if not os.path.exists(directory):
-        directory = os.path.join(SRC_ROOT, "bots", "prompts", "anytype")
+        directory = os.path.join(SRC_ROOT, "bots", "prompts", "langchain")
 
     prompts_dict = {}
     for file in os.listdir(directory):
