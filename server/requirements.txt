@@ -16,13 +16,13 @@ Flask-SQLAlchemy==3.1.1
 
 llama-index==0.10.28
 bs4==0.0.1
-beautifulsoup4==4.12.2
+beautifulsoup4==4.12.3
 unstructured==0.11.6
 pydantic==2.5.3
 pydantic-settings==2.1.0
 email-validator==2.1.0.post1
 supabase==2.3.0
-SQLAlchemy==2.0.23
+SQLAlchemy==2.0.29
 pgvector==0.2.4
 structlog==23.2.0
 pytz==2023.3.post1
@@ -32,7 +32,7 @@ jose==1.0.0
 chalice==1.30.0
 openai==1.10.0
 python-rapidjson==1.14
-fitz #TODO need version?
+fitz==0.0.1.dev2
 
 ## Test dependencies
 pytest==7.4.3
