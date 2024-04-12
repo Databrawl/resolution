@@ -1,5 +1,4 @@
 import logging
-import fitz  # PyMuPDF library for exctracting data from pdf files
 import os
 from functools import reduce
 from typing import Sequence
@@ -91,23 +90,6 @@ def archive_text(text: str) -> None:
     document = Document(text=_clean(text))
 
     _create_documents([document])
-
-
-def archive_file(file_path: str): #TODO need to load a directory for a file somewhere
-    # Open the file (PDF)
-    document = fitz.open(file_path)
-    text = ''
-    # Extract text from each page
-    for page in document:
-        text += page.get_text()
-    # Close the document to release resources
-    document.close()
-
-    # Remove line breaks
-    processed_text = text.replace("\n", "").replace("\r", "")
-
-    documents = [{'text': processed_text}]
-    _create_documents(documents)
 
 
 def retrieve(query: str, retriever_top_k: int = 5) -> list[NodeWithScore]:
