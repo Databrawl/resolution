@@ -5,7 +5,7 @@ from contextvars import ContextVar
 from datetime import datetime
 from typing import Any
 
-from llama_index.constants import DEFAULT_EMBEDDING_DIM
+from llama_index.core.constants import DEFAULT_EMBEDDING_DIM
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import String, UniqueConstraint, Boolean, \
     DateTime, Text

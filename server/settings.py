@@ -164,6 +164,7 @@ class AppSettings(BaseSettings):
     # Project settings
     DEFAULT_CHAT_MEMORY_SIZE: int = 5
     KNOWLEDGE_URLS: Optional[str] = None
+    KNOWLEDGE_DIR: Optional[str] = "upload"  # path relative to the SRC_ROOT
 
 
 app_settings = AppSettings()

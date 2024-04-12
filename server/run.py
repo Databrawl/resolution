@@ -14,7 +14,7 @@ from bots.team import call_manager
 from db import db
 from db.models import Org, Chat, User
 from app import app
-from vdb.utils import archive_urls, retrieve
+from vdb.utils import archive_urls, retrieve, archive_files
 from settings import app_settings
 
 logging.basicConfig(level=app_settings.LOG_LEVEL)
@@ -30,7 +30,7 @@ def with_app_context(f):
 
 
 @with_app_context
-def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
+def main(mode: str, org: Org, query: str, store_files: str, crawl_depth: int) -> None:
     try:
         org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()
     except exc.NoResultFound:
@@ -39,13 +39,16 @@ def main(mode: str, org: Org, query: str, crawl_depth: int) -> None:
     Org.current.set(org)
 
     if mode == 'vdb':
-        if not query:
+        if query:
+            results = retrieve(query)
+            pprint(results)
+        elif store_files:
+            archive_files(app_settings.KNOWLEDGE_DIR)
+            db.session.commit()
+        else:
             # no query provided, let's store the documents
             archive_urls(app_settings.KNOWLEDGE_URLS.split(','), crawl_depth)
             db.session.commit()
-        else:
-            results = retrieve(query)
-            pprint(results)
     elif mode == "librarian":
         while True:
             user_input = input('>>> ')
@@ -79,11 +82,12 @@ if __name__ == "__main__":
     parser.add_argument('mode', type=str,
                         help='Application operation mode. One of: "vdb", "librarian", "chat"')
     parser.add_argument('org', type=str, help='The Organization name')
-    parser.add_argument('--query', type=str, help='String to query Vector Database for',
+    parser.add_argument('--query', type=str, help='Vector Database query string',
                         default=None)
+    parser.add_argument('--store_files', action='store_true', help='Whether to upload files to the database')
     parser.add_argument('--crawl_depth', type=int,
                         help='Depth of crawl of the URLs, default is 0 - no crawling, just scrape the given URLs',
                         default=0)
     args = parser.parse_args()
 
-    main(args.mode, args.org, args.query, args.crawl_depth)
+    main(args.mode, args.org, args.query, args.store_files, args.crawl_depth)

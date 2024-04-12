@@ -1,17 +1,19 @@
 import logging
 import fitz  # PyMuPDF library for exctracting data from pdf files
+import os
 from functools import reduce
 from typing import Sequence
 from typing import Union
 
-from llama_index import Document
-from llama_index import StorageContext, QueryBundle
-from llama_index import (
+from llama_index.core.service_context import ServiceContext
+from llama_index.core.readers.file.base import SimpleDirectoryReader
+from llama_index.core.schema import Document, NodeWithScore
+from llama_index.core.storage import StorageContext
+from llama_index.core.schema import QueryBundle
+from llama_index.core.indices.vector_store import (
     VectorStoreIndex,
-    ServiceContext,
+    VectorIndexRetriever
 )
-from llama_index.retrievers import VectorIndexRetriever
-from llama_index.schema import NodeWithScore
 from unstructured.cleaners.core import clean_bullets, clean_dashes, clean_extra_whitespace, \
     clean_non_ascii_chars, clean_ordered_bullets, clean_trailing_punctuation, \
     group_broken_paragraphs, \
@@ -19,7 +21,7 @@ from unstructured.cleaners.core import clean_bullets, clean_dashes, clean_extra_
 
 from vdb.crawler import WebCrawler
 from vdb.store import ChunkVectorStore
-from settings import app_settings
+from settings import app_settings, SRC_ROOT
 
 logger = logging.getLogger(__name__)
 
@@ -79,13 +81,19 @@ def archive_urls(urls: Union[str, list[str]], depth: int = 0) -> None:
     _create_documents(documents)
 
 
+def archive_files(directory: str) -> None:
+    path = os.path.join(SRC_ROOT, directory)
+    documents = SimpleDirectoryReader(path).load_data()
+    _create_documents(documents)
+
+
 def archive_text(text: str) -> None:
     document = Document(text=_clean(text))
 
     _create_documents([document])
 
-#Exctract data from file (currenlty, pdf)
-def archive_file(file_path): #TODO need to load a directory for a file somewhere
+
+def archive_file(file_path: str): #TODO need to load a directory for a file somewhere
     # Open the file (PDF)
     document = fitz.open(file_path)
     text = ''
@@ -94,12 +102,13 @@ def archive_file(file_path): #TODO need to load a directory for a file somewhere
         text += page.get_text()
     # Close the document to release resources
     document.close()
-    
+
     # Remove line breaks
     processed_text = text.replace("\n", "").replace("\r", "")
 
     documents = [{'text': processed_text}]
     _create_documents(documents)
+
 
 def retrieve(query: str, retriever_top_k: int = 5) -> list[NodeWithScore]:
     index = _get_index()

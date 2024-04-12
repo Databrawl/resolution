@@ -1,10 +1,10 @@
 import logging
 from typing import Any, List
 
-from llama_index.schema import BaseNode
-from llama_index.vector_stores import VectorStoreQuery, VectorStoreQueryResult
-from llama_index.vector_stores.types import VectorStore
-from llama_index.vector_stores.utils import node_to_metadata_dict, metadata_dict_to_node
+from llama_index.core.schema import BaseNode
+from llama_index.core.vector_stores import VectorStoreQuery, VectorStoreQueryResult
+from llama_index.core.vector_stores.types import VectorStore
+from llama_index.core.vector_stores.utils import node_to_metadata_dict, metadata_dict_to_node
 from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 

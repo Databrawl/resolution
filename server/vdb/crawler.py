@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from llama_index.readers.base import BaseReader
-from llama_index.readers.schema.base import Document
+from llama_index.core.readers.base import BaseReader
+from llama_index.core.schema import Document
 
 logger = logging.getLogger(__name__)
 
