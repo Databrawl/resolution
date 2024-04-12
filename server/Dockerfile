@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.12-alpine
+FROM public.ecr.aws/docker/library/python:3.12
 
 WORKDIR /usr/src/app
 
