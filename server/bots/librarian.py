@@ -24,7 +24,7 @@ from langchain.prompts import MessagesPlaceholder
 from langchain.schema import SystemMessage
 from langchain_community.chat_models import ChatOpenAI
 
-from vdb.utils import archive_text, archive_urls, search_knowledge_base, archive_file
+from vdb.utils import archive_text, archive_urls, search_knowledge_base
 from settings import app_settings
 
 SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -86,11 +86,6 @@ def librarian_agent():
             func=search_knowledge_base,
             description="Retrieve data from the knowledge base."
         ),
-        Tool(
-            name="Archive_file",
-            func=archive_file,
-            description="Store text data from a file into knowledge base"
-        )
     ]
 
     agent = initialize_agent(
