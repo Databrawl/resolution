@@ -54,6 +54,28 @@
     python server/run.py librarian samurai
     ```
 
+6. Save data to VDB from URLs
+
+   a. Add the files to the `server/upload` directory
+
+   b. Run the command
+    ```bash
+    KNOWLEDGE_URLS=https://link1.com,http://link2.com python server/run.py vdb <org_name> --crawl_depth <N>
+    ```
+    where `KNOWLEDGE_URLS` is the comma separated list of documentation links to scan,
+    `<org_name>` is the name of the organization and `<N>` is the integer denoting the depth of
+    links to follow. The command will add the data from the files to the VDB under the given org.
+
+7. Save data to VDB from the file
+
+   a. Add the files to the `server/upload` directory
+
+   b. Run the command
+    ```bash
+    python server/run.py vdb <org_name> --store_files
+    ```
+    where `<org_name>` is the name of the organization. The command will add the data from the files to the VDB under the given org.
+
 ## Development
 
 * [Docs](docs/README.md)
