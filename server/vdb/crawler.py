@@ -9,6 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 from llama_index.core.readers.base import BaseReader
 from llama_index.core.schema import Document
+from usp.tree import sitemap_tree_for_homepage
 
 logger = logging.getLogger(__name__)
 
@@ -192,7 +193,8 @@ class WebCrawler(BaseReader):
             List[Document]: List of documents.
         """
         documents = []
-        for url in urls:
+        extended_urls = self._add_sitemaps(urls)
+        for url in extended_urls:
             url_documents = self._crawl_url(url, custom_hostname, include_url_in_text)
             documents.extend(url_documents)
 
@@ -249,3 +251,12 @@ class WebCrawler(BaseReader):
             data = soup.getText()
 
         return Document(text=data, extra_info=extra_info)
+
+    def _add_sitemaps(self, urls):
+        new_urls = set()
+        for url in urls:
+            tree = sitemap_tree_for_homepage(url)
+            new_urls |= {page.url for page in tree.all_pages()
+                         if any(page.url.startswith(u) for u in urls)}
+
+        return list(new_urls.union(set(urls)))
