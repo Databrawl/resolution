@@ -114,14 +114,31 @@ For local testing, the following commands are quite useful:
 ## ECR (Elastic Container Registry)
 
 1. `docker build -t resolution-api:latest .` - build the image (from `server` directory)
+   * `docker buildx build --platform linux/amd64,linux/arm64 --push -t 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution .` - build the image for multiple platforms / need to login (see below) first
 2. `aws ecr get-login-password --region us-east-1 --profile serge-guardian-admin | docker login --username AWS --password-stdin 375747807787.dkr.ecr.us-east-1.amazonaws.com`
    logs in docker to the ECR, so it can push images there.
-2. `aws ecr create-repository --repository-name resolution --region us-east-1 --profile serge-guardian-admin`
+3`aws ecr create-repository --repository-name resolution --region us-east-1 --profile serge-guardian-admin`
    creates container called `resolution-hub` in the `us-east-1` region.
-3. `docker tag resolution-api:latest 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution`
+4`docker tag resolution-api:latest 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution`
    tag the image
-4. `docker push 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution` - push the image to the ECR
+5`docker push 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution` - push the image to the ECR
    This is the operation to be repeated
+
+
+## EC2
+1. [Local] Push docker image from local
+2. [Local] Connect to the EC2 instance via ssh:
+    ```bash
+    ssh -i "REsolution-API-EC2.pem" ec2-user@ec2-54-209-19-205.compute-1.amazonaws.com
+    ```
+3. [EC2] Pull docker image from ECR
+   ```bash
+    docker pull 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution
+   ```
+4. [EC2] Run the container
+   ```bash
+   docker run --env-file .env.prod -t -d -p 80:5050 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution
+   ```
 
 ## Helper commands
 

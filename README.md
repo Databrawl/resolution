@@ -6,14 +6,9 @@
 
 1. Install AWS SAM
    CLI ([tutorial](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html))
-2. Go to the `scripts` directory and then run these two commands in separate terminal windows:
-
+2. Run Backend via
     ```bash
-    ./be.sh
-    ```
-
-    ```bash
-    ./fe.sh
+    docker run --env-file .env.prod resolution-api:latest
     ```
 
 ## Developer Setup
@@ -93,7 +88,7 @@ company needs.
 ### Basic components:
 
 1. ✅ Org support
-2. Chat is attached to current org
+2. ✅ Chat is attached to current org
    It's easier to make accounts bound to the Org. Otherwise, we'll probably need to bind orgs and the databases to the
    URLs, which is complex and complicated. We should have boilerplate code for authentication available.
-3. Save chat history in DB
+3. ✅ Save chat history in DB
