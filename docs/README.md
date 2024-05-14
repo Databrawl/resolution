@@ -131,6 +131,10 @@ For local testing, the following commands are quite useful:
     ```bash
     ssh -i "REsolution-API-EC2.pem" ec2-user@ec2-54-209-19-205.compute-1.amazonaws.com
     ```
+3. [Local] Copy the env file to the server
+    ```bash
+    scp -i ~/.ssh/REsolution-API-EC2.pem .env.prod ec2-user@ec2-54-209-19-205.compute-1.amazonaws.com:/home/ec2-user/.env.prod
+   ```
 3. [EC2] Pull docker image from ECR
    ```bash
     docker pull 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution
