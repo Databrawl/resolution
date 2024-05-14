@@ -155,7 +155,7 @@ class AppSettings(BaseSettings):
     # OpenAI
     OPENAI_API_KEY: str
     GPT_35: str = "gpt-3.5-turbo-1106"
-    GPT_4: str = "gpt-4-turbo"
+    GPT_4: str = "gpt-4o"
 
     # LlamaIndex
     CHUNK_SIZE: int = 512
