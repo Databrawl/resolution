@@ -1,4 +1,5 @@
 #!/bin/bash
 
-
 # To be executed on the remote server
+docker pull 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution
+docker run --env-file .env.prod --name resolution-api -t -d -p 80:5050 375747807787.dkr.ecr.us-east-1.amazonaws.com/resolution
