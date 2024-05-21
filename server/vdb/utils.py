@@ -26,6 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 def _clean(text: str) -> str:
+    if not text:
+        return text
     cleaners = [
         clean_bullets,
         clean_dashes,
