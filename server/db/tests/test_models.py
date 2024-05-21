@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 import pytest
-from llama_index.constants import DEFAULT_EMBEDDING_DIM
+from llama_index.core.constants import DEFAULT_EMBEDDING_DIM
 from sqlalchemy import exc, select
 
 from db import db

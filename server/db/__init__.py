@@ -1,9 +1,3 @@
-# from db.database import Database
-# from settings import app_settings
-#
-# db = Database(app_settings.SQLALCHEMY_DATABASE_URI)
-
-
 from __future__ import annotations
 
 import re

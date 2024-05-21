@@ -2,9 +2,9 @@ import random
 import uuid
 
 from langchain.embeddings import OpenAIEmbeddings
-from llama_index.constants import DEFAULT_EMBEDDING_DIM
-from llama_index.schema import TextNode
-from llama_index.vector_stores import VectorStoreQuery
+from llama_index.core.constants import DEFAULT_EMBEDDING_DIM
+from llama_index.core.schema import TextNode
+from llama_index.core.vector_stores import VectorStoreQuery
 from sqlalchemy import select
 
 from db import db

@@ -3,7 +3,7 @@ from hashlib import sha256
 
 import factory
 from factory import lazy_attribute
-from llama_index.constants import DEFAULT_EMBEDDING_DIM
+from llama_index.core.constants import DEFAULT_EMBEDDING_DIM
 
 from db import db
 from db.models import User, Org, Chunk, OrgUser, Message, Chat, Onboarding

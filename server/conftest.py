@@ -1,16 +1,25 @@
 import pytest
 import structlog
-from sqlalchemy.orm.session import Session
 
+from app import app, create_app
 from db import db
-from db.database import SESSION_ARGUMENTS
-from app import app
 
 logger = structlog.getLogger(__name__)
 
 
+@pytest.fixture()
+def test_app():
+    _test_app = create_app()
+    _test_app.config.update({
+        "TESTING": True,
+    })
+
+    with _test_app.app_context():
+        yield _test_app
+
+
 @pytest.fixture(autouse=True, scope="function")
-def db_session():
+def db_session(test_app):
     """
     Ensure tests are run in a transaction with automatic rollback.
 
@@ -19,8 +28,6 @@ def db_session():
     transaction, resetting the database except for migrations.
     """
     with db.engine.connect() as test_connection:
-        test_session = Session(bind=test_connection, **SESSION_ARGUMENTS)
-        db.session = test_session
         transaction = test_connection.begin()
         try:
             yield
