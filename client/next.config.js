@@ -73,7 +73,7 @@ const ContentSecurityPolicy = {
         "https://js.stripe.com",
     ],
     "frame-src": ["https://js.stripe.com"],
-    "frame-ancestors": [process.env.NEXT_PUBLIC_FRONTEND_URL],
+    "frame-ancestors": ["https://resolution.bot"],
     "style-src": ["'unsafe-inline'", process.env.NEXT_PUBLIC_FRONTEND_URL],
 };
 
