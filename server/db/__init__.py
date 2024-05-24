@@ -3,11 +3,12 @@ from __future__ import annotations
 import re
 from typing import List, Set, Dict, Any
 from uuid import uuid4
-from utils.json import json_dumps, json_loads
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import inspect as sa_inspect, select, UUID, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, declared_attr, InstanceState, Mapped, mapped_column
+
+from utils.json import json_dumps, json_loads
 
 
 class BaseModel(DeclarativeBase):
@@ -119,9 +120,19 @@ class ForeignKeyCascade(ForeignKey):
 
 
 ENGINE_ARGUMENTS = {
-    "connect_args": {"connect_timeout": 10, "options": "-c timezone=UTC"},
+    "connect_args": {
+        "connect_timeout": 10,
+        "options": "-c timezone=UTC",
+        "keepalives": 1,
+        "keepalives_idle": 30,
+        "keepalives_interval": 10,
+        "keepalives_count": 5,
+    },
+    "pool_size": 10,
+    "max_overflow": 2,
+    "pool_recycle": 300,
     "pool_pre_ping": True,
-    "pool_size": 60,
+    "pool_use_lifo": True,
     "json_serializer": json_dumps,
     "json_deserializer": json_loads,
 }
