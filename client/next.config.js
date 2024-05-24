@@ -12,8 +12,6 @@ const nextConfig = {
     },
     images: {
         domains: [
-            "www.quivr.app",
-            "quivr-cms.s3.eu-west-3.amazonaws.com",
             "www.gravatar.com",
             "media.licdn.com",
             "*",
@@ -75,7 +73,7 @@ const ContentSecurityPolicy = {
         "https://js.stripe.com",
     ],
     "frame-src": ["https://js.stripe.com"],
-    "frame-ancestors": ["'none'"],
+    "frame-ancestors": [process.env.NEXT_PUBLIC_FRONTEND_URL],
     "style-src": ["'unsafe-inline'", process.env.NEXT_PUBLIC_FRONTEND_URL],
 };
 
