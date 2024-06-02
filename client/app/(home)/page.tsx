@@ -1,10 +1,10 @@
 "use client";
-import Link from "next/link";
+import {useSearchParams} from "next/navigation";
 import {Suspense} from "react";
 import {FormProvider, useForm} from "react-hook-form";
 import {useTranslation} from "react-i18next";
 
-import {QuivrLogo} from "@/lib/assets/QuivrLogo";
+import SupaLogin from "@/app/(home)/components/EmailLogin/components/PasswordLogin/SupaLogin";
 import {Divider} from "@/lib/components/ui/Divider";
 import {useAuthModes} from "@/lib/hooks/useAuthModes";
 
@@ -16,6 +16,7 @@ import {EmailAuthContextType} from "./types";
 const Main = (): JSX.Element => {
     useLogin();
     const {googleSso, password, magicLink} = useAuthModes();
+    const searchParams = useSearchParams();
 
     const methods = useForm<EmailAuthContextType>({
         defaultValues: {
@@ -24,6 +25,11 @@ const Main = (): JSX.Element => {
         },
     });
     const {t} = useTranslation(["translation", "login"]);
+
+    const product = searchParams.get('product');
+    if (product === 'slack') {
+        return <SupaLogin/>;
+    }
 
     return (
         <div className="w-screen h-screen bg-ivory" data-testid="sign-in-card">
