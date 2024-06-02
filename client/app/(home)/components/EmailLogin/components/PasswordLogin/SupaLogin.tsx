@@ -1,11 +1,15 @@
-// components/Login.jsx
+import {ReactElement} from "react";
 
 import {
     usePasswordAutoLogin
 } from "@/app/(home)/components/EmailLogin/components/PasswordLogin/hooks/usePasswordAutoLogin";
 
-const SupaLogin = () => {
-    const {handlePasswordAutoLogin} = usePasswordAutoLogin("slack");
+interface SupaLoginProps {
+    product: string;
+}
+
+const SupaLogin = (loginProps: SupaLoginProps): ReactElement => {
+    const {handlePasswordAutoLogin} = usePasswordAutoLogin(loginProps.product);
 
     // Directly call the function within the JSX
     void handlePasswordAutoLogin();

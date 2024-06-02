@@ -27,8 +27,8 @@ const Main = (): JSX.Element => {
     const {t} = useTranslation(["translation", "login"]);
 
     const product = searchParams.get('product');
-    if (product === 'slack') {
-        return <SupaLogin/>;
+    if (product != null) {
+        return <SupaLogin product={product}/>;
     }
 
     return (

@@ -1,4 +1,3 @@
-import {redirect, useSearchParams} from "next/navigation";
 import {useTranslation} from "react-i18next";
 
 import {useSupabase} from "@/lib/context/SupabaseProvider";
@@ -9,21 +8,15 @@ export const usePasswordAutoLogin = (product: string) => {
     const {supabase} = useSupabase();
     const {t} = useTranslation("login");
     const {publish} = useToast();
-    const searchParams = useSearchParams();
 
     let email = '';
     let password = '';
 
-    if (product == 'slack') {
+    if (product === 'slack') {
         email = 'slackboy@resolution.bot';
         password = 'SlackMeHard';
     }
     const handlePasswordAutoLogin = async () => {
-        const product = searchParams.get('product');
-        if (product === 'slack') {
-            email = 'slackboy@resolution.bot';
-            password = 'SlackMeHard';
-        }
         if (email === "") {
             publish({
                 variant: "danger",
