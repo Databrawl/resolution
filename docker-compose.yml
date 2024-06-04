@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  client:
+    image: resolution-client
+    pull_policy: never
+    env_file:
+      - .env.local
+    build:
+      context: client
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_ENV=local
+        - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        - NEXT_PUBLIC_CMS_URL=${NEXT_PUBLIC_CMS_URL}
+        - NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
+        - NEXT_PUBLIC_AUTH_MODES=${NEXT_PUBLIC_AUTH_MODES}
+    container_name: web
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - 3000:3000
+
+  api:
+    image: resolution-api
+    pull_policy: never
+    env_file:
+      - .env.local
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+#    healthcheck:
+#      test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
+    command:
+      - "uvicorn"
+      - "main:app"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "5050"
+      - "--workers"
+      - "6"
+    restart: always
+    volumes:
+      - ./backend/:/code/
+    ports:
+      - 5050:5050
+
+#networks:
+#  quivr-network:
+#    driver: bridge
