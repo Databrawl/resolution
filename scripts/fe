@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Check if an argument is provided
+if [ $# -eq 0 ]; then
+  echo "No environment specified, defaulting to 'prod'"
+  ENV="prod"
+else
+  ENV=$1
+fi
+
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+cd "$PARENT_DIR" || exit
+
+set -a
+source .env.$ENV
+set +a
+cd client
+yarn dev
