@@ -12,9 +12,22 @@ export const usePasswordAutoLogin = (product: string) => {
     let email = '';
     let password = '';
 
-    if (product === 'slack') {
+    switch (product) {
+        case 'slack':
         email = 'slackboy@resolution.bot';
         password = 'SlackMeHard';
+            break;
+        case 'notion':
+            email = 'notionhero@resolution.bot';
+            password = 'NoteMeDown';
+            break;
+        case 'github':
+            email = 'gitmaster@resolution.bot';
+            password = 'RebaseAllTheWay';
+            break;
+        default:
+            // Handle the case where product doesn't match any case
+            break;
     }
     const handlePasswordAutoLogin = async () => {
         if (email === "") {
