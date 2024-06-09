@@ -149,8 +149,9 @@ class AppSettings(BaseSettings):
     SUPABASE_KEY: str
 
     # Analytics
-    LANGCHAIN_WANDB_TRACING: bool = False
-    WANDB_PROJECT: str = "guardian"
+    LANGCHAIN_API_KEY: str = None
+    LANGCHAIN_TRACING_V2: bool = True
+    LANGCHAIN_PROJECT: str = None
 
     # OpenAI
     OPENAI_API_KEY: str
