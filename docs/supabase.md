@@ -15,3 +15,18 @@
    ```bash
    npx supabase@beta db push --db-url postgresql://postgres.khbybtymvfmhdakalayr:oNGhdBRtaaOUEHfe@aws-0-us-east-1.pooler.supabase.com:5432
    ```
+
+
+## Clone data from the remote database
+
+1. Pull the schema (to make sure it's the same)
+
+    ```bash
+    supabase db pull
+   ```
+
+2. Clone the data
+
+    ```bash
+    scripts/dump_data.sh
+    ```

@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Check if an argument is provided
+if [ $# -eq 0 ]; then
+  echo "No environment specified, defaulting to 'prod'"
+  ENV="prod"
+else
+  ENV=$1
+fi
+
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+cd "$PARENT_DIR" || exit
+
+set -a
+source .env.$ENV
+set +a
+
+
+echo "Dumping the DB:" $SQLALCHEMY_DATABASE_URI
+
+#supabase db dump --db-url "$SQLALCHEMY_DATABASE_URI" --data-only -f supabase_data.dump
+#pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST -d $POSTGRES_DB -Fc > postgres_data.dump
+#pg_dump postgresql://postgres.khbybtymvfmhdakalayr:oNGhdBRtaaOUEHfe@aws-0-us-east-1.pooler.supabase.com:5432/postgres -Fc --data-only -n public -n auth > postgres_data_only-public-auth.dump
+#pg_dump postgresql://postgres.khbybtymvfmhdakalayr:oNGhdBRtaaOUEHfe@aws-0-us-east-1.pooler.supabase.com:5432/postgres -Fc --data-only -n public -n auth > postgres_data_only-public-auth.dump
+pg_dump $SQLALCHEMY_DATABASE_URI -Fc --data-only -n public -n auth > data/dumps/postgres_data_latest.dump
+
+set -a
+source .env.local
+set +a
+
+echo "Restoring the dump to the DB:" $SQLALCHEMY_DATABASE_URI
+pg_restore $SQLALCHEMY_DATABASE_URI < data/dumps/postgres_data_latest.dump
+# https://www.youtube.com/watch?v=_iVKjnlQf00&ab_channel=SimpleBackups

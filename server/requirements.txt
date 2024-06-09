@@ -2,17 +2,17 @@ alembic==1.13.1
 requests==2.31.0
 
 # Langchain tooling
-langchain==0.2.0
-langchain-community==0.2.0
-langchain-core==0.2.0
+langchain==0.2.3
+langchain-community==0.2.4
+langchain-core==0.2.5
 langchain-openai==0.1.7
-langchain-text-splitters==0.2.0
+langchain-text-splitters==0.2.1
 langdetect==1.0.9
-langsmith==0.1.60
+langsmith==0.1.75
 
 # Web
 Flask==3.0.3
-Flask-Cors==4.0.0
+Flask-Cors==4.0.1
 Flask-SQLAlchemy==3.1.1
 
 llama-index==0.10.28
@@ -23,14 +23,13 @@ pydantic==2.5.3
 pydantic-settings==2.1.0
 email-validator==2.1.0.post1
 supabase==2.3.0
-SQLAlchemy==2.0.29
+SQLAlchemy==2.0.30
 pgvector==0.2.4
 structlog==23.2.0
 pytz==2023.3.post1
 resend==0.6.0
 psycopg2-binary==2.9.9
 jose==1.0.0
-chalice==1.30.0
 openai==1.30.0
 python-rapidjson==1.14
 ultimate-sitemap-parser==0.5

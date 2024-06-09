@@ -40,6 +40,13 @@ def call_manager(memory: ConversationBufferWindowMemory) -> AgentExecutor:
     Call your best man: Customer Support Manager. He knows how to resolve any issue, and find the proper solution to any
     problem with the help of his crew.
     """
+    # TODO: need to wrap this in LangSmith client to enable logging
+    # import openai
+    # from langsmith.wrappers import wrap_openai
+    # client = wrap_openai(openai.Client(api_key=app_settings.OPENAI_API_KEY))
+    #   client = wrap_openai(openai.Client())
+    # llm = client.chat.completions.create(temperature=0, model=app_settings.GPT_4)
+
     llm = ChatOpenAI(temperature=0,
                      model=app_settings.GPT_4,
                      openai_api_key=app_settings.OPENAI_API_KEY)
