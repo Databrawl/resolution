@@ -26,7 +26,7 @@ const Main = (): JSX.Element => {
     });
     const {t} = useTranslation(["translation", "login"]);
 
-    const product = searchParams.get('product');
+    const product = searchParams?.get('product');
     if (product != null) {
         return <SupaLogin product={product}/>;
     }
