@@ -31,5 +31,5 @@ source .env.local
 set +a
 
 echo "Restoring the dump to the DB:" $SQLALCHEMY_DATABASE_URI
-pg_restore $SQLALCHEMY_DATABASE_URI < data/dumps/postgres_data_latest.dump
+pg_restore -d $SQLALCHEMY_DATABASE_URI data/dumps/postgres_data_latest.dump
 # https://www.youtube.com/watch?v=_iVKjnlQf00&ab_channel=SimpleBackups
