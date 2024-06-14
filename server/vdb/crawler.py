@@ -174,24 +174,29 @@ class WebCrawler(BaseReader):
         self.website_extractor = website_extractor or DEFAULT_WEBSITE_EXTRACTOR
         self.depth = depth
         self.scanned_urls = set()
+        self.ignored_url = None
 
     def load_data(
             self,
             urls: List[str],
             custom_hostname: Optional[str] = None,
+            ignored_url: Optional[str] = None,
             include_url_in_text: Optional[bool] = True,
     ) -> List[Document]:
         """Load data from the urls.
 
         Args:
             urls (List[str]): List of URLs to scrape.
-            custom_hostname (Optional[str]): Force a certain hostname in the case
+            custom_hostname (Optional[str]): Force a certain hostname in case
                 a website is displayed under custom URLs (e.g. Substack blogs)
+            ignored_url (Optional[str]): URL pattern to ignore.
             include_url_in_text (Optional[bool]): Include the reference url in the text of the document
 
         Returns:
             List[Document]: List of documents.
         """
+        if ignored_url:
+            self.ignored_url = ignored_url
         documents = []
         extended_urls = self._add_sitemaps(urls)
         for url in extended_urls:
@@ -224,6 +229,8 @@ class WebCrawler(BaseReader):
         for link in links:
             sub_url = urljoin(url, urlparse(link['href']).path)
             if hostname == urlparse(sub_url).hostname and sub_url not in self.scanned_urls:
+                if self.ignored_url and self.ignored_url in sub_url:
+                    continue
                 # only crawl if we are on the same domain
                 sub_documents = self._crawl_url(
                     sub_url,

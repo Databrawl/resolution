@@ -30,7 +30,7 @@ def with_app_context(f):
 
 
 @with_app_context
-def main(mode: str, org: Org, query: str, store_files: str, crawl_depth: int) -> None:
+def main(mode: str, org: Org, query: str, store_files: str, crawl_depth: int, ignored_url: str) -> None:
     try:
         org = db.session.execute(select(Org).where(Org.name == org)).scalar_one()
     except exc.NoResultFound:
@@ -47,7 +47,7 @@ def main(mode: str, org: Org, query: str, store_files: str, crawl_depth: int) ->
             db.session.commit()
         else:
             # no query provided, let's store the documents
-            archive_urls(app_settings.KNOWLEDGE_URLS.split(','), crawl_depth)
+            archive_urls(app_settings.KNOWLEDGE_URLS.split(','), crawl_depth, ignored_url)
             db.session.commit()
     elif mode == "librarian":
         while True:
@@ -82,12 +82,12 @@ if __name__ == "__main__":
     parser.add_argument('mode', type=str,
                         help='Application operation mode. One of: "vdb", "librarian", "chat"')
     parser.add_argument('org', type=str, help='The Organization name')
-    parser.add_argument('--query', type=str, help='Vector Database query string',
-                        default=None)
+    parser.add_argument('--query', type=str, help='Vector Database query string', default=None)
     parser.add_argument('--store_files', action='store_true', help='Whether to upload files to the database')
     parser.add_argument('--crawl_depth', type=int,
                         help='Depth of crawl of the URLs, default is 0 - no crawling, just scrape the given URLs',
                         default=0)
+    parser.add_argument('--ignored_url', type=str, help='URL pattern to ignore', default=None)
     args = parser.parse_args()
 
-    main(args.mode, args.org, args.query, args.store_files, args.crawl_depth)
+    main(args.mode, args.org, args.query, args.store_files, args.crawl_depth, args.ignored_url)

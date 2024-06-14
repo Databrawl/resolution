@@ -1,7 +1,7 @@
 import logging
 import os
 from functools import reduce
-from typing import Sequence
+from typing import Sequence, Optional
 from typing import Union
 
 from llama_index.core.service_context import ServiceContext
@@ -61,20 +61,21 @@ def _get_index() -> VectorStoreIndex:
     )
 
 
-def archive_urls(urls: Union[str, list[str]], depth: int = 0) -> None:
+def archive_urls(urls: Union[str, list[str]], depth: int = 0, ignored_url: Optional[str] = None) -> None:
     """
     Scrape provided URLs and archive the text content. If depth provided, act as a crawler and
     scrape all links to a given depth.
 
     :param urls: single URL or a list of URLs divided by commas
     :param depth: integer representing the depth of the crawler, None if no crawling is required
+    :param ignored_url: URL representing the pattern to ignore
     :return:
     """
     if isinstance(urls, str):
         urls = [urls]
 
     loader = WebCrawler(depth=depth)
-    documents = loader.load_data(urls=urls)
+    documents = loader.load_data(urls=urls, ignored_url=ignored_url)
     logger.info(f"Loaded {len(documents)} documents from {len(urls)} URLs.")
     for document in documents:
         document.text = _clean(document.text)
