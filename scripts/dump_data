@@ -17,7 +17,6 @@ set -a
 source .env.$ENV
 set +a
 
-
 echo "Dumping the DB:" $SQLALCHEMY_DATABASE_URI
 
 #supabase db dump --db-url "$SQLALCHEMY_DATABASE_URI" --data-only -f supabase_data.dump
@@ -29,6 +28,9 @@ pg_dump $SQLALCHEMY_DATABASE_URI -Fc --data-only -n public -n auth > data/dumps/
 set -a
 source .env.local
 set +a
+
+echo "Dropping local DB"
+supabase db reset
 
 echo "Restoring the dump to the DB:" $SQLALCHEMY_DATABASE_URI
 pg_restore -d $SQLALCHEMY_DATABASE_URI data/dumps/postgres_data_latest.dump
