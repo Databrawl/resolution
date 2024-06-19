@@ -25,6 +25,10 @@ export const usePasswordAutoLogin = (product: string) => {
             email = 'gitmaster@resolution.bot';
             password = 'RebaseAllTheWay';
             break;
+        case 'resolution':
+            email = 'reso@resolution.bot';
+            password = 'Reso1sTheBest';
+            break;
         default:
             // Handle the case where product doesn't match any case
             break;
