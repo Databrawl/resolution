@@ -25,13 +25,13 @@ export const PasswordLogin = (): JSX.Element => {
                 {...register("password", {required: true})}
                 placeholder={t("password", {ns: "login"})}
                 label={t("password", {ns: "login"})}
-                inputClassName="py-1 mt-1 mb-3"
+                inputClassName="py-1 mt-1 mb-3 text-slate-200"
                 type="password"
             />
             <Button
                 isLoading={watch("isPasswordSubmitting")}
                 variant="secondary"
-                className="py-2 font-normal w-full mb-1"
+                className="bg-primary hover:bg-primary-hover text-slate-200 py-2 font-normal w-full mb-1"
                 onClick={() => void handlePasswordLogin()}
             >
                 {t("login")}

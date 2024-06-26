@@ -62,7 +62,7 @@ class TestLoad:
 class TestSave:
     def test_existing_chat(self):
         chat = ChatFactory.create()
-        user_message = "Hello, dear REsolution team!"
+        user_message = "Hello, dear REsolution Bot!"
         ai_message = "Hey, how can I help you?"
 
         save(chat.id, user_message, ai_message)
@@ -74,7 +74,7 @@ class TestSave:
         assert messages[0].ai_message == ai_message
 
     def test_no_chat(self):
-        user_message = "Hello, dear REsolution team!"
+        user_message = "Hello, dear REsolution Bot!"
         ai_message = "Hey, how can I help you?"
 
         save(str(uuid4()), user_message, ai_message)

@@ -34,7 +34,7 @@ const Main = (): JSX.Element => {
                     {/*</Link>*/}
                     <p className="text-center text-4xl font-medium">
                         {/*{t("talk_to", {ns: "login"})}{" "}*/}
-                        <span className="text-primary">REsolution Team</span>
+                        <span className="text-primary">REsolution Bot</span>
                     </p>
                     <div className="mt-5 flex flex-col">
                         <FormProvider {...methods}>

@@ -44,7 +44,7 @@ class AppSettings(BaseSettings):
     """
     model_config = SettingsConfigDict(env_file=f'.env.{ENV}', extra='allow')
 
-    PROJECT_NAME: str = "REsolution Team"
+    PROJECT_NAME: str = "REsolution Bot"
     TESTING: bool = True
 
     SESSION_SECRET: str = "".join(

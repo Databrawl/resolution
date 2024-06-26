@@ -17,14 +17,14 @@ export const ChatInput = (): JSX.Element => {
         <>
             <OnboardingQuestions/>
             <div
-                className="flex mt-1 flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-2">
+                className="flex mt-1 flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-input-back border border-black/10 dark:border-white/25 p-2">
                 <form
                     data-testid="chat-input-form"
                     onSubmit={(e) => {
                         e.preventDefault();
                         submitQuestion();
                     }}
-                    className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
+                    className="sticky bottom-0 w-full flex items-center gap-2 z-20 p-2"
                 >
                     {/*Guardian: disable menu control button, as for now we don't have a menu*/}
                     {/*<MenuControlButton/>*/}
@@ -39,7 +39,7 @@ export const ChatInput = (): JSX.Element => {
 
                     <div className="flex flex-row items-center gap-4">
                         <Button
-                            className="px-3 py-2 sm:px-4 sm:py-2 bg-primary border-0"
+                            className="px-3 py-2 sm:px-4 sm:py-2 bg-primary border-0 hover:bg-primary-hover"
                             type="submit"
                             isLoading={generatingAnswer}
                             data-testid="submit-button"

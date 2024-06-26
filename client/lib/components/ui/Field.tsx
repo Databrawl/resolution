@@ -29,7 +29,7 @@ const Field = forwardRef(
         return (
             <fieldset className={cn("flex flex-col w-full", className)} name={name}>
                 {label !== undefined && (
-                    <label htmlFor={name} className="text-sm font-semibold mb-2">
+                    <label htmlFor={name} className="text-sm font-semibold mb-2 text-slate-200">
                         {label}
                         {required && <span>*</span>}
                     </label>
@@ -38,7 +38,7 @@ const Field = forwardRef(
                     <input
                         ref={forwardedRef as RefObject<HTMLInputElement>}
                         className={cn(
-                            `w-full bg-gray-50 dark:bg-gray-900 px-4 py-2 border rounded-md border-black/10 dark:border-white/25`,
+                            `w-full bg-gray-900 px-4 py-2 rounded-md`,
                             icon !== undefined ? "pr-12" : "",
                             inputClassName
                         )}

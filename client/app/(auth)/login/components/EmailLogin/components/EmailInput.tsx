@@ -24,7 +24,7 @@ export const EmailInput = (): JSX.Element => {
             })}
             placeholder={t("email", {ns: "login"})}
             label={t("email", {ns: "translation"})}
-            inputClassName="py-1 mt-1 mb-3"
+            inputClassName="py-1 mt-1 mb-3 text-slate-200"
         />
     );
 };

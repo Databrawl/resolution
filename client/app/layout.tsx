@@ -13,9 +13,9 @@ import "./globals.css";
 const inter = Outfit({subsets: ["latin"]});
 
 export const metadata = {
-    title: "REsolution Team Demo",
+    title: "REsolution Bot Demo",
     description:
-        "REsolution Team is an autonomous team of AI agents that resolves the Customer Support issues",
+        "REsolution Bot is an autonomous team of AI agents that resolves the Customer Support issues",
 };
 
 const RootLayout = async ({

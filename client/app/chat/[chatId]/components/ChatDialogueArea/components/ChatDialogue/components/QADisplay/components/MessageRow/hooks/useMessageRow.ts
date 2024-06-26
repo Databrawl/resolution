@@ -26,7 +26,7 @@ export const useMessageRow = ({speaker, text}: UseMessageRowProps) => {
     const containerClasses = cn(
         "py-3 px-5 w-fit",
         isUserSpeaker ? "bg-msg-gray" : "bg-msg-purple bg-opacity-80",
-        "dark:bg-gray-800 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
+        "dark:bg-slate-950 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
     );
 
     const containerWrapperClasses = cn(
@@ -34,9 +34,13 @@ export const useMessageRow = ({speaker, text}: UseMessageRowProps) => {
         isUserSpeaker ? "items-end" : "items-start"
     );
 
-    const markdownClasses = cn("prose", "dark:prose-invert", {
-        "text-slate-100": isUserSpeaker,
-    });
+    const markdownClasses = cn(
+        "prose",
+        "dark:prose-invert",
+        "prose-strong:text-slate-50",
+        "prose-code:text-slate-50",
+        "text-slate-200"
+    );
 
     return {
         isUserSpeaker,
