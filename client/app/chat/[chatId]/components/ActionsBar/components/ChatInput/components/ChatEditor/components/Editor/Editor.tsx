@@ -35,7 +35,7 @@ export const Editor = ({
 
     return (
         <EditorContent
-            className="w-full"
+            className="w-full text-slate-200"
             onKeyDown={submitOnEnter}
             editor={editor}
         />
